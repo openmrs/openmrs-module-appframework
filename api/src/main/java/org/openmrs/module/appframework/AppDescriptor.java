@@ -18,7 +18,32 @@ package org.openmrs.module.appframework;
  * Describes an "app", vaguely defined as something displayed in the UI as an icon and label, that can be
  * enabled per-user or per-group 
  */
-public class AppDescriptor {
+public interface AppDescriptor {
 
+	/**
+     * @return a unique id for this app
+     */
+    String getId();
+
+    /**
+     * @return the user-facing name for this app
+     */
+    String getLabel();
+    
+    /**
+     * @return the URL of an image to used for this app 
+     */
+    String getIconUrl();
+    
+    /**
+     * @return the URL of a tiny image, e.g. to represent this app in the corner of the header 
+     */
+    String getTinyIconUrl();
+    
+    /**
+     * Supports relative URLs against OpenMRS's context-path
+     * @return the URL of this app's homepage
+     */
+    String getHomepageUrl();
 	
 }

@@ -14,36 +14,52 @@
 package org.openmrs.module.appframework;
 
 
-import org.apache.commons.logging.Log; 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.appframework.api.AppFrameworkService;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
  */
-public class AppFrameworkActivator implements ModuleActivator {
+public class AppFrameworkActivator extends BaseModuleActivator implements ModuleActivator {
 	
 	protected Log log = LogFactory.getLog(getClass());
 		
 	/**
-	 * @see ModuleActivator#willRefreshContext()
-	 */
-	public void willRefreshContext() {
-		log.info("Refreshing App Framework Module");
-	}
-	
-	/**
 	 * @see ModuleActivator#contextRefreshed()
+	 * @should set all available apps on {@link AppFrameworkService}
 	 */
 	public void contextRefreshed() {
-		log.info("App Framework Module refreshed");
-	}
-	
-	/**
-	 * @see ModuleActivator#willStart()
-	 */
-	public void willStart() {
-		log.info("Starting App Framework Module");
+		List<AppDescriptor> apps = new ArrayList<AppDescriptor>();
+		apps.addAll(Context.getRegisteredComponents(AppDescriptor.class));
+
+		for (AppFactory factory : Context.getRegisteredComponents(AppFactory.class)) {
+			apps.addAll(factory.getAppDescriptors());
+		}
+		
+		Set<String> ids = new HashSet<String>();
+		for (AppDescriptor app : apps) {
+			if (ids.contains(app.getId()))
+				log.warn("Found multiple apps with id: " + app.getId());
+			else
+				ids.add(app.getId());
+		}
+		
+		Context.getService(AppFrameworkService.class).setAllApps(apps);
+		
+		log.info("App Framework Module refreshed: " + apps.size() + " apps available");
+		if (log.isDebugEnabled()) {
+			for (AppDescriptor app : apps)
+				log.debug(app.getLabel() + " (" + app.getId() + ")");
+		}
 	}
 	
 	/**
@@ -51,13 +67,6 @@ public class AppFrameworkActivator implements ModuleActivator {
 	 */
 	public void started() {
 		log.info("App Framework Module started");
-	}
-	
-	/**
-	 * @see ModuleActivator#willStop()
-	 */
-	public void willStop() {
-		log.info("Stopping App Framework Module");
 	}
 	
 	/**

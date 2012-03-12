@@ -13,11 +13,15 @@
  */
 package org.openmrs.module.appframework.api.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.appframework.AppDescriptor;
 import org.openmrs.module.appframework.AppEnabled;
 import org.openmrs.module.appframework.api.AppFrameworkService;
 import org.openmrs.module.appframework.api.db.AppEnabledDAO;
@@ -30,6 +34,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
 	private AppEnabledDAO appEnabledDao;
+	
+	private List<AppDescriptor> allApps = new ArrayList<AppDescriptor>();
 
     /**
      * @return the appEnabledDao
@@ -83,6 +89,34 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     	AppEnabled e = appEnabledDao.getByRoleAndApp(role, appName);
     	if (e != null)
     		appEnabledDao.delete(new AppEnabled(role, appName));
+    }
+
+	
+    /**
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#getAllApps()
+     */
+    @Override
+    public List<AppDescriptor> getAllApps() {
+    	return allApps;
+    }
+
+    /**
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#setAllApps(java.util.List)
+     */
+    @Override
+    public void setAllApps(List<AppDescriptor> allApps) {
+    	this.allApps = allApps;
+    }
+    
+    /**
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#getAppById(java.lang.String)
+     */
+    @Override
+    public AppDescriptor getAppById(String id) {
+        for (AppDescriptor app : allApps)
+        	if (app.getId().equals(id))
+        		return app;
+        return null;
     }
 	
 }
