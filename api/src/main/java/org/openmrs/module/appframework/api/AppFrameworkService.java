@@ -13,8 +13,9 @@
  */
 package org.openmrs.module.appframework.api;
 
+import org.openmrs.Role;
+import org.openmrs.User;
 import org.openmrs.api.OpenmrsService;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.
@@ -26,11 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  * @see org.openmrs.api.context.Context
  */
-@Transactional
 public interface AppFrameworkService extends OpenmrsService {
-     
-	/*
-	 * Add service methods here
-	 * 
-	 */
+
+	public void enableAppForUser(String appName, User user);
+
+	public void disableAppForUser(String appName, User user);
+	
+	public void enableAppForRole(String appName, Role role);
+	
+	public void disableAppForRole(String appName, Role role);
+	
 }

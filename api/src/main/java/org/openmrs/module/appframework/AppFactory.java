@@ -13,12 +13,14 @@
  */
 package org.openmrs.module.appframework;
 
+import java.util.List;
+
 
 /**
- * Describes an "app", vaguely defined as something displayed in the UI as an icon and label, that can be
- * enabled per-user or per-group 
+ * Implementations of this interface can produce multiple {@link AppDescriptor}s.
  */
-public class AppDescriptor {
-
+public interface AppFactory {
+	
+	List<AppDescriptor> getAppDescriptors();
 	
 }

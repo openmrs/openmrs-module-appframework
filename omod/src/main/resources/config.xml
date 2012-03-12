@@ -15,26 +15,13 @@
 	<require_version>${openMRSVersion}</require_version>
 	<!-- / Module Properties -->
 
-	
-	<!-- Required Modules -->
-	<require_modules>
-																
-		<require_module version="">
-			org.openmrs.module.uiframework
-		</require_module>
-			
-	</require_modules>
-	<!-- / Required Modules -->
-	
 	<!-- Module Activator -->
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.AppFrameworkActivator</activator>
 	
 	
-	<!-- Maps hibernate file's, if present -->
+	<!-- Maps hibernate files, if present -->
 	<mappingFiles>
-				
-		AppDescriptor.hbm.xml
-				
+		AppEnabled.hbm.xml
 	</mappingFiles>
 
 	<!-- Internationalization -->
@@ -42,14 +29,6 @@
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>
-	</messages>
-	<messages>
-		<lang>fr</lang>
-		<file>messages_fr.properties</file>
-	</messages>
-	<messages>
-		<lang>es</lang>
-		<file>messages_es.properties</file>
 	</messages>
 	<!-- /Internationalization -->
 

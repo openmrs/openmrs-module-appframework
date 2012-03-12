@@ -17,10 +17,12 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<!-- Add here beans related to the API context -->
+	<bean id="appEnabledDao" class="${project.parent.groupId}.${project.parent.artifactId}.api.db.hibernate.HibernateAppEnabledDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
 
-	
-	<!-- Services accessible via Context.getService() -->
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
@@ -32,12 +34,8 @@
 					</property>
 					<property name="target">
 						<bean class="${project.parent.groupId}.${project.parent.artifactId}.api.impl.AppFrameworkServiceImpl">
-							<property name="dao">
-								<bean class="${project.parent.groupId}.${project.parent.artifactId}.api.db.hibernate.HibernateAppFrameworkDAO">
-									<property name="sessionFactory">
-										<ref bean="sessionFactory" />
-									</property>
-								</bean>
+							<property name="appEnabledDao">
+								<ref local="appEnabledDao"/>
 							</property>
 						</bean>
 					</property>

@@ -13,14 +13,24 @@
  */
 package org.openmrs.module.appframework.api.db;
 
-import org.openmrs.module.appframework.api.AppFrameworkService;
+import java.util.List;
+
 
 /**
- *  Database methods for {@link AppFrameworkService}.
+ * Standard conventions for a DAO that manages a single class of type T 
  */
-public interface AppFrameworkDAO {
+public interface SingleClassDAO<T> {
+
+	T getById(Integer id);
 	
-	/*
-	 * Add DAO methods here
-	 */
+	List<T> getAll();
+	
+	T saveOrUpdate(T object);
+	
+	T create(T object);
+	
+	T update(T object);
+	
+	void delete(T object);
+
 }

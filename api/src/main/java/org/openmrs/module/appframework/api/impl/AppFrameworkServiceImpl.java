@@ -13,11 +13,14 @@
  */
 package org.openmrs.module.appframework.api.impl;
 
+import org.openmrs.Role;
+import org.openmrs.User;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.appframework.AppEnabled;
 import org.openmrs.module.appframework.api.AppFrameworkService;
-import org.openmrs.module.appframework.api.db.AppFrameworkDAO;
+import org.openmrs.module.appframework.api.db.AppEnabledDAO;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -26,19 +29,60 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
-	private AppFrameworkDAO dao;
-	
-	/**
-     * @param dao the dao to set
+	private AppEnabledDAO appEnabledDao;
+
+    /**
+     * @return the appEnabledDao
      */
-    public void setDao(AppFrameworkDAO dao) {
-	    this.dao = dao;
+    public AppEnabledDAO getAppEnabledDao() {
+    	return appEnabledDao;
+    }
+
+    /**
+     * @param appEnabledDao the appEnabledDao to set
+     */
+    public void setAppEnabledDao(AppEnabledDAO appEnabledDao) {
+    	this.appEnabledDao = appEnabledDao;
     }
     
     /**
-     * @return the dao
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#enableAppForUser(java.lang.String, org.openmrs.User)
      */
-    public AppFrameworkDAO getDao() {
-	    return dao;
+    @Override
+    public void enableAppForUser(String appName, User user) {
+    	AppEnabled e = appEnabledDao.getByUserAndApp(user, appName);
+    	if (e == null)
+    		appEnabledDao.create(new AppEnabled(user, appName));
     }
+    
+    /**
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#disableAppForUser(java.lang.String, org.openmrs.User)
+     */
+    @Override
+    public void disableAppForUser(String appName, User user) {
+    	AppEnabled e = appEnabledDao.getByUserAndApp(user, appName);
+    	if (e != null)
+    		appEnabledDao.delete(e);
+    }
+    
+    /**
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#enableAppForRole(java.lang.String, org.openmrs.Role)
+     */
+    @Override
+    public void enableAppForRole(String appName, Role role) {
+    	AppEnabled e = appEnabledDao.getByRoleAndApp(role, appName);
+    	if (e == null)
+    		appEnabledDao.create(new AppEnabled(role, appName));
+    }
+    
+    /**
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#disableAppForRole(java.lang.String, org.openmrs.Role)
+     */
+    @Override
+    public void disableAppForRole(String appName, Role role) {
+    	AppEnabled e = appEnabledDao.getByRoleAndApp(role, appName);
+    	if (e != null)
+    		appEnabledDao.delete(new AppEnabled(role, appName));
+    }
+	
 }
