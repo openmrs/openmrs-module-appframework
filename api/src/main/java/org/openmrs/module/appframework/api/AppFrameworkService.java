@@ -19,6 +19,7 @@ import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.appframework.AppDescriptor;
+import org.openmrs.module.appframework.AppEnabled;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.
@@ -39,7 +40,7 @@ public interface AppFrameworkService extends OpenmrsService {
 	public void enableAppForRole(String appName, Role role);
 	
 	public void disableAppForRole(String appName, Role role);
-
+	
 	/**
      * Sets the complete list of apps available.
      * 
@@ -60,4 +61,11 @@ public interface AppFrameworkService extends OpenmrsService {
      * @return the app with the given unique id
      */
     public AppDescriptor getAppById(String id);
+
+    /**
+     * @param user
+     * @return all apps that are enabled for the given user
+     */
+    public List<AppDescriptor> getAppsForUser(User user);
+    
 }

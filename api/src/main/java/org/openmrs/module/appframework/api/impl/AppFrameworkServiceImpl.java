@@ -14,8 +14,12 @@
 package org.openmrs.module.appframework.api.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Role;
@@ -118,5 +122,19 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         		return app;
         return null;
     }
-	
+
+    /**
+     * @see org.openmrs.module.appframework.api.AppFrameworkService#getAppsForUser(org.openmrs.User)
+     */
+    @Override
+    public List<AppDescriptor> getAppsForUser(User user) {
+        Set<String> enabledIds = new HashSet<String>(appEnabledDao.getEnabledAppsForUser(user));
+        List<AppDescriptor> ret = new ArrayList<AppDescriptor>();
+        for (AppDescriptor app : getAllApps()) {
+        	if (enabledIds.contains(app.getIconUrl()))
+        		ret.add(app);
+        }
+        return ret;
+    }
+    
 }

@@ -19,8 +19,36 @@
   		    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+  		    
+  	<!-- This is for the OpenMRS 1.x web application -->
 
-	<!-- Add here beans related to the web context -->
-
+	<bean id="appFrameworkUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+    	 <property name="order"><value>98</value></property> 
+    	<property name="mappings">
+            <props>
+				<prop key="**/appFrameworkHomepage.portlet">appFrameworkHompeagePortletController</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="appFrameworkHompeagePortletController" class="org.openmrs.module.appframework.web1x.AppFrameworkHomepagePortletController" />
+	
+	<bean id="legacyOpenmrsApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
+		<property name="id" value="legacy.openmrs"/>
+		<property name="label" value="OpenMRS (Legacy)"/>
+		<property name="homepageUrl" value="findPatient.htm"/>
+		<property name="iconUrl" value="images/openmrs_logo_white.gif"/>
+	</bean>
+	
+	<bean id="legacyAdminApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
+		<property name="id" value="legacy.admin"/>
+		<property name="label" value="Administration"/>
+		<property name="homepageUrl" value="admin/index.htm"/>
+	</bean>
+	
+	<bean id="googleApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
+		<property name="id" value="google"/>
+		<property name="label" value="Google Search"/>
+		<property name="homepageUrl" value="http://google.com"/>
+	</bean>
 		
 </beans>

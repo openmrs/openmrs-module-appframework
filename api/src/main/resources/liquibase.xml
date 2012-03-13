@@ -22,7 +22,7 @@
 			<column name="uuid" type="char(38)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="app_name" type="varchar(100)"
+			<column name="app_name" type="varchar(100)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="user" type="int(11)"/>
