@@ -15,6 +15,14 @@
 	<require_version>${openMRSVersion}</require_version>
 	<!-- / Module Properties -->
 
+	<!-- Required Modules -->
+	<require_modules>
+		<require_module>
+			org.openmrs.module.uiframework
+		</require_module>
+	</require_modules>
+	<!-- / Required Modules -->
+
 	<!-- Module Activator -->
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.AppFrameworkActivator</activator>
 

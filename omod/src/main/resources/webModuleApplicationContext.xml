@@ -20,7 +20,7 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
   		    
-  	<!-- This is for the OpenMRS 1.x web application -->
+  	<!-- This file is only used in the OpenMRS 1.x web application -->
 
 	<bean id="appFrameworkUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
     	 <property name="order"><value>98</value></property> 
@@ -45,10 +45,23 @@
 		<property name="homepageUrl" value="admin/index.htm"/>
 	</bean>
 	
-	<bean id="googleApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
-		<property name="id" value="google"/>
-		<property name="label" value="Google Search"/>
-		<property name="homepageUrl" value="http://google.com"/>
+	<bean id="configureMetadataApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
+		<property name="id" value="manageMetadata"/>
+		<property name="label" value="Manage Metadata"/>
+		<property name="homepageUrl" value="pages/manageMetadata.page"/>
+		<property name="iconUrl" value="moduleResources/uiframework/images/application32.png"/>
+	</bean>
+	
+	<!--
+	<bean id="systemAdministrationApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
+		<property name="id" value="systemAdministration"/>
+		<property name="label" value="System Administration"/>
+		<property name="homepageUrl" value="pages/systemAdministration.page"/>
+	</bean>
+	-->
+		
+	<bean class="org.openmrs.ui.framework.StandardModuleUiConfiguration">
+		<property name="moduleId" value="appframework"/>
 	</bean>
 		
 </beans>

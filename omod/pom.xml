@@ -20,6 +20,11 @@
 			<artifactId>appframework-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>uiframework-api</artifactId>
+		</dependency>
 
 		<!-- Begin OpenMRS core -->
 
