@@ -8,6 +8,7 @@
 <% ui.includeJavascript("jquery.toastmessage.js") %>
 <% ui.includeJavascript("pagebus/simple/pagebus.js") %>
 <% ui.includeJavascript("uiframework.js") %>
+${ ui.includeFragment("maybeRequireLogin") }
 <script>
     var jq = jQuery;
     

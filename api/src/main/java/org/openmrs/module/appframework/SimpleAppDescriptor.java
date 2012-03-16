@@ -114,5 +114,20 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public void setHomepageUrl(String homepageUrl) {
     	this.homepageUrl = homepageUrl;
     }
-		
+
+    /**
+     * @see org.openmrs.module.appframework.AppDescriptor#startApp(org.openmrs.module.appframework.AppStatus)
+     */
+    @Override
+    public void startApp(AppStatus status) {
+        // do nothing
+    }
+    
+    /**
+     * @see org.openmrs.module.appframework.AppDescriptor#endApp(org.openmrs.module.appframework.AppStatus)
+     */
+    @Override
+    public void endApp(AppStatus status) {
+        // do nothing
+    }
 }

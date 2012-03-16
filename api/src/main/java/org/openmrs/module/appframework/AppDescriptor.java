@@ -45,5 +45,20 @@ public interface AppDescriptor {
      * @return the URL of this app's homepage
      */
     String getHomepageUrl();
+    
+    /**
+     * Called when a new AppStatus is instantiated for this app.
+     * 
+     * @param status
+     */
+    void startApp(AppStatus status);
+    
+    /**
+     * Called when the user chooses to end this app. (The app lifecycle is not well defined at this point
+     * so you should avoid relying on this method being called to do resource cleanup.)
+     * 
+     * @param status
+     */
+    void endApp(AppStatus status);
 	
 }

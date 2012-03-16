@@ -52,7 +52,9 @@ public class AdminExtensionFactory implements ExtensionFactory, ExtensionPointFa
 		Map<String, Extension> ret = new LinkedHashMap<String, Extension>();
 		
 		ret.put("admin.manageMetadata.administerLocations", new LinkExtension("admin.manageMetadata", "Locations",
-	        "fragment:administerLocations", "globe_32.png", "Manage Locations"));
+	        "page:manageLocations", "globe_32.png", "Manage Locations"));
+		ret.put("admin.manageMetadata.administerEncounterTypes", new LinkExtension("admin.manageMetadata",
+	        "Encounter Types", "page:manageEncounterTypes", "clipboard_32.png", "Manage Encounter Types"));
 		
 		return ret;
 	}

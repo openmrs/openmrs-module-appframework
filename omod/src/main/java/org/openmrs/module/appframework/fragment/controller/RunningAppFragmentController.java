@@ -11,28 +11,20 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.appframework.fragment.controller.decorator;
+package org.openmrs.module.appframework.fragment.controller;
 
-import org.openmrs.api.context.Context;
-import org.openmrs.module.appframework.AppDescriptor;
-import org.openmrs.module.appframework.api.AppFrameworkService;
-import org.openmrs.ui.framework.fragment.FragmentConfiguration;
+import org.openmrs.module.appframework.AppUiUtil;
 import org.openmrs.ui.framework.fragment.FragmentModel;
+import org.openmrs.ui.framework.session.Session;
 
 
 /**
- *
+ * Controller for the fragment that shows which app is currently running
  */
 public class RunningAppFragmentController {
 
-	public void controller(FragmentConfiguration config, FragmentModel model) {
-		String appId = (String) config.getAttribute("appId");
-		if (appId != null) {
-			AppDescriptor app = Context.getService(AppFrameworkService.class).getAppById(appId);
-			model.addAttribute("app", app);
-		} else {
-			model.addAttribute("app", null);
-		}
+	public void controller(FragmentModel model, Session session) {
+		model.addAttribute("appStatus", AppUiUtil.getCurrentApp(session));
 	}
 	
 }

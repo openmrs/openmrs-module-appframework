@@ -1,13 +1,13 @@
-<%@ include file="/WEB-INF/template/include.jsp"%>
+<%@ include file="/WEB-INF/template/include.jsp" %>
 
-<%@ include file="/WEB-INF/template/headerMinimal.jsp"%>
+<%@ include file="/WEB-INF/template/headerMinimal.jsp" %>
 
 <style>
 	.app-button {
 		border: 1px black solid;
 		background-color: #e0e0e0;
-		padding: 1em;
-		margin: 1em;
+		padding: 0.3em;
+		margin: 0.5em;
 		float: left;
 		text-align: center;
 	}
@@ -21,7 +21,7 @@
 	<div class="app-button">
 		<a href="${ app.homepageUrl }">
 			<c:if test="${ not empty app.iconUrl }">
-				<img class="app-icon" src="${ app.iconUrl }"/><br/>
+				<img class="app-icon" src="${ app.iconUrl }" height="64"/><br/>
 			</c:if>
 			<span class="app-label">
 				${ app.label }
@@ -30,4 +30,4 @@
 	</div>
 </c:forEach>
 
-<%@ include file="/WEB-INF/template/footerMinimal.jsp"%>
+<%@ include file="/WEB-INF/template/footerMinimal.jsp" %>
