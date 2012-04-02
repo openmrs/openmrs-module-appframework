@@ -43,6 +43,7 @@
 		<property name="id" value="legacy.admin"/>
 		<property name="label" value="Administration"/>
 		<property name="homepageUrl" value="admin/index.htm"/>
+		<property name="iconUrl" value="moduleResources/uiframework/images/configure32.png"/>
 	</bean>
 	
 	<bean id="configureMetadataApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
