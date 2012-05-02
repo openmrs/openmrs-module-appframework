@@ -21,11 +21,12 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		
+		<!-- I think this is unnecessary to build from the command line, but my eclips project is complaining if I don't have it -->
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>uiframework-api</artifactId>
 		</dependency>
-
+		
 		<!-- Begin OpenMRS core -->
 
 		<dependency>

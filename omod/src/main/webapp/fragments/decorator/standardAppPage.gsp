@@ -1,5 +1,6 @@
-${ ui.includeFragment("standardIncludes") }
-${ ui.includeFragment("dialogSupport") }
+<%
+	ui.decorateWith("standardPage")
+%>
 
 ${ ui.includeFragment("runningApp") }
 
