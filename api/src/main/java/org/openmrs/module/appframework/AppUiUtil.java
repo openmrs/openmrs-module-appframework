@@ -82,5 +82,18 @@ public class AppUiUtil {
     		return null;
     	}
     }
+
+	/**
+     * If there is no currently-running app, then start the indicated one. Generally you should call
+     * this method from the controller of any page that usually belongs to one app, but can be accessed
+     * from other apps. 
+     * 
+     * @param appId
+     * @param session
+     */
+    public static void startAppIfNone(String appId, Session session) {
+	    if (getCurrentApp(session) == null)
+	    	startApp(appId, session);
+    }
 	
 }
