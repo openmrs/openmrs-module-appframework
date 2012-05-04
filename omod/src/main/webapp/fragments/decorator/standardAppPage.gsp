@@ -1,9 +1,5 @@
 <%
-	ui.decorateWith("standardPage")
+	ui.decorateWith("standardPage", [ beforeContent: ui.includeFragment("runningApp") ])
 %>
 
-${ ui.includeFragment("runningApp") }
-
-<div id="content">
-	<%= config.content %>
-</div>
+<%= config.content %>

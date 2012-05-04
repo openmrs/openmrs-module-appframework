@@ -17,22 +17,29 @@
 		#running-app-icon {
 			height: 1em;
 		}
+		#running-app-header a:link, #running-app-header a:visited {
+			color: white;
+			text-decoration: none;
+		}
+		#running-app-header a:hover {
+			text-decoration: underline;
+		}
 	</style>
 	
 	<div id="running-app-header">
 		<span id="running-app-home" style="float: left">
-			<a href="../index.htm">
+			<a href="/${ contextPath }/index.htm">
 				<img id="running-app-icon" src="${ ui.resourceLink("images/openmrs_logo_tiny.png") }"/>
 			</a>
 			&nbsp;&nbsp;
 			&#187;
 		</span>
-		<span id="running-app" style="float: left">
+		<a href="/${ contextPath }/${ appStatus.app.homepageUrl }" id="running-app" style="float: left">
 			<% if (appStatus?.app?.tinyIconUrl) { %>
 				<img src="${ appStatus.app.tinyIconUrl }"/>
 			<% } %>
 			<span id="running-app-label">${ appLabel }</span>
-		</span>
+		</a>
 		<span id="running-app-user" style="float: right">
 			${ context.authenticatedUser.personName }
 		</span>
