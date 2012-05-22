@@ -26,12 +26,13 @@
     	 <property name="order"><value>98</value></property> 
     	<property name="mappings">
             <props>
-				<prop key="**/appFrameworkHomepage.portlet">appFrameworkHompeagePortletController</prop>
+				<prop key="**/appFrameworkHomepage.portlet">appFrameworkHomepagePortletController</prop>
 			</props>
 		</property>
 	</bean>
-	<bean id="appFrameworkHompeagePortletController" class="org.openmrs.module.appframework.web1x.AppFrameworkHomepagePortletController" />
+	<bean id="appFrameworkHomepagePortletController" class="org.openmrs.module.appframework.web1x.AppFrameworkHomepagePortletController" />
 	
+	<!--
 	<bean id="legacyOpenmrsApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
 		<property name="id" value="legacy.openmrs"/>
 		<property name="label" value="OpenMRS (Legacy)"/>
@@ -45,6 +46,7 @@
 		<property name="homepageUrl" value="admin/index.htm"/>
 		<property name="iconUrl" value="moduleResources/uiframework/images/configure32.png"/>
 	</bean>
+	-->
 		
 	<bean class="org.openmrs.ui.framework.StandardModuleUiConfiguration">
 		<property name="moduleId" value="appframework"/>
