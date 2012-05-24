@@ -1,4 +1,7 @@
 <%
+	// supports doNotShowApp (default false, to just show a bar, and login info, but not the running app)
+	def showApp = config.doNotShowApp != true
+	
 	def running = appStatus != null;
 	def appLabel = running ? (appStatus?.app?.label ?: ui.message("appFramework.runningApp.unknownApp")) : null
 %>
@@ -31,17 +34,23 @@
 			<a href="/${ contextPath }/index.htm">
 				<img id="running-app-icon" src="${ ui.resourceLink("images/openmrs_logo_tiny.png") }"/>
 			</a>
-			&nbsp;&nbsp;
-			&#187;
-		</span>
-		<a href="/${ contextPath }/${ appStatus.app.homepageUrl }" id="running-app" style="float: left">
-			<% if (appStatus?.app?.tinyIconUrl) { %>
-				<img src="${ appStatus.app.tinyIconUrl }"/>
+			<% if (showApp) { %>
+				&nbsp;&nbsp;
+				&#187;
 			<% } %>
-			<span id="running-app-label">${ appLabel }</span>
-		</a>
+		</span>
+		<% if (showApp) { %>
+			<a href="/${ contextPath }/${ appStatus.app.homepageUrl }" id="running-app" style="float: left">
+				<% if (appStatus?.app?.tinyIconUrl) { %>
+					<img src="${ appStatus.app.tinyIconUrl }"/>
+				<% } %>
+				<span id="running-app-label">${ appLabel }</span>
+			</a>
+		<% } %>
 		<span id="running-app-user" style="float: right">
 			${ context.authenticatedUser.personName }
+			|
+			<a href="/${ contextPath }/logout">Log Out</a>
 		</span>
 		<span style="clear: both">&nbsp;</span>
 	</div>
