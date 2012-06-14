@@ -17,12 +17,6 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<bean id="appEnabledDao" class="${project.parent.groupId}.${project.parent.artifactId}.api.db.hibernate.HibernateAppEnabledDAO">
-		<property name="sessionFactory">
-			<ref bean="sessionFactory" />
-		</property>
-	</bean>
-
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
@@ -33,11 +27,7 @@
 						<ref bean="transactionManager" />
 					</property>
 					<property name="target">
-						<bean class="${project.parent.groupId}.${project.parent.artifactId}.api.impl.AppFrameworkServiceImpl">
-							<property name="appEnabledDao">
-								<ref local="appEnabledDao"/>
-							</property>
-						</bean>
+						<bean class="${project.parent.groupId}.${project.parent.artifactId}.api.impl.AppFrameworkServiceImpl"/>
 					</property>
 					<property name="preInterceptors">
 						<ref bean="serviceInterceptors" />

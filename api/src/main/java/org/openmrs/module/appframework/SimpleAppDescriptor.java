@@ -130,4 +130,12 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public void endApp(AppStatus status) {
         // do nothing
     }
+    
+    /**
+     * @see org.openmrs.module.appframework.AppDescriptor#getRequiredPrivilegeName()
+     */
+    @Override
+    public String getRequiredPrivilegeName() {
+        return "App: " + getId();
+    }
 }

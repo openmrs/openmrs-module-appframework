@@ -60,5 +60,11 @@ public interface AppDescriptor {
      * @param status
      */
     void endApp(AppStatus status);
-	
+
+    /**
+     * The App Framework module will automatically create this privilege if it doesn't already exist
+     * 
+     * @return the name of the privilege that is required for a user to see this app
+     */
+    String getRequiredPrivilegeName();
 }

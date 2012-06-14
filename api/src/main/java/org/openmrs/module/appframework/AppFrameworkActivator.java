@@ -36,8 +36,11 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
 	/**
 	 * @see ModuleActivator#contextRefreshed()
 	 * @should set all available apps on {@link AppFrameworkService}
+	 * @should create privileges for all available apps
 	 */
 	public void contextRefreshed() {
+		AppFrameworkService service = Context.getService(AppFrameworkService.class);
+		
 		List<AppDescriptor> apps = new ArrayList<AppDescriptor>();
 		apps.addAll(Context.getRegisteredComponents(AppDescriptor.class));
 
@@ -53,7 +56,10 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
 				ids.add(app.getId());
 		}
 		
-		Context.getService(AppFrameworkService.class).setAllApps(apps);
+		service.setAllApps(apps);
+		for (AppDescriptor app : apps) {
+			service.ensurePrivilegeExists(app);
+		}
 		
 		log.info("App Framework Module refreshed: " + apps.size() + " apps available");
 		if (log.isDebugEnabled()) {

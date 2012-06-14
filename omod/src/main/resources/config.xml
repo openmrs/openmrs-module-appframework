@@ -36,7 +36,6 @@
 	
 	<!-- Maps hibernate files, if present -->
 	<mappingFiles>
-		AppEnabled.hbm.xml
 	</mappingFiles>
 
 	<!-- Internationalization -->

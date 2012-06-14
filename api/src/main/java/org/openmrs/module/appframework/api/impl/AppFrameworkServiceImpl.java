@@ -14,21 +14,18 @@
 package org.openmrs.module.appframework.api.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Role;
+import org.openmrs.Privilege;
 import org.openmrs.User;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.AppDescriptor;
-import org.openmrs.module.appframework.AppEnabled;
 import org.openmrs.module.appframework.api.AppFrameworkService;
-import org.openmrs.module.appframework.api.db.AppEnabledDAO;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -37,64 +34,23 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
-	private AppEnabledDAO appEnabledDao;
-	
 	private List<AppDescriptor> allApps = new ArrayList<AppDescriptor>();
 
-    /**
-     * @return the appEnabledDao
-     */
-    public AppEnabledDAO getAppEnabledDao() {
-    	return appEnabledDao;
-    }
-
-    /**
-     * @param appEnabledDao the appEnabledDao to set
-     */
-    public void setAppEnabledDao(AppEnabledDAO appEnabledDao) {
-    	this.appEnabledDao = appEnabledDao;
-    }
-    
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#enableAppForUser(java.lang.String, org.openmrs.User)
-     */
-    @Override
-    public void enableAppForUser(String appName, User user) {
-    	AppEnabled e = appEnabledDao.getByUserAndApp(user, appName);
-    	if (e == null)
-    		appEnabledDao.create(new AppEnabled(user, appName));
-    }
-    
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#disableAppForUser(java.lang.String, org.openmrs.User)
-     */
-    @Override
-    public void disableAppForUser(String appName, User user) {
-    	AppEnabled e = appEnabledDao.getByUserAndApp(user, appName);
-    	if (e != null)
-    		appEnabledDao.delete(e);
-    }
-    
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#enableAppForRole(java.lang.String, org.openmrs.Role)
-     */
-    @Override
-    public void enableAppForRole(String appName, Role role) {
-    	AppEnabled e = appEnabledDao.getByRoleAndApp(role, appName);
-    	if (e == null)
-    		appEnabledDao.create(new AppEnabled(role, appName));
-    }
-    
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#disableAppForRole(java.lang.String, org.openmrs.Role)
-     */
-    @Override
-    public void disableAppForRole(String appName, Role role) {
-    	AppEnabled e = appEnabledDao.getByRoleAndApp(role, appName);
-    	if (e != null)
-    		appEnabledDao.delete(new AppEnabled(role, appName));
-    }
-
+	/**
+	 * @see org.openmrs.module.appframework.api.AppFrameworkService#ensurePrivilegeExists(org.openmrs.module.appframework.AppDescriptor)
+	 */
+	@Override
+	public Privilege ensurePrivilegeExists(AppDescriptor app) {
+	    String privName = app.getRequiredPrivilegeName();
+	    Privilege priv = Context.getUserService().getPrivilege(privName);
+	    if (priv == null) {
+	    	priv = new Privilege();
+	    	priv.setPrivilege(app.getRequiredPrivilegeName());
+	    	priv.setDescription("Run the " + app.getLabel() + " app");
+	    	Context.getUserService().savePrivilege(priv);
+	    }
+	    return priv;
+	}
 	
     /**
      * @see org.openmrs.module.appframework.api.AppFrameworkService#getAllApps()
@@ -128,13 +84,13 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
      */
     @Override
     public List<AppDescriptor> getAppsForUser(User user) {
-        Set<String> enabledIds = new HashSet<String>(appEnabledDao.getEnabledAppsForUser(user));
-        List<AppDescriptor> ret = new ArrayList<AppDescriptor>();
-        for (AppDescriptor app : getAllApps()) {
-        	if (enabledIds.contains(app.getIconUrl()))
-        		ret.add(app);
-        }
-        return ret;
+    	List<AppDescriptor> ret = new ArrayList<AppDescriptor>();
+    	for (AppDescriptor app : getAllApps()) {
+    		if (app.getRequiredPrivilegeName() == null || user.hasPrivilege(app.getRequiredPrivilegeName())) {
+    			ret.add(app);
+    		}
+    	}
+    	return ret;
     }
     
 }
