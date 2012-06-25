@@ -31,11 +31,13 @@
 	
 	<div id="running-app-header">
 		<span id="running-app-home" style="float: left">
-			<a href="/${ contextPath }/index.htm">
+			<a href="/${ contextPath }/index.htm?<% if (config.context) { %>${ config.context }<% } %>">
 				<img id="running-app-icon" src="${ ui.resourceLink("images/openmrs_logo_tiny.png") }"/>
+				&nbsp;
+				Home
 			</a>
 			<% if (showApp) { %>
-				&nbsp;&nbsp;
+				&nbsp;
 				&#187;
 			<% } %>
 		</span>
