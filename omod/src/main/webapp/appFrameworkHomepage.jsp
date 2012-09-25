@@ -58,11 +58,7 @@ function saveSortOrder() {
 </div>
 
 <div style="clear: both"/>
-<div style="height: 100%; vertical-align: bottom">
-TODO: put at bottom	
 <button id="editButton" onclick="enterEditSortOrderMode()">Edit</button>
 <button id="saveButton" onclick="saveSortOrder()" style="display:none">Save</button>
-</div>
-<div id="output"/>
 
 <%@ include file="/WEB-INF/template/footerMinimal.jsp" %>
