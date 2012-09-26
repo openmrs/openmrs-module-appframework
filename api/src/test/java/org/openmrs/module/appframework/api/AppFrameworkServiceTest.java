@@ -79,5 +79,47 @@ public class  AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
     	Assert.assertEquals(1, enabled.size());
     	Assert.assertEquals(enableThis, enabled.get(0));
     }
+    
+    
+    /**
+     * @see AppFrameworkService#getAppsForUser(User)
+     * @verifies get apps that a particular user has privileges for
+     */
+    @Test
+    public void getAppsForUser_shouldSortAppsAccordingToUserProperty() throws Exception {
+	    // setup test data
+    	UserService userService = Context.getUserService();
+    	User user = userService.getUser(502);
+    	Assert.assertNotNull(user);
+    	Assert.assertFalse(user.hasRole(RoleConstants.SUPERUSER));
+    	Assert.assertTrue(user.hasRole(RoleConstants.PROVIDER));
+    	
+    	Role provider = userService.getRole(RoleConstants.PROVIDER);
+    	Assert.assertNotNull(provider);
+
+    	// first check no apps are enabled
+    	List<AppDescriptor> enabled = service.getAppsForUser(user);
+    	Assert.assertEquals(0, enabled.size());
+
+    	// now enable one
+    	AppDescriptor enableThis = service.getAllApps().get(0);
+    	Privilege priv = service.ensurePrivilegeExists(enableThis);
+    	provider.addPrivilege(priv);
+    	// and another
+    	enableThis = service.getAllApps().get(1);
+    	priv = service.ensurePrivilegeExists(enableThis);
+    	provider.addPrivilege(priv);
+    	userService.saveRole(provider);
+    	
+    	// reverse the order in the sorting
+    	List<AppDescriptor> apps = service.getAppsForUser(user);
+    	String sortOrder = apps.get(1).getId() + "," + apps.get(0).getId();
+    	user.setUserProperty("app_sort_order", sortOrder);
+    	userService.saveUser(user, null);
+    	
+    	List<AppDescriptor> appsAfterSorting = service.getAppsForUser(user);
+    	Assert.assertEquals(apps.get(0).getId(), appsAfterSorting.get(1).getId());
+    	Assert.assertEquals(apps.get(1).getId(), appsAfterSorting.get(0).getId());
+    }
 	
 }
