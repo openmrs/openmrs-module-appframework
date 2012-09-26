@@ -14,7 +14,6 @@
 package org.openmrs.module.appframework.web1x;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +22,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppDescriptor;
-import org.openmrs.module.appframework.SimpleAppDescriptor;
 import org.openmrs.module.appframework.api.AppFrameworkService;
-import org.openmrs.web.WebConstants;
+import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.web.controller.PortletController;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 /**
  *
@@ -43,9 +41,31 @@ public class AppFrameworkHomepagePortletController extends PortletController {
 	 */
 	@Override
 	public ModelAndView handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		User currentUser = Context.getAuthenticatedUser();
+		
+		String[] appParam = req.getParameterValues("app[]");
+		if (appParam != null) {
+			StringBuilder data = new StringBuilder();
+			for (String app : appParam) {
+				data.append(app).append(",");
+			}
+			
+			// save the sort order to the user's properties
+			log.debug("order: " + data.toString());
+			currentUser.setUserProperty("app_sort_order", data.toString());
+			
+			try {
+				Context.addProxyPrivilege(PrivilegeConstants.EDIT_USERS);
+				Context.getUserService().saveUser(currentUser, null);
+			}
+			finally {
+				Context.removeProxyPrivilege(PrivilegeConstants.EDIT_USERS);
+			}
+		}
+		
 		AppFrameworkService service = Context.getService(AppFrameworkService.class);
 
-		List<AppDescriptor> apps = service.getAppsForUser(Context.getAuthenticatedUser());
+		List<AppDescriptor> apps = service.getAppsForUser(currentUser);
 		if (apps.size() == 0) {
 			// since I haven't implemented a UI for enabling apps yet, show all apps for testing:
 			apps.addAll(service.getAllApps());

@@ -14,9 +14,9 @@
 package org.openmrs.module.appframework.api.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +26,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.AppDescriptor;
 import org.openmrs.module.appframework.api.AppFrameworkService;
+import org.springframework.util.StringUtils;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -84,13 +85,36 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
      */
     @Override
     public List<AppDescriptor> getAppsForUser(User user) {
-    	List<AppDescriptor> ret = new ArrayList<AppDescriptor>();
+    	Map<String, AppDescriptor> appMap = new HashMap<String, AppDescriptor>();
     	for (AppDescriptor app : getAllApps()) {
     		if (app.getRequiredPrivilegeName() == null || user.hasPrivilege(app.getRequiredPrivilegeName())) {
-    			ret.add(app);
+    			appMap.put(app.getId(), app);
     		}
     	}
-    	return ret;
+    	
+    	// re-sort this list according to the "app_sort_order" user property
+    	String sortOrder = user.getUserProperty("app_sort_order");
+    	if (StringUtils.hasLength(sortOrder)) {
+    		List<AppDescriptor> ret = new ArrayList<AppDescriptor>();
+
+    		// loop over the sort order and add to new list in that order
+    		List<String> sortedIds = new ArrayList<String>();
+    		for (String id : sortOrder.split(",")) {
+    			AppDescriptor app = appMap.get(id);
+    			if (app != null) {
+    				ret.add(app);
+    				appMap.remove(id);
+    			}
+    		}
+    		
+    		// add all apps that weren't in the sort order for some reason
+    		ret.addAll(appMap.values());
+    		
+    		return ret;
+    	}
+    	else
+    		return new ArrayList<AppDescriptor>(appMap.values());
+    	
     }
     
 }
