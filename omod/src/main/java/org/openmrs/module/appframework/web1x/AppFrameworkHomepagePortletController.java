@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppDescriptor;
+import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.api.AppFrameworkService;
 import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.web.controller.PortletController;
@@ -52,7 +53,7 @@ public class AppFrameworkHomepagePortletController extends PortletController {
 			
 			// save the sort order to the user's properties
 			log.debug("order: " + data.toString());
-			currentUser.setUserProperty("app_sort_order", data.toString());
+			currentUser.setUserProperty(AppFrameworkConstants.APP_SORT_ORDER_USER_PROPERTY, data.toString());
 			
 			try {
 				Context.addProxyPrivilege(PrivilegeConstants.EDIT_USERS);

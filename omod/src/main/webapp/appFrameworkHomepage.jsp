@@ -50,7 +50,7 @@ function saveSortOrder() {
 				<img class="app-icon" src="${ app.iconUrl }" height="64"/><br/>
 			</c:if>
 			<span class="app-label">
-				${ app.label } - ${app.id}
+				${ app.label }
 			</span>
 		</a>
 	</div>

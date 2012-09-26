@@ -25,6 +25,7 @@ import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.AppDescriptor;
+import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.api.AppFrameworkService;
 import org.springframework.util.StringUtils;
 
@@ -32,7 +33,7 @@ import org.springframework.util.StringUtils;
  * It is a default implementation of {@link AppFrameworkService}.
  */
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
-	
+
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
 	private List<AppDescriptor> allApps = new ArrayList<AppDescriptor>();
@@ -92,8 +93,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     		}
     	}
     	
-    	// re-sort this list according to the "app_sort_order" user property
-    	String sortOrder = user.getUserProperty("app_sort_order");
+    	// re-sort this list according to user property
+    	String sortOrder = user.getUserProperty(AppFrameworkConstants.APP_SORT_ORDER_USER_PROPERTY);
     	if (StringUtils.hasLength(sortOrder)) {
     		List<AppDescriptor> ret = new ArrayList<AppDescriptor>();
 

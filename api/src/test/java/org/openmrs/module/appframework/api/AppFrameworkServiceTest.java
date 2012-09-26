@@ -27,6 +27,7 @@ import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppDescriptor;
 import org.openmrs.module.appframework.AppFrameworkActivator;
+import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.util.RoleConstants;
 
@@ -114,7 +115,7 @@ public class  AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
     	// reverse the order in the sorting
     	List<AppDescriptor> apps = service.getAppsForUser(user);
     	String sortOrder = apps.get(1).getId() + "," + apps.get(0).getId();
-    	user.setUserProperty("app_sort_order", sortOrder);
+    	user.setUserProperty(AppFrameworkConstants.APP_SORT_ORDER_USER_PROPERTY, sortOrder);
     	userService.saveUser(user, null);
     	
     	List<AppDescriptor> appsAfterSorting = service.getAppsForUser(user);
