@@ -13,13 +13,11 @@
  */
 package org.openmrs.module.appframework.api;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
 import org.openmrs.User;
@@ -28,11 +26,20 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppDescriptor;
 import org.openmrs.module.appframework.AppFrameworkActivator;
 import org.openmrs.module.appframework.AppFrameworkConstants;
+import org.openmrs.module.appframework.SimpleAppDescriptor;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.util.RoleConstants;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 /**
- * Tests {@link ${AppFrameworkService}}.
+ * Tests {@link AppFrameworkService}.
  */
 public class  AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
@@ -121,6 +128,53 @@ public class  AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
     	List<AppDescriptor> appsAfterSorting = service.getAppsForUser(user);
     	Assert.assertEquals(apps.get(0).getId(), appsAfterSorting.get(1).getId());
     	Assert.assertEquals(apps.get(1).getId(), appsAfterSorting.get(0).getId());
+    }
+
+    @Test
+    public void getAllAppsOrdered() throws Exception {
+        SimpleAppDescriptor firstApp = new SimpleAppDescriptor("4", "App1", 2);
+        SimpleAppDescriptor secondApp = new SimpleAppDescriptor("2", "App2", 8);
+        SimpleAppDescriptor thirdApp = new SimpleAppDescriptor("1", "App3", 10);
+        SimpleAppDescriptor fourthApp = new SimpleAppDescriptor("3", "App4", 13);
+        SimpleAppDescriptor fifthApp = new SimpleAppDescriptor("5", "App5");
+
+        List<AppDescriptor> apps = new ArrayList<AppDescriptor>();
+        apps.addAll(Arrays.asList(thirdApp, fifthApp, secondApp, fourthApp, firstApp));
+        service.setAllApps(apps);
+
+        List<AppDescriptor> orderedApps = service.getAllApps();
+
+        List<AppDescriptor> expectedApps = new ArrayList<AppDescriptor>();
+        expectedApps.addAll(Arrays.asList(firstApp, secondApp, thirdApp, fourthApp, fifthApp));
+        assertThat(orderedApps, is(expectedApps));
+    }
+
+    @Test
+    public void getAppsOrderedForAnUser() throws Exception {
+        User user = Mockito.mock(User.class);
+        Mockito.when(user.hasPrivilege(Mockito.argThat(new ArgumentMatcher<String>() {
+            @Override
+            public boolean matches(Object argument) {
+                String privilegedName = (String) argument;
+                return !privilegedName.matches("App: 2");
+            }
+        }))).thenReturn(true);
+
+        SimpleAppDescriptor firstApp = new SimpleAppDescriptor("4", "App1", 2);
+        SimpleAppDescriptor forbiddenApp = new SimpleAppDescriptor("2", "App2", 8);
+        SimpleAppDescriptor secondApp = new SimpleAppDescriptor("1", "App3", 10);
+        SimpleAppDescriptor thirdApp = new SimpleAppDescriptor("3", "App4", 13);
+        SimpleAppDescriptor fourthApp = new SimpleAppDescriptor("5", "App5");
+
+        List<AppDescriptor> apps = new ArrayList<AppDescriptor>();
+        apps.addAll(Arrays.asList(thirdApp, forbiddenApp, secondApp, fourthApp, firstApp));
+        service.setAllApps(apps);
+
+        List<AppDescriptor> orderedApps = service.getAppsForUser(user);
+
+        List<AppDescriptor> expectedApps = new ArrayList<AppDescriptor>();
+        expectedApps.addAll(Arrays.asList(firstApp, secondApp, thirdApp, fourthApp));
+        assertThat(orderedApps, is(expectedApps));
     }
 	
 }

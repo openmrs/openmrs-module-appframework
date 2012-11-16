@@ -13,10 +13,7 @@
  */
 package org.openmrs.module.appframework.api.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,6 +64,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
      */
     @Override
     public void setAllApps(List<AppDescriptor> allApps) {
+        Collections.sort(allApps, new AppDescriptorComparator());
     	this.allApps = allApps;
     }
     
@@ -86,7 +84,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
      */
     @Override
     public List<AppDescriptor> getAppsForUser(User user) {
-    	Map<String, AppDescriptor> appMap = new HashMap<String, AppDescriptor>();
+    	Map<String, AppDescriptor> appMap = new LinkedHashMap<String, AppDescriptor>();
     	for (AppDescriptor app : getAllApps()) {
     		if (app.getRequiredPrivilegeName() == null || user.hasPrivilege(app.getRequiredPrivilegeName())) {
     			appMap.put(app.getId(), app);
@@ -117,5 +115,22 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     		return new ArrayList<AppDescriptor>(appMap.values());
     	
     }
-    
+
+    private static class AppDescriptorComparator implements Comparator<AppDescriptor> {
+        @Override
+        public int compare(AppDescriptor appDescriptor, AppDescriptor appDescriptor1) {
+            Integer firstAppOrder = appDescriptor.getOrder();
+            Integer secondAppOrder = appDescriptor1.getOrder();
+            if(firstAppOrder == null) {
+                if(secondAppOrder == null) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            } else if(secondAppOrder == null) {
+                return -1;
+            }
+            return firstAppOrder.compareTo(secondAppOrder);
+        }
+    }
 }

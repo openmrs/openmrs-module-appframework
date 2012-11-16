@@ -29,42 +29,47 @@ public interface AppDescriptor {
      * @return the user-facing name for this app
      */
     String getLabel();
-    
+
     /**
-     * @return the URL of an image to used for this app 
+     * @return the URL of an image to used for this app
      */
     String getIconUrl();
-    
+
     /**
-     * @return the URL of a tiny image, e.g. to represent this app in the corner of the header 
+     * @return the URL of a tiny image, e.g. to represent this app in the corner of the header
      */
     String getTinyIconUrl();
-    
+
     /**
      * Supports relative URLs against OpenMRS's context-path
      * @return the URL of this app's homepage
      */
     String getHomepageUrl();
-    
+
+    Integer getOrder();
+
+    void setOrder(Integer order);
+
     /**
      * Called when a new AppStatus is instantiated for this app.
-     * 
+     *
      * @param status
      */
     void startApp(AppStatus status);
-    
+
     /**
      * Called when the user chooses to end this app. (The app lifecycle is not well defined at this point
      * so you should avoid relying on this method being called to do resource cleanup.)
-     * 
+     *
      * @param status
      */
     void endApp(AppStatus status);
 
     /**
      * The App Framework module will automatically create this privilege if it doesn't already exist
-     * 
+     *
      * @return the name of the privilege that is required for a user to see this app
      */
     String getRequiredPrivilegeName();
+
 }

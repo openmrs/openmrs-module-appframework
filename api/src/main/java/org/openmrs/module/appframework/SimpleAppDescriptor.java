@@ -24,30 +24,36 @@ public class SimpleAppDescriptor implements AppDescriptor {
 	protected String iconUrl;
 	protected String tinyIconUrl;
 	protected String homepageUrl;
-	
-	/**
-	 * Default constructor 
+    protected Integer order;
+
+    /**
+	 * Default constructor
 	 */
 	public SimpleAppDescriptor() {
 	}
-	
+
+    public SimpleAppDescriptor(String id, String label, Integer order) {
+	    this.id = id;
+	    this.label = label;
+        this.order = order;
+    }
+
     /**
      * @param id
      * @param label
      */
     public SimpleAppDescriptor(String id, String label) {
-	    this.id = id;
-	    this.label = label;
+        this(id, label, null);
     }
 
-	/**
+    /**
      * @see org.openmrs.module.appframework.AppDescriptor#getId()
      */
 	@Override
     public String getId() {
     	return id;
     }
-	
+
     /**
      * @param id the id to set
      */
@@ -62,14 +68,14 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public String getLabel() {
     	return label;
     }
-	
+
     /**
      * @param label the label to set
      */
     public void setLabel(String label) {
     	this.label = label;
     }
-	
+
     /**
      * @see org.openmrs.module.appframework.AppDescriptor#getIconUrl()
      */
@@ -77,7 +83,7 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public String getIconUrl() {
     	return iconUrl;
     }
-	
+
     /**
      * @param iconUrl the iconUrl to set
      */
@@ -92,7 +98,7 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public String getTinyIconUrl() {
     	return tinyIconUrl;
     }
-	
+
     /**
      * @param tinyIconUrl the tinyIconUrl to set
      */
@@ -107,12 +113,22 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public String getHomepageUrl() {
     	return homepageUrl;
     }
-	
+
     /**
      * @param homepageUrl the homepageUrl to set
      */
     public void setHomepageUrl(String homepageUrl) {
     	this.homepageUrl = homepageUrl;
+    }
+
+    @Override
+    public Integer getOrder() {
+        return order;
+    }
+
+    @Override
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 
     /**
@@ -122,7 +138,7 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public void startApp(AppStatus status) {
         // do nothing
     }
-    
+
     /**
      * @see org.openmrs.module.appframework.AppDescriptor#endApp(org.openmrs.module.appframework.AppStatus)
      */
@@ -130,7 +146,7 @@ public class SimpleAppDescriptor implements AppDescriptor {
     public void endApp(AppStatus status) {
         // do nothing
     }
-    
+
     /**
      * @see org.openmrs.module.appframework.AppDescriptor#getRequiredPrivilegeName()
      */
