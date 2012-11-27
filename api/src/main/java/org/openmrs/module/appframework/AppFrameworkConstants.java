@@ -15,6 +15,6 @@ package org.openmrs.module.appframework;
 
 public class AppFrameworkConstants {
 
-    public static final String APP_SORT_ORDER_USER_PROPERTY = "appframwork.sort_order";
+    public static final String APP_SORT_ORDER_USER_PROPERTY = "appframework.sort_order";
 
 }
