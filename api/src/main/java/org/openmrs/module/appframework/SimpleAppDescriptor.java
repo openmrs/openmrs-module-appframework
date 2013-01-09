@@ -14,13 +14,22 @@
 package org.openmrs.module.appframework;
 
 
+import org.openmrs.messagesource.MessageSourceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 /**
  * Basic implementation of AppDescriptor, suitable for subclassing
  */
 public class SimpleAppDescriptor implements AppDescriptor {
-	
-	protected String id;
+
+    @Autowired
+    @Qualifier("messageSourceService")
+    MessageSourceService messageSourceService;
+
+    protected String id;
 	protected String label;
+    protected String labelCode;
 	protected String iconUrl;
 	protected String tinyIconUrl;
 	protected String homepageUrl;
@@ -66,7 +75,13 @@ public class SimpleAppDescriptor implements AppDescriptor {
      */
     @Override
     public String getLabel() {
-    	return label;
+        if (label != null) {
+    	    return label;
+        } else if (labelCode != null) {
+            return messageSourceService.getMessage(labelCode);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -153,5 +168,13 @@ public class SimpleAppDescriptor implements AppDescriptor {
     @Override
     public String getRequiredPrivilegeName() {
         return "App: " + getId();
+    }
+
+    public String getLabelCode() {
+        return labelCode;
+    }
+
+    public void setLabelCode(String labelCode) {
+        this.labelCode = labelCode;
     }
 }
