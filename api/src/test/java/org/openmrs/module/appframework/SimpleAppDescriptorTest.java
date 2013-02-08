@@ -53,4 +53,19 @@ public class SimpleAppDescriptorTest {
         assertThat(simpleAppDescriptor.getLabel(), is(LOCALIZED_LABEL));
     }
 
+    @Test
+    public void testDefaultRequiredPrivilegeName() {
+        simpleAppDescriptor.setId("application");
+
+        assertThat(simpleAppDescriptor.getRequiredPrivilegeName(), is("App: application"));
+    }
+
+    @Test
+    public void testOverridenRequiredPrivilegeName() {
+        simpleAppDescriptor.setId("application");
+        String overridenAppPriviligeName = "Overriden";
+        simpleAppDescriptor.setRequiredPrivilegeName(overridenAppPriviligeName);
+
+        assertThat(simpleAppDescriptor.getRequiredPrivilegeName(), is(overridenAppPriviligeName));
+    }
 }

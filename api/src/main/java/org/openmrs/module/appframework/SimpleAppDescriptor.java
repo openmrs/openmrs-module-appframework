@@ -34,6 +34,7 @@ public class SimpleAppDescriptor implements AppDescriptor {
 	protected String tinyIconUrl;
 	protected String homepageUrl;
     protected Integer order;
+    protected String requiredPrivilegeName;
 
     /**
 	 * Default constructor
@@ -162,12 +163,19 @@ public class SimpleAppDescriptor implements AppDescriptor {
         // do nothing
     }
 
+    public void setRequiredPrivilegeName(String requiredPrivilegeName) {
+        this.requiredPrivilegeName = requiredPrivilegeName;
+    }
+
     /**
      * @see org.openmrs.module.appframework.AppDescriptor#getRequiredPrivilegeName()
      */
     @Override
     public String getRequiredPrivilegeName() {
-        return "App: " + getId();
+        if(requiredPrivilegeName == null) {
+            requiredPrivilegeName = "App: " + getId();
+        }
+        return requiredPrivilegeName;
     }
 
     public String getLabelCode() {
