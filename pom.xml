@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>appframework</artifactId>
-	<version>1.4</version>
+	<version>1.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>App Framework Module</name>
 	<description>Framework supporting the idea of self-contained apps that you can see on your homepage.</description>
