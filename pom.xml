@@ -22,9 +22,9 @@
 	</organization>
 
 	<scm>
-		<connection>scm:git:git@github.com:djazayeri/openmrs-module-appframework.git</connection>
-		<developerConnection>scm:git:git@github.com:djazayeri/openmrs-module-appframework.git</developerConnection>
-		<url>scm:git:git@github.com:djazayeri/openmrs-module-appframework.git</url>
+		<connection>scm:git:git@github.com:openmrs/openmrs-module-appframework.git</connection>
+		<developerConnection>scm:git:git@github.com:openmrs/openmrs-module-appframework.git</developerConnection>
+		<url>scm:git:git@github.com:openmrs/openmrs-module-appframework.git</url>
 	</scm>
 
 	<modules>
