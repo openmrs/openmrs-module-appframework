@@ -35,20 +35,10 @@
 	<properties>
 		<openMRSVersion>1.8.2</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<uiframeworkModuleVersion>1.2</uiframeworkModuleVersion>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- Depends on uiframework module -->
-			<dependency>
-				<groupId>org.openmrs.module</groupId>
-				<artifactId>uiframework-api</artifactId>
-				<version>${uiframeworkModuleVersion}</version>
-				<type>jar</type>
-				<scope>provided</scope>
-			</dependency>
-
 			<!-- Begin OpenMRS core -->
 			
 			<dependency>

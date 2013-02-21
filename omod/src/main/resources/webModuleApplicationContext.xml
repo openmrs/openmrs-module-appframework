@@ -47,9 +47,5 @@
 		<property name="iconUrl" value="moduleResources/uiframework/images/configure32.png"/>
 	</bean>
 	-->
-		
-	<bean class="org.openmrs.ui.framework.StandardModuleUiConfiguration">
-		<property name="moduleId" value="appframework"/>
-	</bean>
-		
+
 </beans>
