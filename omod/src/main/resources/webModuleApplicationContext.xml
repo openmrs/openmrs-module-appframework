@@ -27,11 +27,13 @@
     	<property name="mappings">
             <props>
 				<prop key="**/appFrameworkHomepage.portlet">appFrameworkHomepagePortletController</prop>
+				<prop key="**/module/appframework">appFrameworkController</prop>
 			</props>
 		</property>
 	</bean>
 	<bean id="appFrameworkHomepagePortletController" class="org.openmrs.module.appframework.web1x.AppFrameworkHomepagePortletController" />
-	
+	<bean id="appFrameworkController" class="org.openmrs.module.appframework.web.AppFrameworkController" />
+
 	<!--
 	<bean id="legacyOpenmrsApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
 		<property name="id" value="legacy.openmrs"/>
