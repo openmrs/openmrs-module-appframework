@@ -32,7 +32,6 @@
 		</property>
 	</bean>
 	<bean id="appFrameworkHomepagePortletController" class="org.openmrs.module.appframework.web1x.AppFrameworkHomepagePortletController" />
-	<bean id="appFrameworkController" class="org.openmrs.module.appframework.web.AppFrameworkController" />
 
 	<!--
 	<bean id="legacyOpenmrsApp" class="org.openmrs.module.appframework.SimpleAppDescriptor">
