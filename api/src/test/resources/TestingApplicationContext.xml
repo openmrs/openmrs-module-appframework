@@ -9,12 +9,4 @@
                 http://www.springframework.org/schema/util
                 http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<bean id="testingAppDescriptor" class="org.openmrs.module.appframework.SimpleAppDescriptor">
-		<property name="id" value="google"/>
-		<property name="label" value="Google Search"/>
-		<property name="homepageUrl" value="http://google.com"/>
-	</bean>
-	
-	<bean id="testingAppFactory" class="org.openmrs.module.appframework.TestingAppFactory"/>
-
 </beans>

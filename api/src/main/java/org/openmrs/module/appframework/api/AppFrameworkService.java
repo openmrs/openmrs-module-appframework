@@ -13,14 +13,12 @@
  */
 package org.openmrs.module.appframework.api;
 
-import java.util.List;
-
-import org.openmrs.Privilege;
-import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.appframework.AppDescriptor;
-import org.springframework.transaction.annotation.Transactional;
+import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.Extension;
+
+import java.util.List;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.
@@ -34,41 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface AppFrameworkService extends OpenmrsService {
 
-	/**
-	 * Creates a privilege for app, if it doesn't already exist
-	 * 
-	 * @param app
-	 * @return the existing or newly-created privilege
-	 */
-	@Transactional
-	Privilege ensurePrivilegeExists(AppDescriptor app);
-		
-	/**
-     * Sets the complete list of apps available.
-     * 
-     * You should not need to call this--the framework calls this itself after modules are loaded. 
-     * 
-     * @param apps
-     */
-    void setAllApps(List<AppDescriptor> apps);
-    
-    /**
-     * Please do not modify the contents of the returned list.
-     * @return all available apps (irrespective of whether or not they're enabled for users and roles)
-     */
     List<AppDescriptor> getAllApps();
-	
-    /**
-     * @param id
-     * @return the app with the given unique id
-     */
-    AppDescriptor getAppById(String id);
 
-    /**
-     * @param user
-     * @return all apps that are enabled for the given user
-     * @should get apps that a particular user has privileges for
-     */
-    List<AppDescriptor> getAppsForUser(User user);
-    
+    List<Extension> getAllExtensions(String appId, String extensionPointId);
+
 }
