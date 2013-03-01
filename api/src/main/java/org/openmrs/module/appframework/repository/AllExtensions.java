@@ -19,7 +19,9 @@ public class AllExtensions {
 
     public void add(Extension extension) {
         if (this.extensions.contains(extension)) throw new IllegalArgumentException("Extension already exists");
-        this.extensions.add(extension);
+        synchronized (this.extensions) {
+            this.extensions.add(extension);
+        }
     }
 
     public List<Extension> getExtensions() {

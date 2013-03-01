@@ -4,6 +4,7 @@ import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -19,7 +20,13 @@ public class AllAppDescriptors {
 
     public void add(AppDescriptor appDescriptor) {
         if (this.appDescriptors.contains(appDescriptor)) throw new IllegalArgumentException("App already exists.");
-        this.appDescriptors.add(appDescriptor);
+
+        // Since the repository is an in-memory list, it has to be
+        // protected against multiple threads.
+        synchronized (appDescriptors) {
+            this.appDescriptors.add(appDescriptor);
+            Collections.sort(this.appDescriptors);
+        }
     }
 
     public List<AppDescriptor> getAppDescriptors() {

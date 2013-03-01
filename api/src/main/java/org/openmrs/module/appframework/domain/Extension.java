@@ -4,7 +4,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.Map;
 
-public class Extension {
+public class Extension implements Comparable<Extension> {
 
     @JsonProperty
     protected String id;
@@ -25,28 +25,33 @@ public class Extension {
     protected String url;
 
     @JsonProperty
+    protected int order;
+
+    @JsonProperty
     protected Map<String, Object> extensionParams;
 
 
     public Extension() {
     }
 
-    public Extension(String id, String appId, String extensionPointId, String type, String label, String url) {
+    public Extension(String id, String appId, String extensionPointId, String type, String label, String url, int order) {
         this.id = id;
         this.appId = appId;
         this.extensionPointId = extensionPointId;
         this.type = type;
         this.label = label;
         this.url = url;
+        this.order = order;
     }
 
-    public Extension(String id, String appId, String extensionPointId, String type, String label, String url, Map<String, Object> extensionParams) {
+    public Extension(String id, String appId, String extensionPointId, String type, String label, String url, int order, Map<String, Object> extensionParams) {
         this.id = id;
         this.appId = appId;
         this.extensionPointId = extensionPointId;
         this.type = type;
         this.label = label;
         this.url = url;
+        this.order = order;
         this.extensionParams = extensionParams;
     }
 
@@ -75,6 +80,10 @@ public class Extension {
         return url;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
     public Map<String, Object> getExtensionParams() {
         return extensionParams;
     }
@@ -98,5 +107,10 @@ public class Extension {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public int compareTo(Extension o) {
+        return new Integer(this.order).compareTo(o.order);
     }
 }

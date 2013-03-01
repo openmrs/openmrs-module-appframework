@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -36,17 +35,17 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     public void setUp() throws Exception {
         List<AppDescriptor> appDescriptors = new ArrayList<AppDescriptor>();
         appDescriptors.add(
-                new AppDescriptor("app1", "desc1", "label1", "url1", "iconurl", "tinyIconurl", 1,
+                new AppDescriptor("app1", "desc1", "label1", "url1", "iconurl", "tinyIconurl", 20,
                         Arrays.asList(new ExtensionPoint("extensionPoint1"), new ExtensionPoint("extensionPoint2"))));
         appDescriptors.add(
-                new AppDescriptor("app2", "desc1", "label1", "url1", "iconurl", "tinyIconurl", 2,
+                new AppDescriptor("app2", "desc1", "label1", "url1", "iconurl", "tinyIconurl", 10,
                         Arrays.asList(new ExtensionPoint("extensionPoint1"))));
         allAppDescriptors.add(appDescriptors);
 
         List<Extension> extensions = new ArrayList<Extension>();
-        extensions.add(new Extension("ext1", "app1", "extensionPoint1", "link", "label", "url"));
-        extensions.add(new Extension("ext2", "app1", "extensionPoint2", "link", "label", "url"));
-        extensions.add(new Extension("ext3", "app2", "extensionPoint1", "link", "label", "url"));
+        extensions.add(new Extension("ext1", "app1", "extensionPoint2", "link", "label", "url", 0));
+        extensions.add(new Extension("ext2", "app1", "extensionPoint2", "link", "label", "url", 1));
+        extensions.add(new Extension("ext3", "app2", "extensionPoint1", "link", "label", "url", 2));
         allExtensions.add(extensions);
     }
 
@@ -57,30 +56,21 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     }
 
     @Test
-    public void testGetAllApps() throws Exception {
+    public void testGetAllAppsAndIsSortedByOrder() throws Exception {
         List<AppDescriptor> allApps = appFrameworkService.getAllApps();
 
         assertEquals(2, allApps.size());
-        assertNotNull(CollectionUtils.select(allApps, new Predicate() {
-            @Override
-            public boolean evaluate(Object object) {
-                return ((AppDescriptor) object).getId().equalsIgnoreCase("app1");
-            }
-        }));
-        assertNotNull(CollectionUtils.select(allApps, new Predicate() {
-            @Override
-            public boolean evaluate(Object object) {
-                return ((AppDescriptor) object).getId().equalsIgnoreCase("app1");
-            }
-        }));
+        assertEquals("app2", allApps.get(0).getId());
+        assertEquals("app1", allApps.get(1).getId());
     }
 
     @Test
-    public void testGetAllExtensions() throws Exception {
+    public void testGetAllExtensionsAndIsSortedByOrder() throws Exception {
         List<Extension> extensionsApp1ExtensionPoint2 = appFrameworkService.getAllExtensions("app1", "extensionPoint2");
 
-        assertEquals(1, extensionsApp1ExtensionPoint2.size());
-        assertEquals("ext2", extensionsApp1ExtensionPoint2.get(0).getId());
+        assertEquals(2, extensionsApp1ExtensionPoint2.size());
+        assertEquals("ext1", extensionsApp1ExtensionPoint2.get(0).getId());
+        assertEquals("ext2", extensionsApp1ExtensionPoint2.get(1).getId());
 
         List<Extension> extensionsApp2ExtensionPoint1 = appFrameworkService.getAllExtensions("app2", "extensionPoint1");
 
