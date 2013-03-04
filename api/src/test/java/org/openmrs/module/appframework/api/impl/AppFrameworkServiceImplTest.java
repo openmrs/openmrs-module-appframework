@@ -35,10 +35,10 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     public void setUp() throws Exception {
         List<AppDescriptor> appDescriptors = new ArrayList<AppDescriptor>();
         appDescriptors.add(
-                new AppDescriptor("app1", "desc1", "label1", "url1", "iconurl", "tinyIconurl", 20,
+                new AppDescriptor("app1", "desc1", "label1", "url1", "iconUrl", "tinyIconUrl", 20,
                         Arrays.asList(new ExtensionPoint("extensionPoint1"), new ExtensionPoint("extensionPoint2"))));
         appDescriptors.add(
-                new AppDescriptor("app2", "desc1", "label1", "url1", "iconurl", "tinyIconurl", 10,
+                new AppDescriptor("app2", "desc1", "label1", "url1", "iconUrl", "tinyIconUrl", 10,
                         Arrays.asList(new ExtensionPoint("extensionPoint1"))));
         allAppDescriptors.add(appDescriptors);
 

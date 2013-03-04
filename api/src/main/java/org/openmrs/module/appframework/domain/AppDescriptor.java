@@ -1,11 +1,17 @@
 package org.openmrs.module.appframework.domain;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.openmrs.module.appframework.domain.validators.NoDuplicateExtensionPoint;
+import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
 
+import javax.validation.Valid;
 import java.util.List;
 
+@NoDuplicateExtensionPoint
 public class AppDescriptor implements Comparable<AppDescriptor> {
 
+    @NotEmpty(message = ValidationErrorMessages.APP_DESCRIPTOR_ID_NOT_EMPTY_MESSAGE)
     @JsonProperty
     protected String id;
 
@@ -27,6 +33,7 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
     @JsonProperty
     protected int order;
 
+    @Valid
     @JsonProperty
     protected List<ExtensionPoint> extensionPoints;
 
@@ -105,24 +112,24 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
     }
 
     @Override
-    public int compareTo(AppDescriptor o) {
-        return new Integer(this.order).compareTo(new Integer(o.order));
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AppDescriptor)) return false;
 
         AppDescriptor that = (AppDescriptor) o;
 
-        if (!id.equals(that.id)) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return id != null ? id.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(AppDescriptor o) {
+        return new Integer(this.order).compareTo(new Integer(o.order));
     }
 }

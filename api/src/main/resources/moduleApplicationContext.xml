@@ -19,6 +19,8 @@
 
     <context:component-scan base-package="org.openmrs.module.appframework"/>
 
+    <bean id="validatorFactory" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+
     <bean parent="serviceContext">
 		<property name="moduleService">
 			<list>

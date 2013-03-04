@@ -1,11 +1,14 @@
 package org.openmrs.module.appframework.domain;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
 
 import java.util.Map;
 
 public class Extension implements Comparable<Extension> {
 
+    @NotEmpty(message = ValidationErrorMessages.EXTENSION_ID_NOT_EMPTY_MESSAGE)
     @JsonProperty
     protected String id;
 
@@ -99,14 +102,14 @@ public class Extension implements Comparable<Extension> {
 
         Extension extension = (Extension) o;
 
-        if (!id.equals(extension.id)) return false;
+        if (id != null ? !id.equals(extension.id) : extension.id != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
