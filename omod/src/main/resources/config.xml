@@ -23,11 +23,6 @@
 	<!-- Module Activator -->
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.AppFrameworkActivator</activator>
 
-	<extension>
-		<point>org.openmrs.navigation.homepage</point>
-		<class>${project.parent.groupId}.${project.parent.artifactId}.web1x.HomepageExtension</class>
-	</extension>	
-	
 	<!-- Maps hibernate files, if present -->
 	<mappingFiles>
 	</mappingFiles>
