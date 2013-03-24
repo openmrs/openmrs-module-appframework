@@ -45,8 +45,12 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
 	 * @should create privileges for all available apps
 	 */
 	public void contextRefreshed() {
+        List<AppConfigurationLoader> configurationLoaders = Context.getRegisteredComponents(AppConfigurationLoader.class);
+        AppConfigurationLoader loader = configurationLoaders.get(0);
+
         try {
-            appConfigurationLoader.loadConfiguration();
+//            appConfigurationLoader.loadConfiguration();
+            loader.loadConfiguration();
         } catch (IOException e) {
             throw new RuntimeException("Error reading app framework configuration", e);
         }
