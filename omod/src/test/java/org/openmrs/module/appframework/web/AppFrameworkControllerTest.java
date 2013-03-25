@@ -37,7 +37,6 @@ public class AppFrameworkControllerTest {
     public void testGetAllApps() throws Exception {
         mockStatic(Context.class);
         when(Context.getService(AppFrameworkService.class)).thenReturn(mockAppFrameworkService);
-        when(Context.getAuthenticatedUser()).thenReturn(null);
         when(mockAppFrameworkService.getAllApps()).thenReturn(getTestAppList());
 
         List<AppDescriptor> appList = new AppFrameworkController().getAppList();
