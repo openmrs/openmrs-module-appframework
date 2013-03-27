@@ -1,0 +1,26 @@
+[
+    {
+        "id": "patientDashboardApp",
+        "description": "Patient Dashboard Application",
+        "extensionPoints": [
+            {
+                "id": "activeVisitActions",
+                "description": "Actions for Visit"
+            },
+            {
+                "id": "patientActions"
+            }
+        ],
+        "contextModel": [ "patientId", "activeVisitId" ]
+    },
+    {
+        "id": "xrayApp",
+        "description": "XRay Application",
+        "extensionPoints": [
+            {
+                "id": "patientLinks"
+            }
+        ],
+        "contextModel": [ "xrayConceptId", "patientId" ]
+    }
+]

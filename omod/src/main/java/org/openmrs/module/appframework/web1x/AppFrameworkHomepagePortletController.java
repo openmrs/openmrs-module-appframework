@@ -24,9 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.appframework.AppDescriptor;
-import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.api.AppFrameworkService;
+import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.web.controller.PortletController;
 import org.springframework.web.servlet.ModelAndView;
@@ -53,8 +52,7 @@ public class AppFrameworkHomepagePortletController extends PortletController {
 			
 			// save the sort order to the user's properties
 			log.debug("order: " + data.toString());
-			currentUser.setUserProperty(AppFrameworkConstants.APP_SORT_ORDER_USER_PROPERTY, data.toString());
-			
+
 			try {
 				Context.addProxyPrivilege(PrivilegeConstants.EDIT_USERS);
 				Context.getUserService().saveUser(currentUser, null);
@@ -66,7 +64,9 @@ public class AppFrameworkHomepagePortletController extends PortletController {
 		
 		AppFrameworkService service = Context.getService(AppFrameworkService.class);
 
-		List<AppDescriptor> apps = service.getAppsForUser(currentUser);
+//		List<AppDescriptor> apps = service.getAppsForUser(currentUser);
+		List<AppDescriptor> apps = service.getAllApps();
+
 		if (apps.size() == 0) {
 			// since I haven't implemented a UI for enabling apps yet, show all apps for testing:
 			apps.addAll(service.getAllApps());

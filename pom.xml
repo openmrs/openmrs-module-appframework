@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>appframework</artifactId>
-	<version>1.6-SNAPSHOT</version>
+	<version>2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>App Framework Module</name>
 	<description>Framework supporting the idea of self-contained apps that you can see on your homepage.</description>
@@ -33,22 +33,12 @@
 	</modules>
 	
 	<properties>
-		<openMRSVersion>1.8.2</openMRSVersion>
+		<openMRSVersion>1.9.4-SNAPSHOT</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<uiframeworkModuleVersion>1.2</uiframeworkModuleVersion>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- Depends on uiframework module -->
-			<dependency>
-				<groupId>org.openmrs.module</groupId>
-				<artifactId>uiframework-api</artifactId>
-				<version>${uiframeworkModuleVersion}</version>
-				<type>jar</type>
-				<scope>provided</scope>
-			</dependency>
-
 			<!-- Begin OpenMRS core -->
 			
 			<dependency>

@@ -1,0 +1,21 @@
+[
+    {
+        "id": "orderXrayExtension",
+        "appId": "patientDashboardApp",
+        "extensionPointId": "activeVisitActions",
+        "type": "link",
+        "label": "Order XRay",
+        "url": "/xray/order?patientId={{patientId}}&activeVisitId={{activeVisitId}}",
+        "extensionParams": {
+            "iconUrl": "/xray/icon"
+        }
+    },
+    {
+        "id": "gotoPatientExtension",
+        "appId": "xrayApp",
+        "extensionPointId": "patientLinks",
+        "type": "link",
+        "label": "Goto Patient",
+        "url": "/patientDashboard?patientId={{patientId}}"
+    }
+]

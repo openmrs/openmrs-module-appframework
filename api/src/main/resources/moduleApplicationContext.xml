@@ -17,7 +17,11 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<bean parent="serviceContext">
+    <context:component-scan base-package="org.openmrs.module.appframework"/>
+
+    <bean id="validatorFactory" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+
+    <bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
 				<value>${project.parent.groupId}.${project.parent.artifactId}.api.AppFrameworkService</value>
@@ -39,5 +43,4 @@
 			</list>
 		</property>
 	</bean>
-	
 </beans>

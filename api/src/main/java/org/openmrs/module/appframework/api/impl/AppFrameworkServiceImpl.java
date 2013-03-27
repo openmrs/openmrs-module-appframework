@@ -13,124 +13,51 @@
  */
 package org.openmrs.module.appframework.api.impl;
 
+import java.security.PublicKey;
 import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Privilege;
-import org.openmrs.User;
-import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.appframework.AppDescriptor;
-import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.api.AppFrameworkService;
-import org.springframework.util.StringUtils;
+import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.repository.AllAppDescriptors;
+import org.openmrs.module.appframework.repository.AllExtensions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
  */
+@Service
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
 
-	protected final Log log = LogFactory.getLog(this.getClass());
-	
-	private List<AppDescriptor> allApps = new ArrayList<AppDescriptor>();
+    private AllAppDescriptors allAppDescriptors;
 
-	/**
-	 * @see org.openmrs.module.appframework.api.AppFrameworkService#ensurePrivilegeExists(org.openmrs.module.appframework.AppDescriptor)
-	 */
-	@Override
-	public Privilege ensurePrivilegeExists(AppDescriptor app) {
-	    String privName = app.getRequiredPrivilegeName();
-	    Privilege priv = Context.getUserService().getPrivilege(privName);
-	    if (priv == null) {
-	    	priv = new Privilege();
-	    	priv.setPrivilege(app.getRequiredPrivilegeName());
-	    	priv.setDescription("Run the " + app.getLabel() + " app");
-	    	Context.getUserService().savePrivilege(priv);
-	    }
-	    return priv;
-	}
-	
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#getAllApps()
-     */
+    private AllExtensions allExtensions;
+
+    @Autowired
+    public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions) {
+        this.allAppDescriptors = allAppDescriptors;
+        this.allExtensions = allExtensions;
+    }
+
     @Override
     public List<AppDescriptor> getAllApps() {
-    	return allApps;
+        return allAppDescriptors.getAppDescriptors();
     }
 
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#setAllApps(java.util.List)
-     */
     @Override
-    public void setAllApps(List<AppDescriptor> allApps) {
-        Collections.sort(allApps, new AppDescriptorComparator());
-    	this.allApps = allApps;
-    }
-    
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#getAppById(java.lang.String)
-     */
-    @Override
-    public AppDescriptor getAppById(String id) {
-        for (AppDescriptor app : allApps)
-        	if (app.getId().equals(id))
-        		return app;
-        return null;
-    }
-
-    /**
-     * @see org.openmrs.module.appframework.api.AppFrameworkService#getAppsForUser(org.openmrs.User)
-     */
-    @Override
-    public List<AppDescriptor> getAppsForUser(User user) {
-    	Map<String, AppDescriptor> appMap = new LinkedHashMap<String, AppDescriptor>();
-    	for (AppDescriptor app : getAllApps()) {
-    		if (app.getRequiredPrivilegeName() == null || user.hasPrivilege(app.getRequiredPrivilegeName())) {
-    			appMap.put(app.getId(), app);
-    		}
-    	}
-    	
-    	// re-sort this list according to user property
-    	String sortOrder = user.getUserProperty(AppFrameworkConstants.APP_SORT_ORDER_USER_PROPERTY);
-    	if (StringUtils.hasLength(sortOrder)) {
-    		List<AppDescriptor> ret = new ArrayList<AppDescriptor>();
-
-    		// loop over the sort order and add to new list in that order
-    		List<String> sortedIds = new ArrayList<String>();
-    		for (String id : sortOrder.split(",")) {
-    			AppDescriptor app = appMap.get(id);
-    			if (app != null) {
-    				ret.add(app);
-    				appMap.remove(id);
-    			}
-    		}
-    		
-    		// add all apps that weren't in the sort order for some reason
-    		ret.addAll(appMap.values());
-    		
-    		return ret;
-    	}
-    	else
-    		return new ArrayList<AppDescriptor>(appMap.values());
-    	
-    }
-
-    private static class AppDescriptorComparator implements Comparator<AppDescriptor> {
-        @Override
-        public int compare(AppDescriptor appDescriptor, AppDescriptor appDescriptor1) {
-            Integer firstAppOrder = appDescriptor.getOrder();
-            Integer secondAppOrder = appDescriptor1.getOrder();
-            if(firstAppOrder == null) {
-                if(secondAppOrder == null) {
-                    return 0;
-                } else {
-                    return 1;
-                }
-            } else if(secondAppOrder == null) {
-                return -1;
-            }
-            return firstAppOrder.compareTo(secondAppOrder);
+    public List<Extension> getAllExtensions(String appId, String extensionPointId) {
+        List<Extension> extensions = allExtensions.getExtensions();
+        List<Extension> matchingExtensions = new ArrayList<Extension>();
+        for(Extension extension : extensions) {
+            if (extension.getAppId().equalsIgnoreCase(appId) &&
+                extension.getExtensionPointId().equalsIgnoreCase(extensionPointId))
+                matchingExtensions.add(extension);
         }
+        return matchingExtensions;
     }
 }
