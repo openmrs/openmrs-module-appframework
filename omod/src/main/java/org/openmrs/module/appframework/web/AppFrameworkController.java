@@ -3,7 +3,7 @@ package org.openmrs.module.appframework.web;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.appframework.api.AppFrameworkService;
+import org.openmrs.module.appframework.service.AppFrameworkService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.springframework.stereotype.Controller;

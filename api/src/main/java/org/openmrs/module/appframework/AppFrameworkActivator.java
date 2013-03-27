@@ -14,19 +14,19 @@
 package org.openmrs.module.appframework;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
-import org.openmrs.module.appframework.api.AppFrameworkService;
-import org.openmrs.module.appframework.loader.AppConfigurationLoader;
+import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.factory.AppFrameworkFactory;
+import org.openmrs.module.appframework.repository.AllAppDescriptors;
+import org.openmrs.module.appframework.repository.AllExtensions;
+import org.openmrs.module.appframework.service.AppFrameworkService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,23 +36,31 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
 	
 	protected Log log = LogFactory.getLog(getClass());
 
-    @Autowired
-    private AppConfigurationLoader appConfigurationLoader;
-
 	/**
 	 * @see ModuleActivator#contextRefreshed()
 	 * @should set all available apps on {@link AppFrameworkService}
 	 * @should create privileges for all available apps
 	 */
 	public void contextRefreshed() {
-        List<AppConfigurationLoader> configurationLoaders = Context.getRegisteredComponents(AppConfigurationLoader.class);
-        AppConfigurationLoader loader = configurationLoaders.get(0);
+        // I dislike this way of pulling in services and components. Ideally they should be pulled in
+        // using proper IOC. It is not possible for this class since the activator of each module is created
+        // in openmrs-core via newInstance() which doesn't instantiate it in a spring way. This should
+        // later be changed.
 
-        try {
-//            appConfigurationLoader.loadConfiguration();
-            loader.loadConfiguration();
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading app framework configuration", e);
+        List<AppFrameworkFactory> appFrameworkFactories = Context.getRegisteredComponents(AppFrameworkFactory.class);
+        AllAppDescriptors allAppDescriptors = Context.getRegisteredComponents(AllAppDescriptors.class).get(0);
+        AllExtensions allExtensions = Context.getRegisteredComponents(AllExtensions.class).get(0);
+
+        for(AppFrameworkFactory appFrameworkFactory : appFrameworkFactories) {
+            try {
+                List<AppDescriptor> appDescriptors = appFrameworkFactory.getAppDescriptors();
+                allAppDescriptors.add(appDescriptors);
+
+                List<Extension> extensions = appFrameworkFactory.getExtensions();
+                allExtensions.add(extensions);
+            } catch (Exception e) {
+                log.error("Error loading app framework. Some apps might not work." + appFrameworkFactory, e);
+            }
         }
 	}
 	

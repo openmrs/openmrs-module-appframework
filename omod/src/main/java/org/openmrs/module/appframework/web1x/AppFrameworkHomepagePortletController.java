@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.appframework.api.AppFrameworkService;
+import org.openmrs.module.appframework.service.AppFrameworkService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.web.controller.PortletController;
