@@ -45,7 +45,6 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
 	 * @should create privileges for all available apps
 	 */
 	public void contextRefreshed() {
-		System.out.println("IN MODULE ACTIVATOR...");
         List<AppConfigurationLoader> configurationLoaders = Context.getRegisteredComponents(AppConfigurationLoader.class);
         AppConfigurationLoader loader = configurationLoaders.get(0);
 

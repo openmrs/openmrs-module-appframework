@@ -1,14 +1,15 @@
 package org.openmrs.module.appframework.loader;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+
 import org.junit.Test;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
+import org.springframework.test.annotation.DirtiesContext;
 
 public class AppConfigurationLoaderTest extends BaseModuleContextSensitiveTest {
 
@@ -22,6 +23,7 @@ public class AppConfigurationLoaderTest extends BaseModuleContextSensitiveTest {
     AllExtensions allExtensions;
 
     @Test
+    @DirtiesContext
     public void testConfigurationLoad() throws IOException {
         appConfigurationLoader.loadConfiguration();
 

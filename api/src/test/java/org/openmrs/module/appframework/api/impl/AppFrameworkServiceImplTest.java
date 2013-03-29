@@ -57,15 +57,6 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 	@Test
 	public void testGetAllAppsAndIsSortedByOrder() throws Exception {
 		List<AppDescriptor> allApps = appFrameworkService.getAllApps();
-		String apps = "";
-		int index = 0;
-		for (AppDescriptor appDescriptor : allApps) {
-			if (index > 0)
-				apps += ",";
-			apps += appDescriptor.getId();
-			index++;
-		}
-		System.out.println("APPs:" + apps);
 		assertEquals(2, allApps.size());
 		assertEquals("app2", allApps.get(0).getId());
 		assertEquals("app1", allApps.get(1).getId());
