@@ -3,7 +3,6 @@ package org.openmrs.module.appframework.service;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.module.appframework.service.AppFrameworkServiceImpl;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
@@ -17,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest {
 

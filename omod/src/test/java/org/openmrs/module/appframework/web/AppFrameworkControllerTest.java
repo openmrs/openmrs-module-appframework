@@ -20,7 +20,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 @PrepareForTest(Context.class)
 @RunWith(PowerMockRunner.class)
-@Ignore
 public class AppFrameworkControllerTest {
 
     @Mock
