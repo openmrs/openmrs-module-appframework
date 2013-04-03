@@ -48,7 +48,9 @@ public class AllAppDescriptors {
     }
 
     public List<AppDescriptor> getAppDescriptors() {
-        return appDescriptors;
+        List<AppDescriptor> appDescriptorList = new ArrayList<AppDescriptor>();
+        appDescriptorList.addAll(this.appDescriptors);
+        return appDescriptorList;
     }
 
     public void clear() {

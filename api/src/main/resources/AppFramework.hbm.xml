@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openmrs.module.appframework.domain">
+
+    <class name="ComponentState" table="appframework_component_state">
+
+        <id name="componentStateId" type="java.lang.Integer" column="component_state_id" unsaved-value="0">
+            <generator class="native">
+                <param name="sequence">appframework_component_enabled_component_enabled_id_seq</param>
+            </generator>
+        </id>
+
+        <property name="uuid" type="java.lang.String" column="uuid" length="38" unique="true" />
+
+        <property name="componentId" type="java.lang.String" column="component_id" not-null="true" length="255" />
+
+        <property name="componentType" column="component_type" length="50">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">org.openmrs.module.appframework.domain.ComponentType</param>
+                <param name="type">12</param>
+            </type>
+        </property>
+
+        <property name="enabled" type="java.lang.Boolean" column="enabled" length="1" />
+
+    </class>
+
+</hibernate-mapping>

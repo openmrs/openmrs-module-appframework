@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ public class AllExtensions {
 
         synchronized (this.extensions) {
             this.extensions.add(extension);
+            Collections.sort(this.extensions);
         }
     }
 
@@ -44,7 +46,9 @@ public class AllExtensions {
     }
 
     public List<Extension> getExtensions() {
-        return extensions;
+        List<Extension> extensionList = new ArrayList<Extension>();
+        extensionList.addAll(this.extensions);
+        return extensionList;
     }
 
     public void clear() {

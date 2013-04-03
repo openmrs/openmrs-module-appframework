@@ -42,8 +42,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         allAppDescriptors.add(appDescriptors);
 
         List<Extension> extensions = new ArrayList<Extension>();
-        extensions.add(new Extension("ext1", "app1", "extensionPoint2", "link", "label", "url", 0));
-        extensions.add(new Extension("ext2", "app1", "extensionPoint2", "link", "label", "url", 1));
+        extensions.add(new Extension("ext1", "app1", "extensionPoint2", "link", "label", "url", 1));
+        extensions.add(new Extension("ext2", "app1", "extensionPoint2", "link", "label", "url", 0));
         extensions.add(new Extension("ext3", "app2", "extensionPoint1", "link", "label", "url", 2));
         allExtensions.add(extensions);
     }
@@ -68,8 +68,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         List<Extension> extensionsApp1ExtensionPoint2 = appFrameworkService.getAllExtensions("app1", "extensionPoint2");
 
         assertEquals(2, extensionsApp1ExtensionPoint2.size());
-        assertEquals("ext1", extensionsApp1ExtensionPoint2.get(0).getId());
-        assertEquals("ext2", extensionsApp1ExtensionPoint2.get(1).getId());
+        assertEquals("ext2", extensionsApp1ExtensionPoint2.get(0).getId());
+        assertEquals("ext1", extensionsApp1ExtensionPoint2.get(1).getId());
 
         List<Extension> extensionsApp2ExtensionPoint1 = appFrameworkService.getAllExtensions("app2", "extensionPoint1");
 

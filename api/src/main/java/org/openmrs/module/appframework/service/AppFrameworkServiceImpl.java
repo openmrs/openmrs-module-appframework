@@ -15,10 +15,15 @@ package org.openmrs.module.appframework.service;
 
 import java.util.*;
 
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.ComponentState;
+import org.openmrs.module.appframework.domain.ComponentType;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
+import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllExtensions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,10 +38,14 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private AllExtensions allExtensions;
 
+    private AllComponentsState allComponentsState;
+
     @Autowired
-    public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions) {
+    public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
+                                   AllComponentsState allComponentsState) {
         this.allAppDescriptors = allAppDescriptors;
         this.allExtensions = allExtensions;
+        this.allComponentsState = allComponentsState;
     }
 
     @Override
@@ -55,4 +64,57 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         }
         return matchingExtensions;
     }
+
+    @Override
+    public List<AppDescriptor> getAllEnabledApps() {
+        List<AppDescriptor> appDescriptors = getAllApps();
+
+        ComponentState componentState;
+        List<AppDescriptor> disabledAppDescriptors = new ArrayList<AppDescriptor>();
+        for(AppDescriptor appDescriptor : appDescriptors) {
+             componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
+             if (componentState != null && !componentState.getEnabled())
+                 disabledAppDescriptors.add(appDescriptor);
+        }
+
+        appDescriptors.removeAll(disabledAppDescriptors);
+        return appDescriptors;
+    }
+
+    @Override
+    public List<Extension> getAllEnabledExtensions(String appId, String extensionPointId) {
+        List<Extension> extensions = getAllExtensions(appId, extensionPointId);
+
+        ComponentState componentState;
+        List<Extension> disabledExtensions = new ArrayList<Extension>();
+        for(Extension extension : extensions) {
+            componentState = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
+            if (componentState != null && !componentState.getEnabled())
+                disabledExtensions.add(extension);
+        }
+
+        extensions.removeAll(disabledExtensions);
+        return extensions;
+    }
+
+    @Override
+    public void enableApp(String appId) {
+        allComponentsState.setComponentState(appId, ComponentType.APP, true);
+    }
+
+    @Override
+    public void disableApp(String appId) {
+        allComponentsState.setComponentState(appId, ComponentType.APP, false);
+    }
+
+    @Override
+    public void enableExtension(String extensionId) {
+        allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, true);
+    }
+
+    @Override
+    public void disableExtension(String extensionId) {
+        allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, false);
+    }
+
 }
