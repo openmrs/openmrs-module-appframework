@@ -25,22 +25,24 @@
 		<property name="moduleService">
 			<list>
 				<value>${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkService</value>
-				<bean
-					class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-					<property name="transactionManager">
-						<ref bean="transactionManager" />
-					</property>
-					<property name="target">
-						<bean class="${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkServiceImpl"/>
-					</property>
-					<property name="preInterceptors">
-						<ref bean="serviceInterceptors" />
-					</property>
-					<property name="transactionAttributeSource">
-						<ref bean="transactionAttributeSource" />
-					</property>
-				</bean>
+				<ref local="appFrameworkService"/>
 			</list>
 		</property>
 	</bean>
+	
+	<bean id="appFrameworkService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkServiceImpl" />
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+    
 </beans>
