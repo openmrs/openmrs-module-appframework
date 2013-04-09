@@ -13,10 +13,9 @@
  */
 package org.openmrs.module.appframework.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.ComponentState;
@@ -33,88 +32,88 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
-
-    private AllAppDescriptors allAppDescriptors;
-
-    private AllExtensions allExtensions;
-
-    private AllComponentsState allComponentsState;
-
-    @Autowired
-    public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
-                                   AllComponentsState allComponentsState) {
-        this.allAppDescriptors = allAppDescriptors;
-        this.allExtensions = allExtensions;
-        this.allComponentsState = allComponentsState;
-    }
-
-    @Override
-    public List<AppDescriptor> getAllApps() {
-        return allAppDescriptors.getAppDescriptors();
-    }
-
-    @Override
-    public List<Extension> getAllExtensions(String appId, String extensionPointId) {
-        List<Extension> extensions = allExtensions.getExtensions();
-        List<Extension> matchingExtensions = new ArrayList<Extension>();
-        for(Extension extension : extensions) {
-            if (extension.getAppId().equalsIgnoreCase(appId) &&
-                extension.getExtensionPointId().equalsIgnoreCase(extensionPointId))
-                matchingExtensions.add(extension);
-        }
-        return matchingExtensions;
-    }
-
-    @Override
-    public List<AppDescriptor> getAllEnabledApps() {
-        List<AppDescriptor> appDescriptors = getAllApps();
-
-        ComponentState componentState;
-        List<AppDescriptor> disabledAppDescriptors = new ArrayList<AppDescriptor>();
-        for(AppDescriptor appDescriptor : appDescriptors) {
-             componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
-             if (componentState != null && !componentState.getEnabled())
-                 disabledAppDescriptors.add(appDescriptor);
-        }
-
-        appDescriptors.removeAll(disabledAppDescriptors);
-        return appDescriptors;
-    }
-
-    @Override
-    public List<Extension> getAllEnabledExtensions(String appId, String extensionPointId) {
-        List<Extension> extensions = getAllExtensions(appId, extensionPointId);
-
-        ComponentState componentState;
-        List<Extension> disabledExtensions = new ArrayList<Extension>();
-        for(Extension extension : extensions) {
-            componentState = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
-            if (componentState != null && !componentState.getEnabled())
-                disabledExtensions.add(extension);
-        }
-
-        extensions.removeAll(disabledExtensions);
-        return extensions;
-    }
-
-    @Override
-    public void enableApp(String appId) {
-        allComponentsState.setComponentState(appId, ComponentType.APP, true);
-    }
-
-    @Override
-    public void disableApp(String appId) {
-        allComponentsState.setComponentState(appId, ComponentType.APP, false);
-    }
-
-    @Override
-    public void enableExtension(String extensionId) {
-        allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, true);
-    }
-
-    @Override
-    public void disableExtension(String extensionId) {
-        allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, false);
-    }
-
+	
+	private AllAppDescriptors allAppDescriptors;
+	
+	private AllExtensions allExtensions;
+	
+	private AllComponentsState allComponentsState;
+	
+	@Autowired
+	public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
+	    AllComponentsState allComponentsState) {
+		this.allAppDescriptors = allAppDescriptors;
+		this.allExtensions = allExtensions;
+		this.allComponentsState = allComponentsState;
+	}
+	
+	@Override
+	public List<AppDescriptor> getAllApps() {
+		return allAppDescriptors.getAppDescriptors();
+	}
+	
+	@Override
+	public List<Extension> getAllExtensions(String appId, String extensionPointId) {
+		List<Extension> extensions = allExtensions.getExtensions();
+		List<Extension> matchingExtensions = new ArrayList<Extension>();
+		for (Extension extension : extensions) {
+			if (extension.getAppId().equalsIgnoreCase(appId)
+			        && extension.getExtensionPointId().equalsIgnoreCase(extensionPointId))
+				matchingExtensions.add(extension);
+		}
+		return matchingExtensions;
+	}
+	
+	@Override
+	public List<AppDescriptor> getAllEnabledApps() {
+		List<AppDescriptor> appDescriptors = getAllApps();
+		
+		ComponentState componentState;
+		List<AppDescriptor> disabledAppDescriptors = new ArrayList<AppDescriptor>();
+		for (AppDescriptor appDescriptor : appDescriptors) {
+			componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
+			if (componentState != null && !componentState.getEnabled())
+				disabledAppDescriptors.add(appDescriptor);
+		}
+		
+		appDescriptors.removeAll(disabledAppDescriptors);
+		return appDescriptors;
+	}
+	
+	@Override
+	public List<Extension> getAllEnabledExtensions(String appId, String extensionPointId) {
+		List<Extension> extensions = getAllExtensions(appId, extensionPointId);
+		
+		ComponentState componentState;
+		List<Extension> disabledExtensions = new ArrayList<Extension>();
+		for (Extension extension : extensions) {
+			componentState = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
+			if (componentState != null && !componentState.getEnabled())
+				disabledExtensions.add(extension);
+		}
+		
+		extensions.removeAll(disabledExtensions);
+		return extensions;
+	}
+	
+	@Override
+	public void enableApp(String appId) {
+		allComponentsState.setComponentState(appId, ComponentType.APP, true);
+	}
+	
+	@Override
+	public void disableApp(String appId) {
+		allComponentsState.setComponentState(appId, ComponentType.APP, false);
+	}
+	
+	@Override
+	public void enableExtension(String extensionId) {
+		allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, true);
+	}
+	
+	@Override
+	public void disableExtension(String extensionId) {
+		allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, false);
+	}
+	
 }

@@ -13,38 +13,38 @@
  */
 package org.openmrs.module.appframework.service;
 
-import org.openmrs.User;
+import java.util.List;
+
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 
-import java.util.List;
-
 /**
- * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.
+ * This service exposes module's core functionality. It is a Spring managed bean which is configured
+ * in moduleApplicationContext.xml.
  * <p>
  * It can be accessed only via Context:<br>
  * <code>
  * Context.getService(AppFrameworkService.class).someMethod();
  * </code>
- *
+ * 
  * @see org.openmrs.api.context.Context
  */
 public interface AppFrameworkService extends OpenmrsService {
-
-    List<AppDescriptor> getAllApps();
-
-    List<Extension> getAllExtensions(String appId, String extensionPointId);
-
-    List<AppDescriptor> getAllEnabledApps();
-
-    List<Extension> getAllEnabledExtensions(String appId, String extensionPointId);
-
-    void enableApp(String appId);
-
-    void disableApp(String appId);
-
-    void enableExtension(String extensionId);
-
-    void disableExtension(String extensionId);
+	
+	List<AppDescriptor> getAllApps();
+	
+	List<Extension> getAllExtensions(String appId, String extensionPointId);
+	
+	List<AppDescriptor> getAllEnabledApps();
+	
+	List<Extension> getAllEnabledExtensions(String appId, String extensionPointId);
+	
+	void enableApp(String appId);
+	
+	void disableApp(String appId);
+	
+	void enableExtension(String extensionId);
+	
+	void disableExtension(String extensionId);
 }
