@@ -40,6 +40,15 @@ public interface AppFrameworkService extends OpenmrsService {
 	
 	List<Extension> getAllEnabledExtensions(String appId, String extensionPointId);
 	
+	/**
+	 * Gets all enabled extensions for the specified extensionPointId
+	 * 
+	 * @param extensionPointId the extensionPointId to match against
+	 * @return a set of Extensions
+	 * @should get all extensions for the specified extensionPointId
+	 */
+	List<Extension> getAllEnabledExtensions(String extensionPointId);
+	
 	void enableApp(String appId);
 	
 	void disableApp(String appId);

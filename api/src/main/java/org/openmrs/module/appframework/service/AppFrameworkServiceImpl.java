@@ -16,6 +16,7 @@ package org.openmrs.module.appframework.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.ComponentState;
@@ -93,6 +94,24 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		}
 		
 		extensions.removeAll(disabledExtensions);
+		return extensions;
+	}
+	
+	/**
+	 * @see org.openmrs.module.appframework.service.AppFrameworkService#getAllEnabledExtensions(java.lang.String)
+	 */
+	@Override
+	public List<Extension> getAllEnabledExtensions(String extensionPointId) {
+		List<Extension> extensions = new ArrayList<Extension>();
+		if (StringUtils.isBlank(extensionPointId))
+			return extensions;
+		
+		for (Extension extension : allExtensions.getExtensions()) {
+			//TODO also check if the extension and its app are enabled when the feature is implemented
+			if (extensionPointId.equals(extension.getExtensionPointId()))
+				extensions.add(extension);
+		}
+		
 		return extensions;
 	}
 	
