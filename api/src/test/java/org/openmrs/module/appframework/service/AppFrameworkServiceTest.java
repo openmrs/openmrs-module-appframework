@@ -23,6 +23,7 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
@@ -33,6 +34,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAllEnabledExtensions(String)}
 	 */
 	@Test
+	@DirtiesContext
 	@Verifies(value = "should get all extensions for the specified extensionPointId", method = "getAllEnabledExtensions(String)")
 	public void getAllEnabledExtensions_shouldGetAllExtensionsForTheSpecifiedExtensionPointId() throws Exception {
 		//trigger loading of the apps
