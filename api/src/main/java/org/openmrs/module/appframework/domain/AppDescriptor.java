@@ -34,6 +34,9 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	@JsonProperty
 	protected int order;
 	
+	@JsonProperty
+	protected String requiredPrivilege;
+	
 	@Valid
 	@JsonProperty
 	protected List<ExtensionPoint> extensionPoints;
@@ -56,7 +59,7 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	}
 	
 	public AppDescriptor(String id, String description, String label, String url, String iconUrl, String tinyIconUrl,
-	    int order, List<ExtensionPoint> extensionPoints) {
+	    int order, String requiredPrivilege, List<ExtensionPoint> extensionPoints) {
 		this.id = id;
 		this.description = description;
 		this.label = label;
@@ -64,6 +67,7 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 		this.iconUrl = iconUrl;
 		this.tinyIconUrl = tinyIconUrl;
 		this.order = order;
+		this.requiredPrivilege = requiredPrivilege;
 		this.extensionPoints = extensionPoints;
 	}
 	
@@ -93,6 +97,10 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	
 	public int getOrder() {
 		return order;
+	}
+	
+	public String getRequiredPrivilege() {
+		return requiredPrivilege;
 	}
 	
 	public List<ExtensionPoint> getExtensionPoints() {

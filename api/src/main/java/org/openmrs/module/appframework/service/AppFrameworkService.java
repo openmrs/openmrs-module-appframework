@@ -44,7 +44,7 @@ public interface AppFrameworkService extends OpenmrsService {
 	 * Gets all enabled extensions for the specified extensionPointId
 	 * 
 	 * @param extensionPointId the extensionPointId to match against
-	 * @return a set of Extensions
+	 * @return a list of Extensions
 	 * @should get all extensions for the specified extensionPointId
 	 */
 	List<Extension> getAllEnabledExtensions(String extensionPointId);
@@ -56,4 +56,23 @@ public interface AppFrameworkService extends OpenmrsService {
 	void enableExtension(String extensionId);
 	
 	void disableExtension(String extensionId);
+	
+	/**
+	 * Gets all enabled extensions for the currently logged in user
+	 * 
+	 * @return a list of Extensions
+	 * @should get all enabled extensions for the currently logged in user
+	 * @should return no extension if there is no authenticated user
+	 */
+	List<Extension> getExtensionsForCurrentUser();
+	
+	/**
+	 * Gets all enabled apps for the currently logged in user
+	 * 
+	 * @return a list of Extensions
+	 * @should get all enabled apps for the currently logged in user
+	 * @should return no app if there is no authenticated user
+	 */
+	List<AppDescriptor> getAppsForCurrentUser();
+	
 }

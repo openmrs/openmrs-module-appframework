@@ -2,6 +2,7 @@
     {
         "id": "patientDashboardApp",
         "description": "Patient Dashboard Application",
+        "requiredPrivilege": "Some Random Privilege",
         "extensionPoints": [
             {
                 "id": "activeVisitActions",
@@ -16,6 +17,7 @@
     {
         "id": "xrayApp",
         "description": "XRay Application",
+        "requiredPrivilege": "Manage X-Rays",
         "extensionPoints": [
             {
                 "id": "patientLinks"

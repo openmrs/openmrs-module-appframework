@@ -32,7 +32,7 @@ public class AppConfigurationLoaderFactoryTest extends BaseModuleContextSensitiv
         List<Extension> extensions = appConfigurationLoaderFactory.getExtensions();
 
         assertEquals(3, appDescriptors.size());
-        assertEquals(2, extensions.size());
+        assertEquals(3, extensions.size());
     }
 
 }

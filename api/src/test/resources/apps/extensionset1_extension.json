@@ -5,7 +5,8 @@
         "extensionPointId": "activeVisitActions",
         "type": "link",
         "label": "Order XRay",
-        "url": "/xray/order?patientId={{patientId}}&activeVisitId={{activeVisitId}}",
+        "url": "/xray/order.page?patientId={{patientId}}&activeVisitId={{activeVisitId}}",
+        "requiredPrivilege": "Some Random Privilege",
         "extensionParams": {
             "iconUrl": "/xray/icon"
         }
@@ -16,6 +17,15 @@
         "extensionPointId": "patientLinks",
         "type": "link",
         "label": "Goto Patient",
-        "url": "/patientDashboard?patientId={{patientId}}"
+        "url": "/orderXrays.page?patientId={{patientId}}",
+        "requiredPrivilege": "Another Random Ext Privilege"
+    },
+    {
+        "id": "gotoArchives",
+        "appId": "archiveRoomApp",
+        "extensionPointId": "patientActions",
+        "type": "link",
+        "label": "Go to Archives",
+        "url": "/archives.page?patientId={{patientId}}"
     }
 ]

@@ -31,6 +31,9 @@ public class Extension implements Comparable<Extension> {
 	protected int order;
 	
 	@JsonProperty
+	protected String requiredPrivilege;
+	
+	@JsonProperty
 	protected Map<String, Object> extensionParams;
 	
 	public Extension() {
@@ -47,7 +50,7 @@ public class Extension implements Comparable<Extension> {
 	}
 	
 	public Extension(String id, String appId, String extensionPointId, String type, String label, String url, int order,
-	    Map<String, Object> extensionParams) {
+	    String requiredPrivilege, Map<String, Object> extensionParams) {
 		this.id = id;
 		this.appId = appId;
 		this.extensionPointId = extensionPointId;
@@ -55,6 +58,7 @@ public class Extension implements Comparable<Extension> {
 		this.label = label;
 		this.url = url;
 		this.order = order;
+		this.requiredPrivilege = requiredPrivilege;
 		this.extensionParams = extensionParams;
 	}
 	
@@ -84,6 +88,10 @@ public class Extension implements Comparable<Extension> {
 	
 	public int getOrder() {
 		return order;
+	}
+	
+	public String getRequiredPrivilege() {
+		return requiredPrivilege;
 	}
 	
 	public Map<String, Object> getExtensionParams() {

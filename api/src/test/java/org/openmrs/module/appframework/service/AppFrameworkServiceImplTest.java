@@ -33,10 +33,10 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         List<AppDescriptor> appDescriptors = new ArrayList<AppDescriptor>();
         appDescriptors.add(
                 new AppDescriptor("app1", "desc1", "label1", "url1", "iconUrl", "tinyIconUrl", 20,
-                        Arrays.asList(new ExtensionPoint("extensionPoint1"), new ExtensionPoint("extensionPoint2"))));
+                        null, Arrays.asList(new ExtensionPoint("extensionPoint1"), new ExtensionPoint("extensionPoint2"))));
         appDescriptors.add(
                 new AppDescriptor("app2", "desc1", "label1", "url1", "iconUrl", "tinyIconUrl", 10,
-                        Arrays.asList(new ExtensionPoint("extensionPoint1"))));
+                        null, Arrays.asList(new ExtensionPoint("extensionPoint1"))));
         allAppDescriptors.add(appDescriptors);
 
         List<Extension> extensions = new ArrayList<Extension>();
