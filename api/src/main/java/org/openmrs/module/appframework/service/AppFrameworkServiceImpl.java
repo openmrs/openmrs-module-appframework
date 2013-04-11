@@ -150,6 +150,9 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		
 		Collection<Privilege> userPrivileges = user.getPrivileges();
 		UserService us = Context.getUserService();
+		if (user.isSuperUser())
+			return allExtensions.getExtensions();
+		
 		for (Extension extension : allExtensions.getExtensions()) {
 			//TODO also check if the extension and its app are enabled when the feature is implemented
 			if (StringUtils.isBlank(extension.getRequiredPrivilege())) {
