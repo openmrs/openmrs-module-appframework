@@ -26,10 +26,10 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	protected String url;
 	
 	@JsonProperty
-	protected String iconUrl;
+	protected String icon;
 	
 	@JsonProperty
-	protected String tinyIconUrl;
+	protected String tinyIcon;
 	
 	@JsonProperty
 	protected int order;
@@ -47,25 +47,24 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	public AppDescriptor() {
 	}
 	
-	public AppDescriptor(String id, String description, String label, String url, String iconUrl, String tinyIconUrl,
-	    int order) {
+	public AppDescriptor(String id, String description, String label, String url, String icon, String tinyIcon, int order) {
 		this.id = id;
 		this.description = description;
 		this.label = label;
 		this.url = url;
-		this.iconUrl = iconUrl;
-		this.tinyIconUrl = tinyIconUrl;
+		this.icon = icon;
+		this.tinyIcon = tinyIcon;
 		this.order = order;
 	}
 	
-	public AppDescriptor(String id, String description, String label, String url, String iconUrl, String tinyIconUrl,
-	    int order, String requiredPrivilege, List<ExtensionPoint> extensionPoints) {
+	public AppDescriptor(String id, String description, String label, String url, String icon, String tinyIcon, int order,
+	    String requiredPrivilege, List<ExtensionPoint> extensionPoints) {
 		this.id = id;
 		this.description = description;
 		this.label = label;
 		this.url = url;
-		this.iconUrl = iconUrl;
-		this.tinyIconUrl = tinyIconUrl;
+		this.icon = icon;
+		this.tinyIcon = tinyIcon;
 		this.order = order;
 		this.requiredPrivilege = requiredPrivilege;
 		this.extensionPoints = extensionPoints;
@@ -87,12 +86,12 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 		return url;
 	}
 	
-	public String getIconUrl() {
-		return iconUrl;
+	public String getIcon() {
+		return icon;
 	}
 	
-	public String getTinyIconUrl() {
-		return tinyIconUrl;
+	public String getTinyIcon() {
+		return tinyIcon;
 	}
 	
 	public int getOrder() {

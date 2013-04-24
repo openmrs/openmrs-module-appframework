@@ -67,6 +67,15 @@ public interface AppFrameworkService extends OpenmrsService {
 	List<Extension> getExtensionsForCurrentUser();
 	
 	/**
+	 * Gets all enabled extensions for the currently logged in user for the specified
+	 * extensionPointId
+	 * 
+	 * @return a list of Extensions
+	 * @should get all enabled extensions for the logged in user and extensionPointId
+	 */
+	List<Extension> getExtensionsForCurrentUser(String extensionPointId);
+	
+	/**
 	 * Gets all enabled apps for the currently logged in user
 	 * 
 	 * @return a list of Extensions

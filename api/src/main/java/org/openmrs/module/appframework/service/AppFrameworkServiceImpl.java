@@ -143,9 +143,14 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	@Override
 	public List<Extension> getExtensionsForCurrentUser() {
+		return getExtensionsForCurrentUser(null);
+	}
+	
+	@Override
+	public List<Extension> getExtensionsForCurrentUser(String extensionPointId) {
 		List<Extension> extensions = new ArrayList<Extension>();
 		User user = Context.getAuthenticatedUser();
-		if (user == null)
+		if (user == null && extensionPointId == null)
 			return extensions;
 		
 		Collection<Privilege> userPrivileges = user.getPrivileges();
@@ -154,6 +159,9 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			return allExtensions.getExtensions();
 		
 		for (Extension extension : allExtensions.getExtensions()) {
+			if (extensionPointId != null && !extensionPointId.equalsIgnoreCase(extension.getExtensionPointId()))
+				continue;
+			
 			//TODO also check if the extension and its app are enabled when the feature is implemented
 			if (StringUtils.isBlank(extension.getRequiredPrivilege())) {
 				extensions.add(extension);

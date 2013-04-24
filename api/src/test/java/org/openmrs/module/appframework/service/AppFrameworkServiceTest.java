@@ -164,4 +164,22 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertNull(Context.getAuthenticatedUser());
 		assertTrue(appFrameworkService.getExtensionsForCurrentUser().isEmpty());
 	}
+	
+	/**
+	 * @see AppFrameworkService#getExtensionsForCurrentUser(String)
+	 * @verifies get all enabled extensions for the logged in user and extensionPointId
+	 */
+	@Test
+	@DirtiesContext
+	@Verifies(value = "should return no extension if there is no authenticated user", method = "getExtensionsForCurrentUser(String)")
+	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheLoggedInUserAndExtensionPointId()
+	    throws Exception {
+		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
+		Context.authenticate(user.getUsername(), "Openmr5xy");
+		assertEquals(user, Context.getAuthenticatedUser());
+		
+		List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("activeVisitActions");
+		assertEquals(1, userExts.size());
+		assertEquals("orderXrayExtension", userExts.get(0).getId());
+	}
 }

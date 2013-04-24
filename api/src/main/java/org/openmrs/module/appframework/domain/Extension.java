@@ -28,6 +28,9 @@ public class Extension implements Comparable<Extension> {
 	protected String url;
 	
 	@JsonProperty
+	protected String icon;
+	
+	@JsonProperty
 	protected int order;
 	
 	@JsonProperty
@@ -84,6 +87,10 @@ public class Extension implements Comparable<Extension> {
 	
 	public String getUrl() {
 		return url;
+	}
+	
+	public String getIcon() {
+		return icon;
 	}
 	
 	public int getOrder() {
