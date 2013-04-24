@@ -70,6 +70,7 @@ public interface AppFrameworkService extends OpenmrsService {
 	 * Gets all enabled extensions for the currently logged in user for the specified
 	 * extensionPointId
 	 * 
+	 * @param extensionPointId the extension point id to match against
 	 * @return a list of Extensions
 	 * @should get all enabled extensions for the logged in user and extensionPointId
 	 */
