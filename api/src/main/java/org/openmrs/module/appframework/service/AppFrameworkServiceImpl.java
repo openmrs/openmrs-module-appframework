@@ -31,13 +31,10 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllExtensions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
  */
-@Service
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
 	
 	private AllAppDescriptors allAppDescriptors;
@@ -46,7 +43,6 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	private AllComponentsState allComponentsState;
 	
-	@Autowired
 	public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
 	    AllComponentsState allComponentsState) {
 		this.allAppDescriptors = allAppDescriptors;

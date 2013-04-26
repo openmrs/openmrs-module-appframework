@@ -40,7 +40,7 @@ import org.springframework.test.annotation.DirtiesContext;
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
 	@Autowired
-	private AppFrameworkServiceImpl appFrameworkService;
+	private AppFrameworkService appFrameworkService;
 	
 	@Before
 	public void setup() {

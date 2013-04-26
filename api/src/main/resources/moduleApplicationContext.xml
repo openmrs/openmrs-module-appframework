@@ -35,7 +35,11 @@
             <ref bean="transactionManager" />
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkServiceImpl" />
+            <bean class="${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkServiceImpl">
+            	<constructor-arg ref="allAppDescriptors"/>
+            	<constructor-arg ref="allExtensions"/>
+            	<constructor-arg ref="allComponentsState"/>
+            </bean>
         </property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors" />

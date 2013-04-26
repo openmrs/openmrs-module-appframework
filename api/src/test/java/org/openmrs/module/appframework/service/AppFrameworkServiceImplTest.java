@@ -1,5 +1,11 @@
 package org.openmrs.module.appframework.service;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,16 +17,10 @@ import org.openmrs.module.appframework.repository.AllExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-
 public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
-    private AppFrameworkServiceImpl appFrameworkService;
+    private AppFrameworkService appFrameworkService;
 
     @Autowired
     private AllAppDescriptors allAppDescriptors;
