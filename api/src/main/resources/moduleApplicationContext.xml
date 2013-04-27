@@ -14,6 +14,12 @@
 			</list>
 		</property>
 	</bean>
+
+    <bean id="allComponentsState" class="org.openmrs.module.appframework.repository.AllComponentsState">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
 	
 	<bean id="appFrameworkService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">

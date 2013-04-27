@@ -13,15 +13,8 @@
  */
 package org.openmrs.module.appframework.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Privilege;
 import org.openmrs.User;
-import org.openmrs.api.APIException;
-import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
@@ -31,6 +24,9 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllExtensions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -149,8 +145,6 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		if (user == null && extensionPointId == null)
 			return extensions;
 		
-		Collection<Privilege> userPrivileges = user.getPrivileges();
-		UserService us = Context.getUserService();
 		if (user.isSuperUser())
 			return allExtensions.getExtensions();
 		
@@ -163,14 +157,10 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				extensions.add(extension);
 				continue;
 			}
-			
-			Privilege p = us.getPrivilege(extension.getRequiredPrivilege());
-			
-			if (p == null)
-				throw new APIException("Unknown privilege:" + extension.getRequiredPrivilege());
-			
-			if (userPrivileges.contains(p))
+
+            if (user.hasPrivilege(extension.getRequiredPrivilege())) {
 				extensions.add(extension);
+            }
 		}
 		
 		return extensions;
@@ -187,21 +177,15 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		if (user.isSuperUser())
 			return enabledApps;
 		
-		Collection<Privilege> userPrivileges = user.getPrivileges();
-		UserService us = Context.getUserService();
 		for (AppDescriptor appDescriptor : enabledApps) {
 			if (StringUtils.isBlank(appDescriptor.getRequiredPrivilege())) {
 				userApps.add(appDescriptor);
 				continue;
 			}
 			
-			Privilege p = us.getPrivilege(appDescriptor.getRequiredPrivilege());
-			
-			if (p == null)
-				throw new APIException("Unknown privilege:" + appDescriptor.getRequiredPrivilege());
-			
-			if (userPrivileges.contains(p))
-				userApps.add(appDescriptor);
+			if (user.hasPrivilege(appDescriptor.getRequiredPrivilege())) {
+                userApps.add(appDescriptor);
+            }
 		}
 		return userApps;
 	}
