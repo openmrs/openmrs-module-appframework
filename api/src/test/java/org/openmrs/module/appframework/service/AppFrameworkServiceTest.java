@@ -32,11 +32,13 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+@DirtiesContext
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
 	@Autowired
