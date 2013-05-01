@@ -13,6 +13,9 @@
  */
 package org.openmrs.module.appframework.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
@@ -24,9 +27,6 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllExtensions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -142,27 +142,22 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	public List<Extension> getExtensionsForCurrentUser(String extensionPointId) {
 		List<Extension> extensions = new ArrayList<Extension>();
 		User user = Context.getAuthenticatedUser();
-		if (user == null && extensionPointId == null)
+		if (user == null)
 			return extensions;
-		
-		if (user.isSuperUser())
-			return allExtensions.getExtensions();
-		
-		for (Extension extension : allExtensions.getExtensions()) {
-			if (extensionPointId != null && !extensionPointId.equalsIgnoreCase(extension.getExtensionPointId()))
-				continue;
-			
-			//TODO also check if the extension and its app are enabled when the feature is implemented
-			if (StringUtils.isBlank(extension.getRequiredPrivilege())) {
-				extensions.add(extension);
-				continue;
-			}
 
-            if (user.hasPrivilege(extension.getRequiredPrivilege())) {
-				extensions.add(extension);
+        if (user.isSuperUser()) {
+            return getAllEnabledExtensions(extensionPointId);
+        }
+
+        for (Extension extension : allExtensions.getExtensions()) {
+            //TODO also check if the extension and its app are enabled when the feature is implemented
+            boolean isWantedExtension = extensionPointId == null ||
+                extensionPointId.equalsIgnoreCase(extension.getExtensionPointId());
+            if (isWantedExtension && userHasPrivilege(user, extension.getRequiredPrivilege())) {
+                extensions.add(extension);
             }
-		}
-		
+        }
+
 		return extensions;
 	}
 	
@@ -178,15 +173,15 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			return enabledApps;
 		
 		for (AppDescriptor appDescriptor : enabledApps) {
-			if (StringUtils.isBlank(appDescriptor.getRequiredPrivilege())) {
-				userApps.add(appDescriptor);
-				continue;
-			}
-			
-			if (user.hasPrivilege(appDescriptor.getRequiredPrivilege())) {
+            if (userHasPrivilege(user, appDescriptor.getRequiredPrivilege())) {
                 userApps.add(appDescriptor);
             }
 		}
 		return userApps;
 	}
+
+    private boolean userHasPrivilege(User user, String privilege) {
+        return StringUtils.isBlank(privilege) ||
+            user.hasPrivilege(privilege);
+    }
 }

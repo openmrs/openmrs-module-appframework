@@ -13,10 +13,6 @@
  */
 package org.openmrs.module.appframework.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +30,12 @@ import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
+import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
@@ -83,7 +83,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAllEnabledExtensions(String)}
 	 */
 	@Test
-	@DirtiesContext
 	@Verifies(value = "should get all extensions for the specified extensionPointId", method = "getAllEnabledExtensions(String)")
 	public void getAllEnabledExtensions_shouldGetAllExtensionsForTheSpecifiedExtensionPointId() throws Exception {
 		List<Extension> visitExts = appFrameworkService.getAllEnabledExtensions("activeVisitActions");
@@ -99,7 +98,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAppsForCurrentUser()}
 	 */
 	@Test
-	@DirtiesContext
 	@Verifies(value = "should get all enabled apps for the currently logged in user", method = "getAppsForCurrentUser()")
 	public void getAppsForCurrentUser_shouldGetAllEnabledAppsForTheCurrentlyLoggedInUser() throws Exception {
 		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
@@ -120,7 +118,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getExtensionsForCurrentUser()}
 	 */
 	@Test
-	@DirtiesContext
 	@Verifies(value = "should get all enabled extensions for the currently logged in user", method = "getExtensionsForCurrentUser()")
 	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheCurrentlyLoggedInUser() throws Exception {
 		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
@@ -141,7 +138,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAppsForCurrentUser()}
 	 */
 	@Test
-	@DirtiesContext
 	@Verifies(value = "should return no app if there is no authenticated user", method = "getAppsForCurrentUser()")
 	public void getAppsForCurrentUser_shouldReturnNoAppIfThereIsNoAuthenticatedUser() throws Exception {
 		setupPrivilegesRolesAndUser("Some Random Privilege");
@@ -155,7 +151,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getExtensionsForCurrentUser()}
 	 */
 	@Test
-	@DirtiesContext
 	@Verifies(value = "should return no extension if there is no authenticated user", method = "getExtensionsForCurrentUser()")
 	public void getExtensionsForCurrentUser_shouldReturnNoExtensionIfThereIsNoAuthenticatedUser() throws Exception {
 		setupPrivilegesRolesAndUser("Some Random Privilege");
@@ -170,16 +165,72 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @verifies get all enabled extensions for the logged in user and extensionPointId
 	 */
 	@Test
-	@DirtiesContext
 	@Verifies(value = "should return no extension if there is no authenticated user", method = "getExtensionsForCurrentUser(String)")
-	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheLoggedInUserAndExtensionPointId()
+	public void getExtensionsForCurrentUser_shouldReturnNoExtensionForNoLoggedInUser()
 	    throws Exception {
-		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
-		Context.authenticate(user.getUsername(), "Openmr5xy");
-		assertEquals(user, Context.getAuthenticatedUser());
-		
+        Context.logout();
 		List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("activeVisitActions");
-		assertEquals(1, userExts.size());
-		assertEquals("orderXrayExtension", userExts.get(0).getId());
+		assertEquals(0, userExts.size());
 	}
+
+    /**
+     * @see AppFrameworkService#getExtensionsForCurrentUser(String)
+     * @verifies get all enabled extensions for the logged in user and extensionPointId
+     */
+    @Test
+    @Verifies(value = "should get all enabled extensions for the logged in user and extension point id", method = "getExtensionsForCurrentUser(String)")
+    public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheLoggedInUserAndExtensionPointId()
+        throws Exception {
+        User user = setupPrivilegesRolesAndUser("Some Random Privilege");
+        Context.authenticate(user.getUsername(), "Openmr5xy");
+        assertEquals(user, Context.getAuthenticatedUser());
+
+        List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("activeVisitActions");
+        assertEquals(1, userExts.size());
+        assertEquals("orderXrayExtension", userExts.get(0).getId());
+    }
+
+    /**
+     * @see AppFrameworkService#getExtensionsForCurrentUser(String)
+     * @verifies get all enabled extensions for the logged in user and extensionPointId
+     */
+    @Test
+    @Verifies(value = "should return no extension for is user does not have privilege", method = "getExtensionsForCurrentUser(String)")
+    public void getExtensionsForCurrentUser_shouldReturnNoExtensionForUserWithoutPrivilege()
+        throws Exception {
+        User user = setupPrivilegesRolesAndUser("Another Random Ext Privilege");
+        Context.authenticate(user.getUsername(), "Openmr5xy");
+        assertEquals(user, Context.getAuthenticatedUser());
+
+        List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("activeVisitActions");
+        assertEquals(0, userExts.size());
+    }
+
+    /**
+     * @see AppFrameworkService#getExtensionsForCurrentUser(String)
+     * @verifies get all enabled extensions for the logged in user and extensionPointId
+     */
+    @Test
+    @Verifies(value = "should return just extensions of the id for super user", method = "getExtensionsForCurrentUser(String)")
+    public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheSuperUserAndExtensionPointId()
+        throws Exception {
+
+        User user = new User();
+        user.setPerson(new Person());
+        user.setUsername("username");
+        user.addName(new PersonName("Some", null, "User"));
+        user.getPerson().setGender("M");
+        user.addRole(new Role(RoleConstants.SUPERUSER, "description"));
+
+        UserService us = Context.getUserService();
+        us.saveUser(user, "Openmr5xy");
+
+        Context.authenticate(user.getUsername(), "Openmr5xy");
+        assertEquals(user, Context.getAuthenticatedUser());
+
+        List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("activeVisitActions");
+        assertEquals(1, userExts.size());
+        assertEquals("orderXrayExtension", userExts.get(0).getId());
+    }
+
 }
