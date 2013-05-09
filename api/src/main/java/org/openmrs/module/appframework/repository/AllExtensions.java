@@ -1,16 +1,15 @@
 package org.openmrs.module.appframework.repository;
 
+import org.openmrs.module.appframework.domain.Extension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
-import org.openmrs.module.appframework.domain.Extension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class AllExtensions {
@@ -45,7 +44,7 @@ public class AllExtensions {
 			throw new IllegalArgumentException(constraintViolations.iterator().next().getMessage());
 		
 		if (this.extensions.contains(extension))
-			throw new IllegalArgumentException("Extension already exists");
+			throw new IllegalArgumentException("Extension already exists: " + extension.getId());
 	}
 	
 	public List<Extension> getExtensions() {

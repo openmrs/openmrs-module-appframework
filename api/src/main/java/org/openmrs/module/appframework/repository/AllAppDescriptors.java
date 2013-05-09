@@ -1,16 +1,15 @@
 package org.openmrs.module.appframework.repository;
 
+import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
-import org.openmrs.module.appframework.domain.AppDescriptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class AllAppDescriptors {
@@ -47,7 +46,7 @@ public class AllAppDescriptors {
 			throw new IllegalArgumentException(constraintViolations.iterator().next().getMessage());
 		
 		if (this.appDescriptors.contains(appDescriptor))
-			throw new IllegalArgumentException("App already exists.");
+			throw new IllegalArgumentException("App already exists: " + appDescriptor.getId());
 	}
 	
 	public List<AppDescriptor> getAppDescriptors() {

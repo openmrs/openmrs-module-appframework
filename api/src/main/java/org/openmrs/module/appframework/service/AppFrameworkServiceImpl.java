@@ -13,12 +13,9 @@
  */
 package org.openmrs.module.appframework.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.User;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.UserContext;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.ComponentState;
@@ -27,6 +24,9 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllExtensions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -101,13 +101,12 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	@Override
 	public List<Extension> getAllEnabledExtensions(String extensionPointId) {
 		List<Extension> extensions = new ArrayList<Extension>();
-		if (StringUtils.isBlank(extensionPointId))
-			return extensions;
-		
+
 		for (Extension extension : allExtensions.getExtensions()) {
-			//TODO also check if the extension and its app are enabled when the feature is implemented
-			if (extensionPointId.equals(extension.getExtensionPointId()))
+			//TODO also check if the candidate and its app are enabled when the feature is implemented
+			if (extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId())) {
 				extensions.add(extension);
+            }
 		}
 		
 		return extensions;
@@ -141,20 +140,11 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	@Override
 	public List<Extension> getExtensionsForCurrentUser(String extensionPointId) {
 		List<Extension> extensions = new ArrayList<Extension>();
-		User user = Context.getAuthenticatedUser();
-		if (user == null)
-			return extensions;
+        UserContext userContext = Context.getUserContext();
 
-        if (user.isSuperUser()) {
-            return getAllEnabledExtensions(extensionPointId);
-        }
-
-        for (Extension extension : allExtensions.getExtensions()) {
-            //TODO also check if the extension and its app are enabled when the feature is implemented
-            boolean isWantedExtension = extensionPointId == null ||
-                extensionPointId.equalsIgnoreCase(extension.getExtensionPointId());
-            if (isWantedExtension && userHasPrivilege(user, extension.getRequiredPrivilege())) {
-                extensions.add(extension);
+        for (Extension candidate : getAllEnabledExtensions(extensionPointId)) {
+            if (StringUtils.isEmpty(candidate.getRequiredPrivilege()) || userContext.hasPrivilege(candidate.getRequiredPrivilege())) {
+                extensions.add(candidate);
             }
         }
 
@@ -164,24 +154,19 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	@Override
 	public List<AppDescriptor> getAppsForCurrentUser() {
 		List<AppDescriptor> userApps = new ArrayList<AppDescriptor>();
-		User user = Context.getAuthenticatedUser();
-		if (user == null)
-			return userApps;
-		
+        UserContext userContext = Context.getUserContext();
+
 		List<AppDescriptor> enabledApps = getAllEnabledApps();
-		if (user.isSuperUser())
-			return enabledApps;
-		
-		for (AppDescriptor appDescriptor : enabledApps) {
-            if (userHasPrivilege(user, appDescriptor.getRequiredPrivilege())) {
-                userApps.add(appDescriptor);
+
+		for (AppDescriptor candidate : enabledApps) {
+            if (hasPrivilege(userContext, candidate.getRequiredPrivilege())) {
+                userApps.add(candidate);
             }
 		}
 		return userApps;
 	}
 
-    private boolean userHasPrivilege(User user, String privilege) {
-        return StringUtils.isBlank(privilege) ||
-            user.hasPrivilege(privilege);
+    private boolean hasPrivilege(UserContext userContext, String privilege) {
+        return StringUtils.isBlank(privilege) || userContext.hasPrivilege(privilege);
     }
 }

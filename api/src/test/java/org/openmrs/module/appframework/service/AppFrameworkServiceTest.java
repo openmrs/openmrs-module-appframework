@@ -13,9 +13,6 @@
  */
 package org.openmrs.module.appframework.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Person;
@@ -34,8 +31,14 @@ import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @DirtiesContext
@@ -140,26 +143,29 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAppsForCurrentUser()}
 	 */
 	@Test
-	@Verifies(value = "should return no app if there is no authenticated user", method = "getAppsForCurrentUser()")
+	@Verifies(value = "should return apps with no required privilege if there is no authenticated user", method = "getAppsForCurrentUser()")
 	public void getAppsForCurrentUser_shouldReturnNoAppIfThereIsNoAuthenticatedUser() throws Exception {
 		setupPrivilegesRolesAndUser("Some Random Privilege");
 		if (Context.getAuthenticatedUser() != null)
 			Context.logout();
 		assertNull(Context.getAuthenticatedUser());
-		assertTrue(appFrameworkService.getAppsForCurrentUser().isEmpty());
-	}
+        List<AppDescriptor> actual = appFrameworkService.getAppsForCurrentUser();
+        assertThat(actual, hasSize(1));
+        assertThat(actual.get(0).getId(), is("archiveRoomApp")); // this requires no privilege
+    }
 	
 	/**
 	 * @see {@link AppFrameworkService#getExtensionsForCurrentUser()}
 	 */
 	@Test
-	@Verifies(value = "should return no extension if there is no authenticated user", method = "getExtensionsForCurrentUser()")
+	@Verifies(value = "should return extensions with no required privilege if there is no authenticated user", method = "getExtensionsForCurrentUser()")
 	public void getExtensionsForCurrentUser_shouldReturnNoExtensionIfThereIsNoAuthenticatedUser() throws Exception {
 		setupPrivilegesRolesAndUser("Some Random Privilege");
 		if (Context.getAuthenticatedUser() != null)
 			Context.logout();
 		assertNull(Context.getAuthenticatedUser());
-		assertTrue(appFrameworkService.getExtensionsForCurrentUser().isEmpty());
+		assertThat(appFrameworkService.getExtensionsForCurrentUser(), hasSize(1));
+        assertThat(appFrameworkService.getExtensionsForCurrentUser().get(0).getId(), is("gotoArchives"));
 	}
 	
 	/**

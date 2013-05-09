@@ -13,11 +13,11 @@
  */
 package org.openmrs.module.appframework.service;
 
-import java.util.List;
-
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
+
+import java.util.List;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured
@@ -62,7 +62,7 @@ public interface AppFrameworkService extends OpenmrsService {
 	 * 
 	 * @return a list of Extensions
 	 * @should get all enabled extensions for the currently logged in user
-	 * @should return no extension if there is no authenticated user
+     * @should return extensions with no required privilege if there is no authenticated user
 	 */
 	List<Extension> getExtensionsForCurrentUser();
 	
@@ -81,7 +81,7 @@ public interface AppFrameworkService extends OpenmrsService {
 	 * 
 	 * @return a list of Extensions
 	 * @should get all enabled apps for the currently logged in user
-	 * @should return no app if there is no authenticated user
+     * @should return apps with no required privilege if there is no authenticated user
 	 */
 	List<AppDescriptor> getAppsForCurrentUser();
 	
