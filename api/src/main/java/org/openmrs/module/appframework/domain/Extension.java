@@ -37,6 +37,9 @@ public class Extension implements Comparable<Extension> {
 	protected String requiredPrivilege;
 	
 	@JsonProperty
+	protected String script;
+	
+	@JsonProperty
 	protected Map<String, Object> extensionParams;
 	
 	public Extension() {
@@ -99,6 +102,10 @@ public class Extension implements Comparable<Extension> {
 	
 	public String getRequiredPrivilege() {
 		return requiredPrivilege;
+	}
+	
+	public String getScript() {
+		return script;
 	}
 	
 	public Map<String, Object> getExtensionParams() {
