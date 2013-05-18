@@ -49,7 +49,7 @@ public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
                 extensionsForResource = objectMapper.readValue(extensionResource.getInputStream(), new TypeReference<List<Extension>>() {});
                 extensions.addAll(extensionsForResource);
             } catch (IOException e) {
-                logger.fatal("Error reading extension configuration file.", e);
+                logger.fatal("Error reading extension configuration file: " + extensionResource.getFilename(), e);
             }
         }
         return extensions;
