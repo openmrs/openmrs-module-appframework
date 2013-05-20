@@ -14,9 +14,13 @@
 package org.openmrs.module.appframework.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.openmrs.Location;
+import org.openmrs.LocationTag;
+import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
@@ -24,6 +28,7 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllExtensions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +43,15 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	private AllExtensions allExtensions;
 	
 	private AllComponentsState allComponentsState;
-	
-	public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
-	    AllComponentsState allComponentsState) {
+
+    private LocationService locationService;
+
+    public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
+	    AllComponentsState allComponentsState, LocationService locationService) {
 		this.allAppDescriptors = allAppDescriptors;
 		this.allExtensions = allExtensions;
 		this.allComponentsState = allComponentsState;
+        this.locationService = locationService;
 	}
 	
 	@Override
@@ -165,6 +173,17 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		}
 		return userApps;
 	}
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Location> getLoginLocations() {
+        LocationTag supportsLogin = locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
+        List<Location> locations = locationService.getLocationsByTag(supportsLogin);
+        if (locations.size() == 0) {
+            locations = locationService.getAllLocations(false);
+        }
+        return locations;
+    }
 
     private boolean hasPrivilege(UserContext userContext, String privilege) {
         return StringUtils.isBlank(privilege) || userContext.hasPrivilege(privilege);

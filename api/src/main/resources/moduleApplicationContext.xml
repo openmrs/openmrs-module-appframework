@@ -30,6 +30,7 @@
             	<constructor-arg ref="allAppDescriptors"/>
             	<constructor-arg ref="allExtensions"/>
             	<constructor-arg ref="allComponentsState"/>
+            	<constructor-arg ref="locationService"/>
             </bean>
         </property>
         <property name="preInterceptors">
