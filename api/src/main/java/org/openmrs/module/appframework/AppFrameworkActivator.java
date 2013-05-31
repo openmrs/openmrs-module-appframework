@@ -16,6 +16,8 @@ package org.openmrs.module.appframework;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.LocationTag;
+import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
@@ -34,8 +36,8 @@ import java.util.List;
  * This class contains the logic that is run every time this module is either started or stopped.
  */
 public class AppFrameworkActivator extends BaseModuleActivator implements ModuleActivator {
-	
-	protected Log log = LogFactory.getLog(getClass());
+
+    protected Log log = LogFactory.getLog(getClass());
 
 	/**
 	 * @see ModuleActivator#contextRefreshed()
@@ -75,5 +77,22 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
             }
         }
     }
-	
+
+    @Override
+    public void started() {
+        setupLoginLocationTag(Context.getLocationService());
+        super.started();
+    }
+
+    public void setupLoginLocationTag(LocationService locationService) {
+        LocationTag supportsLogin = locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
+        if (supportsLogin == null) {
+            supportsLogin = new LocationTag();
+            supportsLogin.setName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
+            supportsLogin.setDescription(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN_DESCRIPTION);
+            supportsLogin.setUuid(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN_UUID);
+            locationService.saveLocationTag(supportsLogin);
+        }
+    }
+
 }
