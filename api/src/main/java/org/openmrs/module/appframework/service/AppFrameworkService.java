@@ -16,6 +16,7 @@ package org.openmrs.module.appframework.service;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
 
 import java.util.List;
@@ -35,11 +36,9 @@ public interface AppFrameworkService extends OpenmrsService {
 	
 	List<AppDescriptor> getAllApps();
 	
-	List<Extension> getAllExtensions(String appId, String extensionPointId);
+	List<Extension> getAllExtensions(String extensionPointId);
 	
 	List<AppDescriptor> getAllEnabledApps();
-	
-	List<Extension> getAllEnabledExtensions(String appId, String extensionPointId);
 	
 	/**
 	 * Gets all enabled extensions for the specified extensionPointId
@@ -93,5 +92,24 @@ public interface AppFrameworkService extends OpenmrsService {
      * @return all locations that you can choose as a sessionLocation when logging in
      */
     List<Location> getLoginLocations();
+
+    /**
+     * @return all app templates
+     */
+    List<AppTemplate> getAllAppTemplates();
+
+    /**
+     * Gets an app template by its id
+     * @param id
+     * @return
+     */
+    AppTemplate getAppTemplate(String id);
+
+    /**
+     * Gets an app by its id
+     * @param id
+     * @return
+     */
+    AppDescriptor getApp(String id);
 
 }

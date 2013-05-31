@@ -22,10 +22,12 @@ import org.openmrs.api.context.UserContext;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
+import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllExtensions;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,9 @@ import java.util.List;
  * It is a default implementation of {@link AppFrameworkService}.
  */
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
-	
+
+    private AllAppTemplates allAppTemplates;
+
 	private AllAppDescriptors allAppDescriptors;
 	
 	private AllExtensions allExtensions;
@@ -46,8 +50,9 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private LocationService locationService;
 
-    public AppFrameworkServiceImpl(AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
+    public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
 	    AllComponentsState allComponentsState, LocationService locationService) {
+        this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allExtensions = allExtensions;
 		this.allComponentsState = allComponentsState;
@@ -60,12 +65,10 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	}
 	
 	@Override
-	public List<Extension> getAllExtensions(String appId, String extensionPointId) {
-		List<Extension> extensions = allExtensions.getExtensions();
-		List<Extension> matchingExtensions = new ArrayList<Extension>();
-		for (Extension extension : extensions) {
-			if (extension.getAppId().equalsIgnoreCase(appId)
-			        && extension.getExtensionPointId().equalsIgnoreCase(extensionPointId))
+	public List<Extension> getAllExtensions(String extensionPointId) {
+        List<Extension> matchingExtensions = new ArrayList<Extension>();
+		for (Extension extension : allExtensions.getExtensions()) {
+			if (extensionPointId == null || extension.getExtensionPointId().equalsIgnoreCase(extensionPointId))
 				matchingExtensions.add(extension);
 		}
 		return matchingExtensions;
@@ -87,22 +90,6 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		return appDescriptors;
 	}
 	
-	@Override
-	public List<Extension> getAllEnabledExtensions(String appId, String extensionPointId) {
-		List<Extension> extensions = getAllExtensions(appId, extensionPointId);
-		
-		ComponentState componentState;
-		List<Extension> disabledExtensions = new ArrayList<Extension>();
-		for (Extension extension : extensions) {
-			componentState = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
-			if (componentState != null && !componentState.getEnabled())
-				disabledExtensions.add(extension);
-		}
-		
-		extensions.removeAll(disabledExtensions);
-		return extensions;
-	}
-	
 	/**
 	 * @see org.openmrs.module.appframework.service.AppFrameworkService#getAllEnabledExtensions(java.lang.String)
 	 */
@@ -110,10 +97,25 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	public List<Extension> getAllEnabledExtensions(String extensionPointId) {
 		List<Extension> extensions = new ArrayList<Extension>();
 
-		for (Extension extension : allExtensions.getExtensions()) {
-			//TODO also check if the candidate and its app are enabled when the feature is implemented
+        // first get all extensions from enabled apps
+        for (AppDescriptor app : getAllEnabledApps()) {
+            if (app.getExtensions() != null) {
+                for (Extension candidate : app.getExtensions()) {
+                    // extensions that belong to apps can't be disabled independently of their app, so we don't check AllComponentsState here
+                    if (extensionPointId == null || extensionPointId.equals(candidate.getExtensionPointId())) {
+                        extensions.addAll(app.getExtensions());
+                    }
+                }
+            }
+        }
+
+        // now get "standalone extensions"
+        for (Extension extension : allExtensions.getExtensions()) {
 			if (extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId())) {
-				extensions.add(extension);
+                ComponentState state = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
+                if (state == null || state.getEnabled()) {
+    				extensions.add(extension);
+                }
             }
 		}
 		
@@ -151,7 +153,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         UserContext userContext = Context.getUserContext();
 
         for (Extension candidate : getAllEnabledExtensions(extensionPointId)) {
-            if (StringUtils.isEmpty(candidate.getRequiredPrivilege()) || userContext.hasPrivilege(candidate.getRequiredPrivilege())) {
+            if ( (candidate.getBelongsTo() == null || hasPrivilege(userContext, candidate.getBelongsTo().getRequiredPrivilege()))
+                    && hasPrivilege(userContext, candidate.getRequiredPrivilege()) ) {
                 extensions.add(candidate);
             }
         }
@@ -188,4 +191,20 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     private boolean hasPrivilege(UserContext userContext, String privilege) {
         return StringUtils.isBlank(privilege) || userContext.hasPrivilege(privilege);
     }
+
+    @Override
+    public List<AppTemplate> getAllAppTemplates() {
+        return allAppTemplates.getAppTemplates();
+    }
+
+    @Override
+    public AppTemplate getAppTemplate(String id) {
+        return allAppTemplates.getAppTemplate(id);
+    }
+
+    @Override
+    public AppDescriptor getApp(String id) {
+        return allAppDescriptors.getAppDescriptor(id);
+    }
+
 }

@@ -1,0 +1,13 @@
+{
+    "id": "registrationapp.registerPatient",
+    "extensionPoints": [
+        { "id": "detailToShowAboutPossibleMatchingPatient", "supportedExtensionTypes": ["include-fragment"] }
+    ],
+    "contextModel": [
+        "createdPatientId"
+    ],
+    "configOptions": [
+        { "name": "extraFields", "description": "blah blah how to set it up", "defaultValue": [] },
+        { "name": "urlOnSuccess", "defaultValue": "patientDashboard.page?patientId={{appContext.createdPatientId}}" }
+    ]
+}

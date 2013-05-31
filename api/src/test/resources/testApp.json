@@ -1,0 +1,17 @@
+{
+    "id": "referenceapplication.registerPatient.outpatient",
+    "instanceOf": "registrationapp.registerPatient",
+    "config": {
+        "extraFields": [ "some stuff here" ]
+    },
+    "extensions": [
+        {
+            "extensionPointId": "homepageLink",
+            "type": "link",
+            "label": "Register New Outpatient",
+            "extensionParams": {
+                "iconUrl": "/xray/icon"
+            }
+        }
+    ]
+}

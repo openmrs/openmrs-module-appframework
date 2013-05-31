@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -22,6 +23,22 @@ public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
+
+    @Override
+    public List<AppTemplate> getAppTemplates() throws IOException {
+        Resource[] appDefinitionJsonResources = resourceResolver.getResources("classpath*:/apps/*AppTemplates.json");
+        List<AppTemplate> templates = new ArrayList<AppTemplate>();
+        for (Resource appDefinitionResource : appDefinitionJsonResources) {
+            List<AppTemplate> forResource;
+            try {
+                forResource = objectMapper.readValue(appDefinitionResource.getInputStream(), new TypeReference<List<AppTemplate>>() {});
+                templates.addAll(forResource);
+            } catch (IOException e) {
+                logger.fatal("Error reading AppTemplates configuration file", e);
+            }
+        }
+        return templates;
+    }
 
     @Override
     public List<AppDescriptor> getAppDescriptors() throws IOException {

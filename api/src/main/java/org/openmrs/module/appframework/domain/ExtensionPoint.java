@@ -4,6 +4,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
 
+import java.util.List;
+
 public class ExtensionPoint {
 
     @NotEmpty(message = ValidationErrorMessages.EXTENSION_POINT_ID_NOT_EMPTY_MESSAGE)
@@ -12,6 +14,9 @@ public class ExtensionPoint {
 
     @JsonProperty
     protected String description;
+
+    @JsonProperty
+    protected List<String> supportedExtensionTypes;
 
 
     public ExtensionPoint() {
@@ -32,5 +37,21 @@ public class ExtensionPoint {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<String> getSupportedExtensionTypes() {
+        return supportedExtensionTypes;
+    }
+
+    public void setSupportedExtensionTypes(List<String> supportedExtensionTypes) {
+        this.supportedExtensionTypes = supportedExtensionTypes;
     }
 }

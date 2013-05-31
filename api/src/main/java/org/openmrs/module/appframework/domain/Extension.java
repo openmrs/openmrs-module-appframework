@@ -1,10 +1,10 @@
 package org.openmrs.module.appframework.domain;
 
-import java.util.Map;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
+
+import java.util.Map;
 
 public class Extension implements Comparable<Extension> {
 	
@@ -41,8 +41,14 @@ public class Extension implements Comparable<Extension> {
 	
 	@JsonProperty
 	protected Map<String, Object> extensionParams;
-	
-	public Extension() {
+
+    /**
+     * Will be set by {@link org.openmrs.module.appframework.AppFrameworkActivator} if this extension is defined within
+     * an app
+     */
+    transient private AppDescriptor belongsTo;
+
+    public Extension() {
 	}
 	
 	public Extension(String id, String appId, String extensionPointId, String type, String label, String url, int order) {
@@ -140,4 +146,12 @@ public class Extension implements Comparable<Extension> {
 	public int compareTo(Extension o) {
 		return new Integer(this.order).compareTo(o.order);
 	}
+
+    public void setBelongsTo(AppDescriptor belongsTo) {
+        this.belongsTo = belongsTo;
+    }
+
+    public AppDescriptor getBelongsTo() {
+        return belongsTo;
+    }
 }

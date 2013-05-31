@@ -3,9 +3,9 @@ package org.openmrs.module.appframework.web;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.appframework.service.AppFrameworkService;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.service.AppFrameworkService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,11 +38,11 @@ public class AppFrameworkController {
 
     @RequestMapping(value = "/module/appframework/extensions.json", method = RequestMethod.GET)
     @ResponseBody
-    public List<Extension> getExtensions(@RequestParam String appId, @RequestParam String extensionPointId) {
+    public List<Extension> getExtensions(@RequestParam String extensionPointId) {
         log.info("Fetching the list of extensions");
 
         AppFrameworkService appFrameworkService = getAppFrameworkService();
-        List<Extension> extensions = appFrameworkService.getAllExtensions(appId, extensionPointId);
+        List<Extension> extensions = appFrameworkService.getAllExtensions(extensionPointId);
 
         if (log.isDebugEnabled()) log.debug("Fetched extensions : " + extensions);
 
@@ -64,11 +64,11 @@ public class AppFrameworkController {
 
     @RequestMapping(value = "/module/appframework/enabled_extensions.json", method = RequestMethod.GET)
     @ResponseBody
-    public List<Extension> getEnabledExtensions(@RequestParam String appId, @RequestParam String extensionPointId) {
-        log.info("Fetching the list of enabled extensions - appId : " + appId + " extensionPointId : " + extensionPointId);
+    public List<Extension> getEnabledExtensions(@RequestParam String extensionPointId) {
+        log.info("Fetching the list of enabled extensions - extensionPointId : " + extensionPointId);
 
         AppFrameworkService appFrameworkService = getAppFrameworkService();
-        List<Extension> extensions = appFrameworkService.getAllEnabledExtensions(appId, extensionPointId);
+        List<Extension> extensions = appFrameworkService.getAllEnabledExtensions(extensionPointId);
 
         if (log.isDebugEnabled()) log.debug("Fetched extensions : " + extensions);
 

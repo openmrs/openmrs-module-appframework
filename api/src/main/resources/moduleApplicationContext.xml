@@ -27,6 +27,7 @@
         </property>
         <property name="target">
             <bean class="${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkServiceImpl">
+            	<constructor-arg ref="allAppTemplates"/>
             	<constructor-arg ref="allAppDescriptors"/>
             	<constructor-arg ref="allExtensions"/>
             	<constructor-arg ref="allComponentsState"/>

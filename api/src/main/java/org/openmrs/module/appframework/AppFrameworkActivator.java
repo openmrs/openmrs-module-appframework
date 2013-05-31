@@ -14,20 +14,21 @@
 package org.openmrs.module.appframework;
 
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
 import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.factory.AppFrameworkFactory;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
+import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllExtensions;
 import org.openmrs.module.appframework.service.AppFrameworkService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
@@ -48,34 +49,31 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
         // later be changed.
 
         List<AppFrameworkFactory> appFrameworkFactories = Context.getRegisteredComponents(AppFrameworkFactory.class);
+        AllAppTemplates allAppTemplates = Context.getRegisteredComponents(AllAppTemplates.class).get(0);
         AllAppDescriptors allAppDescriptors = Context.getRegisteredComponents(AllAppDescriptors.class).get(0);
         AllExtensions allExtensions = Context.getRegisteredComponents(AllExtensions.class).get(0);
 
-        for(AppFrameworkFactory appFrameworkFactory : appFrameworkFactories) {
+        for (AppFrameworkFactory appFrameworkFactory : appFrameworkFactories) {
             try {
+                allAppTemplates.clear();
+                List<AppTemplate> appTemplates = appFrameworkFactory.getAppTemplates();
+                allAppTemplates.add(appTemplates);
+
+                allAppDescriptors.clear();
                 List<AppDescriptor> appDescriptors = appFrameworkFactory.getAppDescriptors();
                 allAppDescriptors.add(appDescriptors);
 
+                allExtensions.clear();
                 List<Extension> extensions = appFrameworkFactory.getExtensions();
                 allExtensions.add(extensions);
-            } catch (Exception e) {
+
+                allAppDescriptors.setAppTemplatesOnInstances(allAppTemplates);
+                allAppDescriptors.setExtensionApps();
+            }
+            catch (Exception e) {
                 log.error("Error loading app framework. Some apps might not work." + appFrameworkFactory, e);
             }
         }
-	}
+    }
 	
-	/**
-	 * @see ModuleActivator#started()
-	 */
-	public void started() {
-		log.info("App Framework Module started");
-	}
-	
-	/**
-	 * @see ModuleActivator#stopped()
-	 */
-	public void stopped() {
-		log.info("App Framework Module stopped");
-	}
-		
 }

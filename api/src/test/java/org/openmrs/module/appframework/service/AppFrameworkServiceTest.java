@@ -24,6 +24,7 @@ import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppFrameworkActivator;
 import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
@@ -34,6 +35,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -63,16 +65,20 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		us.savePrivilege(p2);
 		Privilege p3 = new Privilege("Another Random Ext Privilege", "description3");
 		us.savePrivilege(p3);
-		
-		Role role = new Role("Test User", "description");
+        Privilege p4 = new Privilege("Register Patients", "description4");
+        us.savePrivilege(p4);
+
+        Role role = new Role("Test User", "description");
 		if (p1.getPrivilege().equals(privilegeToAssign))
 			role.addPrivilege(p1);
 		else if (p2.getPrivilege().equals(privilegeToAssign))
 			role.addPrivilege(p2);
 		else if (p3.getPrivilege().equals(privilegeToAssign))
 			role.addPrivilege(p3);
-		
-		us.saveRole(role);
+        else if (p4.getPrivilege().equals(privilegeToAssign))
+            role.addPrivilege(p4);
+
+        us.saveRole(role);
 		
 		User u = new User();
 		u.setPerson(new Person());
@@ -138,8 +144,19 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertTrue(userAppIds.contains("orderXrayExtension"));
 		assertTrue(userAppIds.contains("gotoArchives"));
 	}
-	
-	/**
+
+    @Test
+    public void testgetExtensionsForCurrentUser_shouldGetExtensionsBasedOnPrivilegeCheckOnOwningApp() throws Exception {
+        User user = setupPrivilegesRolesAndUser("Register Patients");
+        Context.authenticate(user.getUsername(), "Openmr5xy");
+        assertEquals(user, Context.getAuthenticatedUser());
+
+        List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("homepageLink");
+        assertThat(userExts.size(), is(1));
+        assertThat(userExts.get(0).getId(), is("registerOutpatientHomepageLink"));
+    }
+
+    /**
 	 * @see {@link AppFrameworkService#getAppsForCurrentUser()}
 	 */
 	@Test
@@ -159,7 +176,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	@Verifies(value = "should return extensions with no required privilege if there is no authenticated user", method = "getExtensionsForCurrentUser()")
-	public void getExtensionsForCurrentUser_shouldReturnNoExtensionIfThereIsNoAuthenticatedUser() throws Exception {
+	public void getExtensionsForCurrentUser_shouldReturnExtensionsWithNoRequiredPrivilegeIfThereIsNoAuthenticatedUser() throws Exception {
 		setupPrivilegesRolesAndUser("Some Random Privilege");
 		if (Context.getAuthenticatedUser() != null)
 			Context.logout();
@@ -239,6 +256,30 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("activeVisitActions");
         assertEquals(1, userExts.size());
         assertEquals("orderXrayExtension", userExts.get(0).getId());
+    }
+
+    @Test
+    public void getAllAppTemplates_shouldGetAppTemplates() throws Exception {
+        List<AppTemplate> actual = appFrameworkService.getAllAppTemplates();
+        assertThat(actual.size(), is(1));
+        assertThat(actual.get(0).getId(), is("registrationapp.registerPatient"));
+    }
+
+    @Test
+    public void getAppTemplateById_shouldGetAppTemplate() throws Exception {
+        AppTemplate actual = appFrameworkService.getAppTemplate("registrationapp.registerPatient");
+        assertNotNull(actual);
+        assertThat(actual.getId(), is("registrationapp.registerPatient"));
+    }
+
+    @Test
+    public void testInheritingConfigurationFromAppTemplate() {
+        AppTemplate template = appFrameworkService.getAppTemplate("registrationapp.registerPatient");
+        AppDescriptor instance = appFrameworkService.getApp("referenceapplication.registerPatient.outpatient");
+        assertThat(instance.getTemplate(), is(template));
+        assertThat(instance.getConfig().get("extraFields").size(), is(1));
+        assertThat(instance.getConfig().get("extraFields").get(0).getTextValue(), is("phoneNumber"));
+        assertThat(instance.getConfig().get("urlOnSuccess").getTextValue(), is("patientDashboard.page?patientId={{appContext.createdPatientId}}"));
     }
 
 }

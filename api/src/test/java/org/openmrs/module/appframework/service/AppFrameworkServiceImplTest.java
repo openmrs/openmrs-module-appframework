@@ -1,11 +1,5 @@
 package org.openmrs.module.appframework.service;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +10,12 @@ import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest {
 
@@ -63,13 +63,13 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testGetAllExtensionsAndIsSortedByOrder() throws Exception {
-        List<Extension> extensionsApp1ExtensionPoint2 = appFrameworkService.getAllExtensions("app1", "extensionPoint2");
+        List<Extension> extensionsApp1ExtensionPoint2 = appFrameworkService.getAllEnabledExtensions("extensionPoint2");
 
         assertEquals(2, extensionsApp1ExtensionPoint2.size());
         assertEquals("ext2", extensionsApp1ExtensionPoint2.get(0).getId());
         assertEquals("ext1", extensionsApp1ExtensionPoint2.get(1).getId());
 
-        List<Extension> extensionsApp2ExtensionPoint1 = appFrameworkService.getAllExtensions("app2", "extensionPoint1");
+        List<Extension> extensionsApp2ExtensionPoint1 = appFrameworkService.getAllEnabledExtensions("extensionPoint1");
 
         assertEquals(1, extensionsApp2ExtensionPoint1.size());
         assertEquals("ext3", extensionsApp2ExtensionPoint1.get(0).getId());

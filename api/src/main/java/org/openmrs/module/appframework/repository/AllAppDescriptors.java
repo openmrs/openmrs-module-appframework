@@ -1,6 +1,8 @@
 package org.openmrs.module.appframework.repository;
 
 import org.openmrs.module.appframework.domain.AppDescriptor;
+import org.openmrs.module.appframework.domain.AppTemplate;
+import org.openmrs.module.appframework.domain.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -58,5 +60,51 @@ public class AllAppDescriptors {
 	public void clear() {
 		appDescriptors.clear();
 	}
-	
+
+    /**
+     * Sets the transient {@link AppDescriptor#template} field on apps, based on {@link AppDescriptor#instanceOf}
+     * @param allAppTemplates
+     */
+    public void setAppTemplatesOnInstances(AllAppTemplates allAppTemplates) {
+        for (AppDescriptor appDescriptor : appDescriptors) {
+            String inheritsFromTemplateId = appDescriptor.getInstanceOf();
+            if (inheritsFromTemplateId != null) {
+                AppTemplate template = allAppTemplates.getAppTemplate(inheritsFromTemplateId);
+                if (template == null) {
+                    throw new IllegalStateException("App '" + appDescriptor.getId() + "' says its an instanceOf '" + inheritsFromTemplateId + "' but there is no AppTemplate with that id");
+                } else {
+                    appDescriptor.setTemplate(template);
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets an app by its id
+     * @param id
+     * @return
+     */
+    public AppDescriptor getAppDescriptor(String id) {
+        for (AppDescriptor candidate : appDescriptors) {
+            if (candidate.getId().equals(id)) {
+                return candidate;
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * Sets the {@link Extension#belongsTo} field on each extension that belongs to an app
+     */
+    public void setExtensionApps() {
+        for (AppDescriptor appDescriptor : appDescriptors) {
+            if (appDescriptor.getExtensions() != null) {
+                for (Extension extension : appDescriptor.getExtensions()) {
+                    extension.setBelongsTo(appDescriptor);
+                }
+            }
+        }
+    }
+
 }

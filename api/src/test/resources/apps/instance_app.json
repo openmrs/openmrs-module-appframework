@@ -1,0 +1,21 @@
+[
+    {
+        "id": "referenceapplication.registerPatient.outpatient",
+        "instanceOf": "registrationapp.registerPatient",
+        "config": {
+            "extraFields": [ "phoneNumber" ]
+        },
+        "extensions": [
+            {
+                "id": "registerOutpatientHomepageLink",
+                "extensionPointId": "homepageLink",
+                "type": "link",
+                "label": "Register New Outpatient",
+                "extensionParams": {
+                    "iconUrl": "/xray/icon"
+                }
+            }
+        ],
+        "requiredPrivilege": "Register Patients"
+    }
+]

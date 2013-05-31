@@ -11,6 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This class represent all <em>free-standing</em> extensions, though it does not include extensions that are included in
+ * apps found in {@link AllAppDescriptors}
+ */
 @Repository
 public class AllExtensions {
 	
