@@ -55,6 +55,10 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
         AllAppDescriptors allAppDescriptors = Context.getRegisteredComponents(AllAppDescriptors.class).get(0);
         AllExtensions allExtensions = Context.getRegisteredComponents(AllExtensions.class).get(0);
 
+        registerAppsAndExtensions(appFrameworkFactories, allAppTemplates, allAppDescriptors, allExtensions);
+    }
+
+    public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllExtensions allExtensions) {
         for (AppFrameworkFactory appFrameworkFactory : appFrameworkFactories) {
             try {
                 allAppTemplates.clear();

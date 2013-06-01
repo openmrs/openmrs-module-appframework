@@ -23,6 +23,13 @@ public class AllAppTemplates {
     @Autowired
     private Validator validator;
 
+    public AllAppTemplates() {
+    }
+
+    public AllAppTemplates(Validator validator) {
+        this.validator = validator;
+    }
+
     public void add(Collection<AppTemplate> templates) {
         for (AppTemplate template : templates) {
             add(template);

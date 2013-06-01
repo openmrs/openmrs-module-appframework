@@ -1,7 +1,7 @@
 [
     {
         "id": "referenceapplication.registerPatient.outpatient",
-        "instanceOf": "registrationapp.registerPatient",
+        "instanceOf": "testing.registrationapp.registerPatient",
         "config": {
             "extraFields": [ "phoneNumber" ]
         },

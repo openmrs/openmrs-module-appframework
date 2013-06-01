@@ -152,7 +152,10 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
         ObjectNode merged = new ObjectMapper().createObjectNode();
         for (AppTemplateConfigurationOption configurationOption : template.getConfigOptions()) {
             String optionName = configurationOption.getName();
-            JsonNode configuredValue = config.get(optionName);
+            JsonNode configuredValue = null;
+            if (config != null) {
+                configuredValue = config.get(optionName);
+            }
             if (configuredValue != null) {
                 merged.put(optionName, configuredValue);
             } else {

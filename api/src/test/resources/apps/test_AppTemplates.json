@@ -1,6 +1,6 @@
 [
     {
-        "id": "registrationapp.registerPatient",
+        "id": "testing.registrationapp.registerPatient",
         "extensionPoints": [
             { "id": "detailToShowAboutPossibleMatchingPatient", "supportedExtensionTypes": ["include-fragment"] }
         ],

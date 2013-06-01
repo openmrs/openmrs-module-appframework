@@ -262,19 +262,19 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
     public void getAllAppTemplates_shouldGetAppTemplates() throws Exception {
         List<AppTemplate> actual = appFrameworkService.getAllAppTemplates();
         assertThat(actual.size(), is(1));
-        assertThat(actual.get(0).getId(), is("registrationapp.registerPatient"));
+        assertThat(actual.get(0).getId(), is("testing.registrationapp.registerPatient"));
     }
 
     @Test
     public void getAppTemplateById_shouldGetAppTemplate() throws Exception {
-        AppTemplate actual = appFrameworkService.getAppTemplate("registrationapp.registerPatient");
+        AppTemplate actual = appFrameworkService.getAppTemplate("testing.registrationapp.registerPatient");
         assertNotNull(actual);
-        assertThat(actual.getId(), is("registrationapp.registerPatient"));
+        assertThat(actual.getId(), is("testing.registrationapp.registerPatient"));
     }
 
     @Test
     public void testInheritingConfigurationFromAppTemplate() {
-        AppTemplate template = appFrameworkService.getAppTemplate("registrationapp.registerPatient");
+        AppTemplate template = appFrameworkService.getAppTemplate("testing.registrationapp.registerPatient");
         AppDescriptor instance = appFrameworkService.getApp("referenceapplication.registerPatient.outpatient");
         assertThat(instance.getTemplate(), is(template));
         assertThat(instance.getConfig().get("extraFields").size(), is(1));

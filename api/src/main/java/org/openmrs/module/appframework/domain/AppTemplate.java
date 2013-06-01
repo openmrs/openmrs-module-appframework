@@ -18,6 +18,9 @@ public class AppTemplate {
     private String id;
 
     @JsonProperty
+    private String description;
+
+    @JsonProperty
     private List<ExtensionPoint> extensionPoints;
 
     @JsonProperty

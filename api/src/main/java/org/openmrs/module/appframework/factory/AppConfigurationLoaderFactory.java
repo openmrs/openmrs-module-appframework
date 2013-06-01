@@ -12,6 +12,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,15 +46,18 @@ public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
         Resource[] appDefinitionJsonResources = resourceResolver.getResources("classpath*:/apps/*app.json");
         List<AppDescriptor> appDescriptors = new ArrayList<AppDescriptor>();
         for (Resource appDefinitionResource : appDefinitionJsonResources) {
-            List<AppDescriptor> appDescriptorsForResource;
             try {
-                appDescriptorsForResource = objectMapper.readValue(appDefinitionResource.getInputStream(), new TypeReference<List<AppDescriptor>>() {});
+                List<AppDescriptor> appDescriptorsForResource = getAppDescriptorsForResource(appDefinitionResource.getInputStream());
                 appDescriptors.addAll(appDescriptorsForResource);
             } catch (IOException e) {
-                logger.fatal("Error reading app configuration file", e);
+                logger.fatal("Error reading app configuration file: " + appDefinitionResource.getFile().getPath(), e);
             }
         }
         return appDescriptors;
+    }
+
+    public List<AppDescriptor> getAppDescriptorsForResource(InputStream inputStream) throws IOException {
+        return objectMapper.readValue(inputStream, new TypeReference<List<AppDescriptor>>() {});
     }
 
     @Override
