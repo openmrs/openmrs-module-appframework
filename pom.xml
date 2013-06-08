@@ -28,9 +28,10 @@
 	</scm>
 
 	<modules>
-		<module>api</module>
-		<module>omod</module>
-	</modules>
+        <module>api</module>
+        <module>omod</module>
+        <module>appsfortesting</module>
+    </modules>
 	
 	<properties>
 		<openMRSVersion>1.9.4-SNAPSHOT</openMRSVersion>

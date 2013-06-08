@@ -59,6 +59,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>appframework-appsfortesting</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>4.3.0.Final</version>
