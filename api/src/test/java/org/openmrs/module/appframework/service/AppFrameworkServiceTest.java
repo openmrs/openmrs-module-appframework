@@ -261,7 +261,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
     @Test
     public void getAllAppTemplates_shouldGetAppTemplates() throws Exception {
         List<AppTemplate> actual = appFrameworkService.getAllAppTemplates();
-        assertThat(actual.size(), is(1));
+        assertThat(actual.size(), is(2));
         assertThat(actual.get(0).getId(), is("testing.registrationapp.registerPatient"));
     }
 

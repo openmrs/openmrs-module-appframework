@@ -2,6 +2,7 @@ package org.openmrs.module.appframework.factory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.openmrs.module.appframework.domain.AppDescriptor;
@@ -25,6 +26,11 @@ public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
 
     private PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
+    public AppConfigurationLoaderFactory() {
+    	// Tell the parser to all // and /* style comments.
+    	objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+    }
+    
     @Override
     public List<AppTemplate> getAppTemplates() throws IOException {
         Resource[] appDefinitionJsonResources = resourceResolver.getResources("classpath*:/apps/*AppTemplates.json");
