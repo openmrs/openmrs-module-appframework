@@ -1,5 +1,6 @@
 package org.openmrs.module.appframework.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
@@ -46,6 +47,7 @@ public class Extension implements Comparable<Extension> {
      * Will be set by {@link org.openmrs.module.appframework.AppFrameworkActivator} if this extension is defined within
      * an app
      */
+    @JsonIgnore
     transient private AppDescriptor belongsTo;
 
     public Extension() {
@@ -151,6 +153,7 @@ public class Extension implements Comparable<Extension> {
         this.belongsTo = belongsTo;
     }
 
+    @JsonIgnore
     public AppDescriptor getBelongsTo() {
         return belongsTo;
     }

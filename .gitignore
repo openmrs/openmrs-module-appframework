@@ -4,7 +4,7 @@
 /.idea
 
 omod/.DS_Store
-/target
+target
 
 *.iml
 /.classpath
