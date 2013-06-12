@@ -36,6 +36,9 @@ public class Extension implements Comparable<Extension> {
 	
 	@JsonProperty
 	protected String requiredPrivilege;
+
+    @JsonProperty
+    protected String require;
 	
 	@JsonProperty
 	protected String script;
@@ -156,5 +159,13 @@ public class Extension implements Comparable<Extension> {
     @JsonIgnore
     public AppDescriptor getBelongsTo() {
         return belongsTo;
+    }
+
+    public String getRequire() {
+        return require;
+    }
+
+    public void setRequire(String require) {
+        this.require = require;
     }
 }
