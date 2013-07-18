@@ -1,6 +1,6 @@
 [
 {
-    "id": "registrationapp.registerPatient", // test for inline comments
+    "id": "testing.registrationapp.registerPatient", // test for inline comments
     "description": "description",
     "extensionPoints": [
         { "id": "detailToShowAboutPossibleMatchingPatient", "supportedExtensionTypes": ["include-fragment"] }
