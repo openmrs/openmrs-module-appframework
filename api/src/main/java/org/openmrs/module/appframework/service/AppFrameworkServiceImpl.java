@@ -181,11 +181,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     @Transactional(readOnly = true)
     public List<Location> getLoginLocations() {
         LocationTag supportsLogin = locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
-        List<Location> locations = locationService.getLocationsByTag(supportsLogin);
-        if (locations.size() == 0) {
-            locations = locationService.getAllLocations(false);
-        }
-        return locations;
+        return locationService.getLocationsByTag(supportsLogin);
     }
 
     private boolean hasPrivilege(UserContext userContext, String privilege) {

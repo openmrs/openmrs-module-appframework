@@ -86,8 +86,7 @@ public interface AppFrameworkService extends OpenmrsService {
 	List<AppDescriptor> getAppsForCurrentUser();
 
     /**
-     * If any locations are tagged as supporting logins, we return only those. If no locations have this tag, we
-     * return all non-retired ones.
+     * Gets all non-retired locations that are tagged as supporting logins.
      * @see org.openmrs.module.appframework.AppFrameworkConstants#LOCATION_TAG_SUPPORTS_LOGIN
      * @return all locations that you can choose as a sessionLocation when logging in
      */
