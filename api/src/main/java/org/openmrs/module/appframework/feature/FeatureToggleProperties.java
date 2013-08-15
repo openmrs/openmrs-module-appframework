@@ -50,25 +50,27 @@ public class FeatureToggleProperties {
     }
 
     public boolean isFeatureEnabled(String key) {
-        Properties toggles = loadToggles();
-        return Boolean.parseBoolean(toggles.getProperty(key, "false"));
+        return getToggleWithDefault(key, false);
     }
 
     // note that while features are *off* by default, apps and extensions are *on* by default
     public boolean isAppEnabled(String key) {
-        Properties toggles = loadToggles();
-        return Boolean.parseBoolean(toggles.getProperty(key, "true"));
+        return getToggleWithDefault(key, true);
     }
 
     // note that while features are *off* by default, apps and extensions are *on* by default
     public boolean isExtensionEnabled(String key) {
-        Properties toggles = loadToggles();
-        return Boolean.parseBoolean(toggles.getProperty(key, "true"));
+        return getToggleWithDefault(key, true);
     }
 
     public Map<Object,Object> getToggleMap() {
         Properties toggles = loadToggles();
         return Collections.unmodifiableMap(toggles);
+    }
+
+    private boolean getToggleWithDefault(String key, boolean def) {
+        Properties toggles = loadToggles();
+        return Boolean.parseBoolean(toggles.getProperty(key, def ? "true" : "false"));
     }
 
     private Properties loadToggles() {
