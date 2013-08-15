@@ -30,7 +30,7 @@ import java.util.Properties;
 public class FeatureToggleProperties {
 
     private static final String FEATURE_TOGGLE_PROPERTIES_ENV = "FEATURE_TOGGLE_PROPERTIES";
-    private static final String FEATURE_TOGGLE_PROPERTIES_FILE_NAME = "feature_toggles.properties";
+    public static final String FEATURE_TOGGLE_PROPERTIES_FILE_NAME = "feature_toggles.properties";
 
     private Log log = LogFactory.getLog(getClass());
     private File propertiesFile;
@@ -44,14 +44,33 @@ public class FeatureToggleProperties {
         propertiesFile = new File(propertiesFileName);
     }
 
+    // TODO: find a better way to this--this public setter is just used to override the file in test scripts
+    public void setPropertiesFile(File propertiesFile) {
+        this.propertiesFile = propertiesFile;
+    }
+
     public boolean isFeatureEnabled(String key) {
-        Properties toggles = loadToggles();
-        return Boolean.parseBoolean(toggles.getProperty(key, "false"));
+        return getToggleWithDefault(key, false);
+    }
+
+    // note that while features are *off* by default, apps and extensions are *on* by default
+    public boolean isAppEnabled(String key) {
+        return getToggleWithDefault(key, true);
+    }
+
+    // note that while features are *off* by default, apps and extensions are *on* by default
+    public boolean isExtensionEnabled(String key) {
+        return getToggleWithDefault(key, true);
     }
 
     public Map<Object,Object> getToggleMap() {
         Properties toggles = loadToggles();
         return Collections.unmodifiableMap(toggles);
+    }
+
+    private boolean getToggleWithDefault(String key, boolean def) {
+        Properties toggles = loadToggles();
+        return Boolean.parseBoolean(toggles.getProperty(key, def ? "true" : "false"));
     }
 
     private Properties loadToggles() {
