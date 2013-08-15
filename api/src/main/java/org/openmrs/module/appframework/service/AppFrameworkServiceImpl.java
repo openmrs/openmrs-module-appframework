@@ -26,6 +26,7 @@ import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllComponentsState;
@@ -33,6 +34,7 @@ import org.openmrs.module.appframework.repository.AllExtensions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,16 +52,19 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private LocationService locationService;
 
+    private FeatureToggleProperties featureToggles;
+
     public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
-	    AllComponentsState allComponentsState, LocationService locationService) {
+	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles) {
         this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allExtensions = allExtensions;
 		this.allComponentsState = allComponentsState;
         this.locationService = locationService;
+        this.featureToggles = featureToggles;
 	}
-	
-	@Override
+
+    @Override
 	public List<AppDescriptor> getAllApps() {
 		return allAppDescriptors.getAppDescriptors();
 	}
@@ -82,7 +87,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		List<AppDescriptor> disabledAppDescriptors = new ArrayList<AppDescriptor>();
 		for (AppDescriptor appDescriptor : appDescriptors) {
 			componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
-			if (componentState != null && !componentState.getEnabled())
+			if (componentState != null && !componentState.getEnabled()
+                    || !featureToggles.isAppEnabled(appDescriptor.getId()))
 				disabledAppDescriptors.add(appDescriptor);
 		}
 		
@@ -102,8 +108,9 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
             if (app.getExtensions() != null) {
                 for (Extension candidate : app.getExtensions()) {
                     // extensions that belong to apps can't be disabled independently of their app, so we don't check AllComponentsState here
-                    if (extensionPointId == null || extensionPointId.equals(candidate.getExtensionPointId())) {
-                        extensions.addAll(app.getExtensions());
+                    if (extensionPointId == null || extensionPointId.equals(candidate.getExtensionPointId())
+                            && featureToggles.isExtensionEnabled(candidate.getId())) {
+                        extensions.add(candidate);
                     }
                 }
             }
@@ -111,14 +118,16 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
         // now get "standalone extensions"
         for (Extension extension : allExtensions.getExtensions()) {
-			if (extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId())) {
+			if (extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId())
+                    && featureToggles.isExtensionEnabled(extension.getId())) {
                 ComponentState state = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
                 if (state == null || state.getEnabled()) {
     				extensions.add(extension);
                 }
             }
 		}
-		
+
+        Collections.sort(extensions);
 		return extensions;
 	}
 	
