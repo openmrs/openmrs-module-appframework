@@ -38,6 +38,9 @@ public class Extension implements Comparable<Extension> {
 	protected String requiredPrivilege;
 
     @JsonProperty
+    protected String featureToggle;
+
+    @JsonProperty
     protected String require;
 	
 	@JsonProperty
@@ -126,8 +129,16 @@ public class Extension implements Comparable<Extension> {
 	public void setExtensionParams(Map<String, Object> extensionParams) {
 		this.extensionParams = extensionParams;
 	}
-	
-	@Override
+
+    public String getFeatureToggle() {
+        return featureToggle;
+    }
+
+    public void setFeatureToggle(String featureToggle) {
+        this.featureToggle = featureToggle;
+    }
+
+    @Override
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;

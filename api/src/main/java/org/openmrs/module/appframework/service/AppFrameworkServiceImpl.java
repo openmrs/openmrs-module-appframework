@@ -88,8 +88,9 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		for (AppDescriptor appDescriptor : appDescriptors) {
 			componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
 			if (componentState != null && !componentState.getEnabled()
-                    || !featureToggles.isAppEnabled(appDescriptor.getId()))
+                    || appDescriptor.getFeatureToggle() != null && !featureToggles.isFeatureEnabled(appDescriptor.getFeatureToggle())) {
 				disabledAppDescriptors.add(appDescriptor);
+            }
 		}
 		
 		appDescriptors.removeAll(disabledAppDescriptors);
@@ -108,8 +109,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
             if (app.getExtensions() != null) {
                 for (Extension candidate : app.getExtensions()) {
                     // extensions that belong to apps can't be disabled independently of their app, so we don't check AllComponentsState here
-                    if (extensionPointId == null || extensionPointId.equals(candidate.getExtensionPointId())
-                            && featureToggles.isExtensionEnabled(candidate.getId())) {
+                    if ( (extensionPointId == null || extensionPointId.equals(candidate.getExtensionPointId()))
+                        && (candidate.getFeatureToggle() == null || featureToggles.isFeatureEnabled(candidate.getFeatureToggle())) ) {
                         extensions.add(candidate);
                     }
                 }
@@ -118,8 +119,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
         // now get "standalone extensions"
         for (Extension extension : allExtensions.getExtensions()) {
-			if (extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId())
-                    && featureToggles.isExtensionEnabled(extension.getId())) {
+			if ( (extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId()))
+                && (extension.getFeatureToggle() == null || featureToggles.isFeatureEnabled(extension.getFeatureToggle())) ) {
                 ComponentState state = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
                 if (state == null || state.getEnabled()) {
     				extensions.add(extension);

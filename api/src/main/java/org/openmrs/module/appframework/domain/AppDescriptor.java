@@ -48,6 +48,9 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	protected String requiredPrivilege;
 
     @JsonProperty
+    protected String featureToggle;
+
+    @JsonProperty
     protected ObjectNode config;
 	
 	@Valid
@@ -117,22 +120,30 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	public String getRequiredPrivilege() {
 		return requiredPrivilege;
 	}
-	
-	public List<ExtensionPoint> getExtensionPoints() {
+
+    public List<ExtensionPoint> getExtensionPoints() {
 		return extensionPoints;
 	}
-	
+
+    public void setExtensionPoints(List<ExtensionPoint> extensionPoints) {
+        this.extensionPoints = extensionPoints;
+    }
+
 	public List<String> getContextModel() {
 		return contextModel;
-	}
-	
-	public void setExtensionPoints(List<ExtensionPoint> extensionPoints) {
-		this.extensionPoints = extensionPoints;
 	}
 	
 	public void setContextModel(List<String> contextModel) {
 		this.contextModel = contextModel;
 	}
+
+    public String getFeatureToggle() {
+        return featureToggle;
+    }
+
+    public void setFeatureToggle(String featureToggle) {
+        this.featureToggle = featureToggle;
+    }
 
     public ObjectNode getConfig() {
         if (template != null) {

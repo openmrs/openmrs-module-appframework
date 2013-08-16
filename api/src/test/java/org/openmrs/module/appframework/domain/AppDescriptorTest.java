@@ -18,6 +18,10 @@ public class AppDescriptorTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("testApp.json");
         AppDescriptor actual = new ObjectMapper().readValue(inputStream, AppDescriptor.class);
         assertThat(actual.getId(), is("referenceapplication.registerPatient.outpatient"));
+        assertThat(actual.getRequiredPrivilege(), is("referenceapplication.registerPatient.outpatient.privilege"));
+        assertThat(actual.getFeatureToggle(), is("referenceapplication.registerPatient.outpatient.toggle"));
+        assertThat(actual.getExtensions().get(0).getExtensionPointId(), is("homepageLink"));
+        assertThat(actual.getExtensions().get(0).getFeatureToggle(), is("ext.toggle"));
     }
 
 }

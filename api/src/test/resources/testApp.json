@@ -1,6 +1,8 @@
 {
     "id": "referenceapplication.registerPatient.outpatient",
     "instanceOf": "registrationapp.registerPatient",
+    "requiredPrivilege": "referenceapplication.registerPatient.outpatient.privilege",
+    "featureToggle": "referenceapplication.registerPatient.outpatient.toggle",
     "config": {
         "extraFields": [ "some stuff here" ]
     },
@@ -9,6 +11,7 @@
             "extensionPointId": "homepageLink",
             "type": "link",
             "label": "Register New Outpatient",
+            "featureToggle": "ext.toggle",
             "extensionParams": {
                 "iconUrl": "/xray/icon"
             }
