@@ -29,7 +29,7 @@
             <bean class="${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkServiceImpl">
             	<constructor-arg ref="allAppTemplates"/>
             	<constructor-arg ref="allAppDescriptors"/>
-            	<constructor-arg ref="allExtensions"/>
+            	<constructor-arg ref="allFreeStandingExtensions"/>
             	<constructor-arg ref="allComponentsState"/>
             	<constructor-arg ref="locationService"/>
                 <constructor-arg ref="featureToggles"/>
