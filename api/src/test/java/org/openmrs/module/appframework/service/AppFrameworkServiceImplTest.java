@@ -8,7 +8,7 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
-import org.openmrs.module.appframework.repository.AllExtensions;
+import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +27,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     private AllAppDescriptors allAppDescriptors;
 
     @Autowired
-    private AllExtensions allExtensions;
+    private AllFreeStandingExtensions allFreeStandingExtensions;
 
     @Autowired
     private FeatureToggleProperties featureToggles;
@@ -66,13 +66,13 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         allAppDescriptors.add(Arrays.asList(app1, app2));
 
         // now add some free-standing extension
-        allExtensions.add(Arrays.asList(ext3, ext4, ext5));
+        allFreeStandingExtensions.add(Arrays.asList(ext3, ext4, ext5));
     }
 
     @After
     public void tearDown() throws Exception {
         allAppDescriptors.clear();
-        allExtensions.clear();
+        allFreeStandingExtensions.clear();
     }
 
     @Test

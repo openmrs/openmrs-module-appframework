@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
-import org.openmrs.module.appframework.repository.AllExtensions;
+import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -23,7 +23,7 @@ public class AppConfigurationLoaderFactoryTest extends BaseModuleContextSensitiv
     AllAppDescriptors allAppDescriptors;
 
     @Autowired
-    AllExtensions allExtensions;
+    AllFreeStandingExtensions allFreeStandingExtensions;
 
     @Test
     @DirtiesContext

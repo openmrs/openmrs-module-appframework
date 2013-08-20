@@ -16,14 +16,14 @@ import java.util.Set;
  * apps found in {@link AllAppDescriptors}
  */
 @Repository
-public class AllExtensions {
+public class AllFreeStandingExtensions {
 	
 	private List<Extension> extensions = new ArrayList<Extension>();
 	
 	private Validator validator;
 	
 	@Autowired
-	public AllExtensions(Validator validator) {
+	public AllFreeStandingExtensions(Validator validator) {
 		this.validator = validator;
 	}
 	

@@ -30,7 +30,7 @@ import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllComponentsState;
-import org.openmrs.module.appframework.repository.AllExtensions;
+import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
 	private AllAppDescriptors allAppDescriptors;
 	
-	private AllExtensions allExtensions;
+	private AllFreeStandingExtensions allFreeStandingExtensions;
 	
 	private AllComponentsState allComponentsState;
 
@@ -54,11 +54,11 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private FeatureToggleProperties featureToggles;
 
-    public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllExtensions allExtensions,
+    public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
 	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles) {
         this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
-		this.allExtensions = allExtensions;
+		this.allFreeStandingExtensions = allFreeStandingExtensions;
 		this.allComponentsState = allComponentsState;
         this.locationService = locationService;
         this.featureToggles = featureToggles;
@@ -72,7 +72,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	@Override
 	public List<Extension> getAllExtensions(String extensionPointId) {
         List<Extension> matchingExtensions = new ArrayList<Extension>();
-		for (Extension extension : allExtensions.getExtensions()) {
+		for (Extension extension : allFreeStandingExtensions.getExtensions()) {
 			if (extensionPointId == null || extension.getExtensionPointId().equalsIgnoreCase(extensionPointId))
 				matchingExtensions.add(extension);
 		}
@@ -118,7 +118,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         }
 
         // now get "standalone extensions"
-        for (Extension extension : allExtensions.getExtensions()) {
+        for (Extension extension : allFreeStandingExtensions.getExtensions()) {
 			if ( (extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId()))
                 && (extension.getFeatureToggle() == null || featureToggles.isFeatureEnabled(extension.getFeatureToggle())) ) {
                 ComponentState state = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);

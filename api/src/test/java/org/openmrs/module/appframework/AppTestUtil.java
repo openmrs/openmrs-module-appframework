@@ -6,7 +6,7 @@ import org.openmrs.module.appframework.factory.AppConfigurationLoaderFactory;
 import org.openmrs.module.appframework.factory.AppFrameworkFactory;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
-import org.openmrs.module.appframework.repository.AllExtensions;
+import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -32,7 +32,7 @@ public class AppTestUtil {
         Validator validator = mock(Validator.class);
         when(validator.validate(anyObject())).thenReturn(Collections.<ConstraintViolation<Object>>emptySet());
         AllAppDescriptors allAppDescriptors = new AllAppDescriptors(validator);
-        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()), new AllAppTemplates(validator), allAppDescriptors, new AllExtensions(validator));
+        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()), new AllAppTemplates(validator), allAppDescriptors, new AllFreeStandingExtensions(validator));
         return allAppDescriptors.getAppDescriptor(id);
     }
 
@@ -46,7 +46,7 @@ public class AppTestUtil {
         Validator validator = mock(Validator.class);
         when(validator.validate(anyObject())).thenReturn(Collections.<ConstraintViolation<Object>>emptySet());
         AllAppTemplates allAppTemplates = new AllAppTemplates(validator);
-        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()), allAppTemplates, new AllAppDescriptors(validator), new AllExtensions(validator));
+        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()), allAppTemplates, new AllAppDescriptors(validator), new AllFreeStandingExtensions(validator));
         return allAppTemplates.getAppTemplate(id);
     }
 

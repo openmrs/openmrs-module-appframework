@@ -27,7 +27,7 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.factory.AppFrameworkFactory;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
-import org.openmrs.module.appframework.repository.AllExtensions;
+import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.module.appframework.service.AppFrameworkService;
 
 import java.util.List;
@@ -53,12 +53,12 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
         List<AppFrameworkFactory> appFrameworkFactories = Context.getRegisteredComponents(AppFrameworkFactory.class);
         AllAppTemplates allAppTemplates = Context.getRegisteredComponents(AllAppTemplates.class).get(0);
         AllAppDescriptors allAppDescriptors = Context.getRegisteredComponents(AllAppDescriptors.class).get(0);
-        AllExtensions allExtensions = Context.getRegisteredComponents(AllExtensions.class).get(0);
+        AllFreeStandingExtensions allFreeStandingExtensions = Context.getRegisteredComponents(AllFreeStandingExtensions.class).get(0);
 
-        registerAppsAndExtensions(appFrameworkFactories, allAppTemplates, allAppDescriptors, allExtensions);
+        registerAppsAndExtensions(appFrameworkFactories, allAppTemplates, allAppDescriptors, allFreeStandingExtensions);
     }
 
-    public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllExtensions allExtensions) {
+    public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions) {
         for (AppFrameworkFactory appFrameworkFactory : appFrameworkFactories) {
             try {
                 allAppTemplates.clear();
@@ -69,9 +69,9 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
                 List<AppDescriptor> appDescriptors = appFrameworkFactory.getAppDescriptors();
                 allAppDescriptors.add(appDescriptors);
 
-                allExtensions.clear();
+                allFreeStandingExtensions.clear();
                 List<Extension> extensions = appFrameworkFactory.getExtensions();
-                allExtensions.add(extensions);
+                allFreeStandingExtensions.add(extensions);
 
                 allAppDescriptors.setAppTemplatesOnInstances(allAppTemplates);
                 allAppDescriptors.setExtensionApps();
