@@ -105,8 +105,12 @@ public class Extension implements Comparable<Extension> {
 	public String getUrl() {
 		return url;
 	}
-	
-	public String getIcon() {
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getIcon() {
 		return icon;
 	}
 	
@@ -179,4 +183,37 @@ public class Extension implements Comparable<Extension> {
     public void setRequire(String require) {
         this.require = require;
     }
+
+    /**
+     * The substitution algorithm implemented here is very simple. It does <em>not</em> support:
+     * <ul>
+     *     <li>whitespaces like {{ var }}</li>
+     *     <li>{{obj.prop}} unless you explicitly include "obj.prop" in variables</li>
+     *     <li>including the same variable twice in input</li>
+     * </ul>
+     * @param contextPath e.g. "/openmrs"
+     * @param contextModel
+     * @return url, or "javascript:" + script if type == script, with contextModel substituted for any {{var}} in the url
+     */
+    public String url(String contextPath, Map<String, Object> contextModel) {
+        String url = "script".equals(this.type) ?
+                ("javascript:" + this.script) :
+                (contextPath + "/" + this.url);
+        if (url == null) {
+            return null;
+        }
+        for (Map.Entry<String, Object> entry : contextModel.entrySet()) {
+            url = url.replace("{{" + entry.getKey() + "}}", "" + entry.getValue());
+        }
+        return url;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
+    }
+
 }
