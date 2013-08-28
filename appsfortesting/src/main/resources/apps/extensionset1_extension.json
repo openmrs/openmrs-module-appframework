@@ -9,7 +9,8 @@
         "requiredPrivilege": "Some Random Privilege",
         "extensionParams": {
             "iconUrl": "/xray/icon"
-        }
+        },
+        "require": "visit.active"
     },
     {
         "id": "gotoPatientExtension",
@@ -26,6 +27,7 @@
         "extensionPointId": "patientActions",
         "type": "link",
         "label": "Go to Archives",
-        "url": "/archives.page?patientId={{patientId}}"
+        "url": "/archives.page?patientId={{patientId}}",
+        "require": "!visit.active"
     }
 ]

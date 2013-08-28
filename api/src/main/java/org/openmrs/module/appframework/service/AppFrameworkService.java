@@ -19,6 +19,7 @@ import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
 
+import javax.script.Bindings;
 import java.util.List;
 
 /**
@@ -75,8 +76,19 @@ public interface AppFrameworkService extends OpenmrsService {
 	 * @should get all enabled extensions for the logged in user and extensionPointId
 	 */
 	List<Extension> getExtensionsForCurrentUser(String extensionPointId);
-	
-	/**
+
+    /**
+     * Gets enabled extensions points for the currently logged in user, for the specified extensionPointId. If any
+     * extension has a "require" attribute, and contextModel is not null, we evaluate the extension's require string
+     * against contextModel.
+     * @param extensionPointId
+     * @param contextModel
+     * @return
+     * @should get enabled extensions for the current user whose require property matches the contextModel
+     */
+    List<Extension> getExtensionsForCurrentUser(String extensionPointId, Bindings contextModel);
+
+    /**
 	 * Gets all enabled apps for the currently logged in user
 	 * 
 	 * @return a list of Extensions

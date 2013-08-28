@@ -12,11 +12,14 @@ import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.script.SimpleBindings;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest {
 
@@ -109,5 +112,34 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         assertEquals(2, extensionPoints.size());
         assertEquals("ext5", extensionPoints.get(0).getId());
         assertEquals("ext2", extensionPoints.get(1).getId());
+    }
+
+    @Test
+    public void testCheckRequireExpression() throws Exception {
+        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null);
+
+        VisitStatus visit = new VisitStatus(true, false);
+        SimpleBindings contextModel = new SimpleBindings();
+        contextModel.put("visit", visit);
+
+        assertTrue(service.checkRequireExpression(extensionRequiring("visit.active"), contextModel));
+        assertTrue(service.checkRequireExpression(extensionRequiring("visit.active || visit.admitted"), contextModel));
+        assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted"), contextModel));
+        assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted && visit.admitted"), contextModel));
+    }
+
+    private Extension extensionRequiring(String requires) {
+        Extension extension = new Extension();
+        extension.setRequire(requires);
+        return extension;
+    }
+
+    public class VisitStatus {
+        public boolean active;
+        public boolean admitted;
+        public VisitStatus(boolean active, boolean admitted) {
+            this.active = active;
+            this.admitted = admitted;
+        }
     }
 }

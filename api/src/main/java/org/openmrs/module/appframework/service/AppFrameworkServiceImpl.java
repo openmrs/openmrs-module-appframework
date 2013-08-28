@@ -14,6 +14,8 @@
 package org.openmrs.module.appframework.service;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.api.LocationService;
@@ -33,6 +35,10 @@ import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +47,8 @@ import java.util.List;
  * It is a default implementation of {@link AppFrameworkService}.
  */
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
+
+    private final Log log = LogFactory.getLog(getClass());
 
     private AllAppTemplates allAppTemplates;
 
@@ -54,6 +62,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private FeatureToggleProperties featureToggles;
 
+    private ScriptEngine javascriptEngine;
+
     public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
 	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles) {
         this.allAppTemplates = allAppTemplates;
@@ -62,7 +72,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.allComponentsState = allComponentsState;
         this.locationService = locationService;
         this.featureToggles = featureToggles;
-	}
+        this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
+    }
 
     @Override
 	public List<AppDescriptor> getAllApps() {
@@ -159,20 +170,37 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	@Override
 	public List<Extension> getExtensionsForCurrentUser(String extensionPointId) {
-		List<Extension> extensions = new ArrayList<Extension>();
+        return getExtensionsForCurrentUser(extensionPointId, null);
+	}
+
+    @Override
+    public List<Extension> getExtensionsForCurrentUser(String extensionPointId, Bindings contextModel) {
+        List<Extension> extensions = new ArrayList<Extension>();
         UserContext userContext = Context.getUserContext();
 
         for (Extension candidate : getAllEnabledExtensions(extensionPointId)) {
             if ( (candidate.getBelongsTo() == null || hasPrivilege(userContext, candidate.getBelongsTo().getRequiredPrivilege()))
                     && hasPrivilege(userContext, candidate.getRequiredPrivilege()) ) {
-                extensions.add(candidate);
+                if (contextModel == null || checkRequireExpression(candidate, contextModel)) {
+                    extensions.add(candidate);
+                }
             }
         }
 
-		return extensions;
-	}
-	
-	@Override
+        return extensions;
+    }
+
+    boolean checkRequireExpression(Extension candidate, Bindings contextModel) {
+        try {
+            String requireExpression = candidate.getRequire();
+            return requireExpression == null || javascriptEngine.eval("(" + requireExpression + ") == true", contextModel).equals(Boolean.TRUE);
+        } catch (ScriptException e) {
+            log.error("Failed to evaluate 'require' check for extension " + candidate.getId(), e);
+            return false;
+        }
+    }
+
+    @Override
 	public List<AppDescriptor> getAppsForCurrentUser() {
 		List<AppDescriptor> userApps = new ArrayList<AppDescriptor>();
         UserContext userContext = Context.getUserContext();

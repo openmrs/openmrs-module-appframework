@@ -32,6 +32,8 @@ import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
+import javax.script.Bindings;
+import javax.script.SimpleBindings;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -258,6 +260,35 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         assertEquals("orderXrayExtension", userExts.get(0).getId());
     }
 
+    /**
+     * @see AppFrameworkService#getExtensionsForCurrentUser(String, Bindings)
+     * @verifies get enabled extensions for the current user whose require property matches the contextModel
+     */
+    @Test
+    public void getExtensionsForCurrentUser_shouldGetEnabledExtensionsForTheCurrentUserByRequireProperty() throws Exception {
+        User user = setupPrivilegesRolesAndUser("Some Random Privilege");
+        Context.authenticate(user.getUsername(), "Openmr5xy");
+        assertEquals(user, Context.getAuthenticatedUser());
+
+        SimpleBindings contextModel = setupContextModel(true);
+
+        List<Extension> extensions = appFrameworkService.getExtensionsForCurrentUser(null, contextModel);
+        assertEquals(1, extensions.size());
+        assertEquals("orderXrayExtension", extensions.get(0).getId());
+
+        contextModel = setupContextModel(false);
+        extensions = appFrameworkService.getExtensionsForCurrentUser(null, contextModel);
+        assertEquals(1, extensions.size());
+        assertEquals("gotoArchives", extensions.get(0).getId());
+    }
+
+    private SimpleBindings setupContextModel(boolean isVisitActive) {
+        SimpleBindings bindings = new SimpleBindings();
+        bindings.put("patientId", 7);
+        bindings.put("visit", new VisitStatus(isVisitActive));
+        return bindings;
+    }
+
     @Test
     public void getAllAppTemplates_shouldGetAppTemplates() throws Exception {
         List<AppTemplate> actual = appFrameworkService.getAllAppTemplates();
@@ -282,4 +313,12 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         assertThat(instance.getConfig().get("urlOnSuccess").getTextValue(), is("patientDashboard.page?patientId={{appContext.createdPatientId}}"));
     }
 
+    public class VisitStatus {
+        public int id = 17;
+        public boolean active;
+
+        public VisitStatus(boolean visitActive) {
+            this.active = visitActive;
+        }
+    }
 }
