@@ -23,7 +23,7 @@ public class ExtensionTest {
         Extension extension = new Extension();
         extension.setUrl("url?ptId={{patient.id}}&q={{foo}}");
 
-        assertThat(extension.url("openmrs", contextModel), is("/openmrs/url?ptId=7&q=bar"));
+        assertThat(extension.url("/openmrs", contextModel), is("/openmrs/url?ptId=7&q=bar"));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class ExtensionTest {
         extension.setType("script");
         extension.setScript("window.alert('Hello, world.')");
 
-        assertThat(extension.url("openmrs", Collections.<String, Object>emptyMap()), is("javascript:window.alert('Hello, world.')"));
+        assertThat(extension.url("/openmrs", Collections.<String, Object>emptyMap()), is("javascript:window.alert('Hello, world.')"));
     }
 
 }

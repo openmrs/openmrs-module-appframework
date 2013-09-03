@@ -1,5 +1,6 @@
 package org.openmrs.module.appframework.domain;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -196,9 +197,14 @@ public class Extension implements Comparable<Extension> {
      * @return url, or "javascript:" + script if type == script, with contextModel substituted for any {{var}} in the url
      */
     public String url(String contextPath, Map<String, Object> contextModel) {
+        if (StringUtils.isNotBlank(contextPath)) {
+            if ( !contextPath.startsWith("/") ){
+                contextPath = "/" + contextPath;
+            }
+        }
         String url = "script".equals(this.type) ?
                 ("javascript:" + this.script) :
-                ("/" + contextPath + "/" + this.url);
+                (contextPath + "/" + this.url);
         if (url == null) {
             return null;
         }
