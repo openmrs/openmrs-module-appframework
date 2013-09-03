@@ -198,7 +198,7 @@ public class Extension implements Comparable<Extension> {
     public String url(String contextPath, Map<String, Object> contextModel) {
         String url = "script".equals(this.type) ?
                 ("javascript:" + this.script) :
-                (contextPath + "/" + this.url);
+                ("/" + contextPath + "/" + this.url);
         if (url == null) {
             return null;
         }
