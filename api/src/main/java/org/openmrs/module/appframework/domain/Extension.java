@@ -197,22 +197,45 @@ public class Extension implements Comparable<Extension> {
      * @return url, or "javascript:" + script if type == script, with contextModel substituted for any {{var}} in the url
      */
     public String url(String contextPath, Map<String, Object> contextModel) {
-        if (StringUtils.isNotBlank(contextPath)) {
-            if ( !contextPath.startsWith("/") ){
-                contextPath = "/" + contextPath;
-            }
-        }
-        String url = "script".equals(this.type) ?
-                ("javascript:" + this.script) :
-                (contextPath + "/" + this.url);
-        if (url == null) {
-            return null;
-        }
-        for (Map.Entry<String, Object> entry : contextModel.entrySet()) {
-            url = url.replace("{{" + entry.getKey() + "}}", "" + entry.getValue());
-        }
-        return url;
+        return url(contextPath, contextModel, null);
     }
+
+	public String url(String contextPath, Map<String, Object> contextModel, String returnUrl) {
+		if (StringUtils.isNotBlank(contextPath)) {
+			if ( !contextPath.startsWith("/") ){
+				contextPath = "/" + contextPath;
+			}
+		}
+
+		String url = "script".equals(this.type) ?
+				("javascript:" + this.script) :
+				(contextPath + "/" + this.url);
+		if (url == null) {
+			return null;
+		}
+		for (Map.Entry<String, Object> entry : contextModel.entrySet()) {
+			url = url.replace("{{" + entry.getKey() + "}}", "" + entry.getValue());
+		}
+
+		if (!"script".equals(type) && returnUrl != null) {
+			if (!url.contains("returnUrl=")) {
+				returnUrl = "returnUrl=" + java.net.URLEncoder.encode(returnUrl);
+				if (url.contains("?")) {
+					returnUrl = "&" + returnUrl;
+				} else {
+					returnUrl = "?" + returnUrl;
+				}
+
+				String[] splitUrl = url.split("#");
+				if (splitUrl.length == 1) {
+					url += returnUrl;
+				} else {
+					url = splitUrl[0] + returnUrl + "#" + splitUrl[1];
+				}
+			}
+		}
+		return url;
+	}
 
     public void setType(String type) {
         this.type = type;
@@ -221,5 +244,4 @@ public class Extension implements Comparable<Extension> {
     public void setScript(String script) {
         this.script = script;
     }
-
 }
