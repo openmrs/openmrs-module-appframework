@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class AppFrameworkActivator extends BaseModuleActivator implements ModuleActivator {
 
-    protected Log log = LogFactory.getLog(getClass());
+    private Log log = LogFactory.getLog(getClass());
 
 	/**
 	 * @see ModuleActivator#contextRefreshed()

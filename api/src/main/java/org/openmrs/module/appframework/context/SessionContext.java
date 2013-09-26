@@ -5,11 +5,11 @@ package org.openmrs.module.appframework.context;
  */
 public class SessionContext {
 
-    Integer currentUserId;
+    protected Integer currentUserId;
 
-    Integer currentProviderId;
+    protected Integer currentProviderId;
 
-    Integer sessionLocationId;
+    protected Integer sessionLocationId;
 
     public Integer getCurrentUserId() {
         return currentUserId;

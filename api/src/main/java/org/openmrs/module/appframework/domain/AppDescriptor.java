@@ -190,15 +190,18 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 
     @Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (!(o instanceof AppDescriptor))
+        }
+		if (!(o instanceof AppDescriptor)) {
 			return false;
+        }
 		
 		AppDescriptor that = (AppDescriptor) o;
 		
-		if (id != null ? !id.equals(that.id) : that.id != null)
+		if (id != null ? !id.equals(that.id) : that.id != null) {
 			return false;
+        }
 		
 		return true;
 	}
@@ -210,7 +213,7 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	
 	@Override
 	public int compareTo(AppDescriptor o) {
-		return new Integer(this.order).compareTo(new Integer(o.order));
+		return Integer.valueOf(this.order).compareTo(Integer.valueOf(o.order));
 	}
 
     public String getInstanceOf() {

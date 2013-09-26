@@ -145,15 +145,18 @@ public class Extension implements Comparable<Extension> {
 
     @Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (!(o instanceof Extension))
+        }
+		if (!(o instanceof Extension)) {
 			return false;
+        }
 		
 		Extension extension = (Extension) o;
 		
-		if (id != null ? !id.equals(extension.id) : extension.id != null)
+		if (id != null ? !id.equals(extension.id) : extension.id != null) {
 			return false;
+        }
 		
 		return true;
 	}
@@ -165,7 +168,7 @@ public class Extension implements Comparable<Extension> {
 	
 	@Override
 	public int compareTo(Extension o) {
-		return new Integer(this.order).compareTo(o.order);
+		return Integer.valueOf(this.order).compareTo(o.order);
 	}
 
     public void setBelongsTo(AppDescriptor belongsTo) {
