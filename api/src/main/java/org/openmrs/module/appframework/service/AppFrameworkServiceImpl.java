@@ -23,6 +23,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.AppFrameworkConstants;
+import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.ComponentState;
@@ -35,10 +36,10 @@ import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -174,7 +175,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	}
 
     @Override
-    public List<Extension> getExtensionsForCurrentUser(String extensionPointId, Bindings contextModel) {
+    public List<Extension> getExtensionsForCurrentUser(String extensionPointId, AppContextModel contextModel) {
         List<Extension> extensions = new ArrayList<Extension>();
         UserContext userContext = Context.getUserContext();
 
@@ -190,7 +191,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         return extensions;
     }
 
-    boolean checkRequireExpression(Extension candidate, Bindings contextModel) {
+    // making it public is a hack so we can test this directly in the appui module
+    public boolean checkRequireExpression(Extension candidate, AppContextModel contextModel) {
         try {
             String requireExpression = candidate.getRequire();
             return requireExpression == null || javascriptEngine.eval("(" + requireExpression + ") == true", contextModel).equals(Boolean.TRUE);

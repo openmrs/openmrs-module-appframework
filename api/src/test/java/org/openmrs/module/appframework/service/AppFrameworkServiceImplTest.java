@@ -3,6 +3,7 @@ package org.openmrs.module.appframework.service;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
@@ -12,7 +13,6 @@ import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.script.SimpleBindings;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -119,7 +119,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null);
 
         VisitStatus visit = new VisitStatus(true, false);
-        SimpleBindings contextModel = new SimpleBindings();
+        AppContextModel contextModel = new AppContextModel();
         contextModel.put("visit", visit);
 
         assertTrue(service.checkRequireExpression(extensionRequiring("visit.active"), contextModel));
