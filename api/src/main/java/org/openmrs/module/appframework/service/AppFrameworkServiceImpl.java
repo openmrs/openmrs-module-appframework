@@ -36,9 +36,11 @@ import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -195,7 +197,9 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     public boolean checkRequireExpression(Extension candidate, AppContextModel contextModel) {
         try {
             String requireExpression = candidate.getRequire();
-            return requireExpression == null || javascriptEngine.eval("(" + requireExpression + ") == true", contextModel).equals(Boolean.TRUE);
+            javascriptEngine.setBindings(new SimpleBindings(contextModel), ScriptContext.ENGINE_SCOPE);
+            return requireExpression == null || javascriptEngine.eval("(" + requireExpression + ") == true", new SimpleBindings(contextModel)).equals(Boolean.TRUE);
+
         } catch (ScriptException e) {
             log.error("Failed to evaluate 'require' check for extension " + candidate.getId(), e);
             return false;
