@@ -15,6 +15,7 @@ package org.openmrs.module.appframework.service;
 
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
@@ -86,7 +87,7 @@ public interface AppFrameworkService extends OpenmrsService {
      * @return
      * @should get enabled extensions for the current user whose require property matches the contextModel
      */
-    List<Extension> getExtensionsForCurrentUser(String extensionPointId, Bindings contextModel);
+    List<Extension> getExtensionsForCurrentUser(String extensionPointId, AppContextModel appContextModel);
 
     /**
 	 * Gets all enabled apps for the currently logged in user

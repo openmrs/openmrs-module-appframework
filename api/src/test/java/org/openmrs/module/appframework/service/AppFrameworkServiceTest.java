@@ -23,6 +23,7 @@ import org.openmrs.User;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppFrameworkActivator;
+import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
@@ -270,7 +271,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         Context.authenticate(user.getUsername(), "Openmr5xy");
         assertEquals(user, Context.getAuthenticatedUser());
 
-        SimpleBindings contextModel = setupContextModel(true);
+        AppContextModel contextModel = setupContextModel(true);
 
         List<Extension> extensions = appFrameworkService.getExtensionsForCurrentUser(null, contextModel);
         assertEquals(1, extensions.size());
@@ -282,8 +283,8 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         assertEquals("gotoArchives", extensions.get(0).getId());
     }
 
-    private SimpleBindings setupContextModel(boolean isVisitActive) {
-        SimpleBindings bindings = new SimpleBindings();
+    private AppContextModel setupContextModel(boolean isVisitActive) {
+        AppContextModel bindings = new AppContextModel();
         bindings.put("patientId", 7);
         bindings.put("visit", new VisitStatus(isVisitActive));
         return bindings;
