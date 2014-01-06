@@ -86,24 +86,44 @@ public class Extension implements Comparable<Extension> {
 	public String getId() {
 		return id;
 	}
-	
-	public String getAppId() {
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getAppId() {
 		return appId;
 	}
-	
-	public String getExtensionPointId() {
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getExtensionPointId() {
 		return extensionPointId;
 	}
-	
-	public String getType() {
+
+    public void setExtensionPointId(String extensionPointId) {
+        this.extensionPointId = extensionPointId;
+    }
+
+    public String getType() {
 		return type;
 	}
-	
-	public String getLabel() {
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getLabel() {
 		return label;
 	}
-	
-	public String getUrl() {
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getUrl() {
 		return url;
 	}
 
@@ -114,18 +134,34 @@ public class Extension implements Comparable<Extension> {
     public String getIcon() {
 		return icon;
 	}
-	
-	public int getOrder() {
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public int getOrder() {
 		return order;
 	}
-	
-	public String getRequiredPrivilege() {
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public String getRequiredPrivilege() {
 		return requiredPrivilege;
 	}
-	
-	public String getScript() {
+
+    public void setRequiredPrivilege(String requiredPrivilege) {
+        this.requiredPrivilege = requiredPrivilege;
+    }
+
+    public String getScript() {
 		return script;
 	}
+
+    public void setScript(String script) {
+        this.script = script;
+    }
 	
 	public Map<String, Object> getExtensionParams() {
 		return extensionParams;
@@ -240,11 +276,4 @@ public class Extension implements Comparable<Extension> {
 		return url;
 	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setScript(String script) {
-        this.script = script;
-    }
 }
