@@ -59,19 +59,25 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
     }
 
     public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions) {
+        allAppTemplates.clear();
+        allAppDescriptors.clear();
+        allFreeStandingExtensions.clear();
         for (AppFrameworkFactory appFrameworkFactory : appFrameworkFactories) {
             try {
-                allAppTemplates.clear();
                 List<AppTemplate> appTemplates = appFrameworkFactory.getAppTemplates();
-                allAppTemplates.add(appTemplates);
+                if (appTemplates != null) {
+                    allAppTemplates.add(appTemplates);
+                }
 
-                allAppDescriptors.clear();
                 List<AppDescriptor> appDescriptors = appFrameworkFactory.getAppDescriptors();
-                allAppDescriptors.add(appDescriptors);
+                if (appDescriptors != null) {
+                    allAppDescriptors.add(appDescriptors);
+                }
 
-                allFreeStandingExtensions.clear();
                 List<Extension> extensions = appFrameworkFactory.getExtensions();
-                allFreeStandingExtensions.add(extensions);
+                if (extensions != null) {
+                    allFreeStandingExtensions.add(extensions);
+                }
 
                 allAppDescriptors.setAppTemplatesOnInstances(allAppTemplates);
                 allAppDescriptors.setExtensionApps();
