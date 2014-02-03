@@ -82,8 +82,19 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	public List<AppDescriptor> getAllApps() {
 		return allAppDescriptors.getAppDescriptors();
 	}
-	
-	@Override
+
+    @Override
+    public List<Extension> getExtensionsById(String extensionPointId, String id) {
+        List<Extension> matchingExtensions = new ArrayList<Extension>();
+        for (Extension extension : getAllExtensions(extensionPointId)) {
+            if (extension.getId().equalsIgnoreCase(id)) {
+                matchingExtensions.add(extension);
+            }
+        }
+        return matchingExtensions;
+    }
+
+    @Override
 	public List<Extension> getAllExtensions(String extensionPointId) {
         List<Extension> matchingExtensions = new ArrayList<Extension>();
 		for (Extension extension : allFreeStandingExtensions.getExtensions()) {

@@ -39,6 +39,8 @@ public interface AppFrameworkService extends OpenmrsService {
 	List<AppDescriptor> getAllApps();
 	
 	List<Extension> getAllExtensions(String extensionPointId);
+
+    List<Extension> getExtensionsById(String extensionPointId, String id);
 	
 	List<AppDescriptor> getAllEnabledApps();
 	
