@@ -116,7 +116,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testCheckRequireExpression() throws Exception {
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null);
+        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null);
 
         VisitStatus visit = new VisitStatus(true, false);
         AppContextModel contextModel = new AppContextModel();

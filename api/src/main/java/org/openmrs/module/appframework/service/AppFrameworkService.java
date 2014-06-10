@@ -19,6 +19,7 @@ import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.properties.RuntimeProperties;
 
 import javax.script.Bindings;
 import java.util.List;
@@ -125,5 +126,11 @@ public interface AppFrameworkService extends OpenmrsService {
      * @return
      */
     AppDescriptor getApp(String id);
+
+    /**
+     * Just to allow us to inject a mock runtime properties during testing
+     * @param runtimeProperties
+     */
+    void setRuntimeProperties(RuntimeProperties runtimeProperties);
 
 }

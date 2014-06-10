@@ -27,37 +27,48 @@ import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.properties.RuntimeProperties;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
-import javax.script.Bindings;
-import javax.script.SimpleBindings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import javax.script.Bindings;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @DirtiesContext
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
 	@Autowired
 	private AppFrameworkService appFrameworkService;
-	
+
+    private RuntimeProperties mockRuntimeProperties;
+
 	@Before
 	public void setup() {
 		//trigger loading of the apps
 		new AppFrameworkActivator().contextRefreshed();
+
+        // create mock runtime properties
+        mockRuntimeProperties = mock(RuntimeProperties.class);
+        when(mockRuntimeProperties.getProperties()).thenReturn(new Properties());
+        appFrameworkService.setRuntimeProperties(mockRuntimeProperties);
 	}
-	
+
 	private User setupPrivilegesRolesAndUser(String privilegeToAssign) {
 		UserService us = Context.getUserService();
 		//Register the test privileges in the test *app.json and *extension.json files
@@ -313,6 +324,61 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         assertThat(instance.getConfig().get("extraFields").get(0).getTextValue(), is("phoneNumber"));
         assertThat(instance.getConfig().get("urlOnSuccess").getTextValue(), is("patientDashboard.page?patientId={{appContext.createdPatientId}}"));
     }
+
+    @Test
+    @Verifies(value = "should get all enabled apps", method = "getAllEnabledApps()")
+    public void getAllEnabledApps_shouldGetAllEnabledApps() throws Exception {
+        List<AppDescriptor> apps = appFrameworkService.getAllEnabledApps();
+        assertEquals(4, apps.size());//should include the app with that requires no privilege
+        List<String> appIds = new ArrayList<String>();
+        for (AppDescriptor app : apps) {
+            appIds.add(app.getId());
+        }
+        assertTrue(appIds.contains("patientDashboardApp"));
+        assertTrue(appIds.contains("archiveRoomApp"));
+        assertTrue(appIds.contains("xrayApp"));
+        assertTrue(appIds.contains("referenceapplication.registerPatient.outpatient"));
+    }
+
+    @Test
+    @Verifies(value = "should not get app disabled in runtime properties", method = "getAllEnabledApps()")
+    public void getAllEnabledApps_shouldNotGetAppDisabledInRuntimeProperties() throws Exception {
+
+        when(mockRuntimeProperties.hasProperty("disabledApps")).thenReturn(true);
+        when(mockRuntimeProperties.getProperty("disabledApps")).thenReturn("someApp,patientDashboardApp,anotherApp");
+
+        List<AppDescriptor> apps = appFrameworkService.getAllEnabledApps();
+        assertEquals(3, apps.size());
+        List<String> appIds = new ArrayList<String>();
+        for (AppDescriptor app : apps) {
+            appIds.add(app.getId());
+        }
+        assertFalse(appIds.contains("patientDashboardApp"));
+        assertTrue(appIds.contains("archiveRoomApp"));
+        assertTrue(appIds.contains("xrayApp"));
+        assertTrue(appIds.contains("referenceapplication.registerPatient.outpatient"));
+    }
+
+    @Test
+    @Verifies(value = "should not get app if not enabled in runtime properties", method = "getAllEnabledApps()")
+    public void getAllEnabledApps_shouldNotGetAppIfNotEnabledInRuntimeProperties() throws Exception {
+
+        when(mockRuntimeProperties.hasProperty("enabledApps")).thenReturn(true);
+        when(mockRuntimeProperties.getProperty("enabledApps")).thenReturn("someApp,patientDashboardApp,anotherApp");
+
+        List<AppDescriptor> apps = appFrameworkService.getAllEnabledApps();
+        assertEquals(1, apps.size());
+        List<String> appIds = new ArrayList<String>();
+        for (AppDescriptor app : apps) {
+            appIds.add(app.getId());
+        }
+        assertTrue(appIds.contains("patientDashboardApp"));
+        assertFalse(appIds.contains("archiveRoomApp"));
+        assertFalse(appIds.contains("xrayApp"));
+        assertFalse(appIds.contains("referenceapplication.registerPatient.outpatient"));
+
+    }
+
 
     public class VisitStatus {
         public int id = 17;

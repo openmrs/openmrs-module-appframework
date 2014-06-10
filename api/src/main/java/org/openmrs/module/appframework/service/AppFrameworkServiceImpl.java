@@ -30,21 +30,22 @@ import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
+import org.openmrs.module.appframework.properties.RuntimeProperties;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -65,16 +66,19 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private FeatureToggleProperties featureToggles;
 
+    private RuntimeProperties runtimeProperties;
+
     private ScriptEngine javascriptEngine;
 
     public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
-	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles) {
+	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles, RuntimeProperties runtimeProperties) {
         this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allFreeStandingExtensions = allFreeStandingExtensions;
 		this.allComponentsState = allComponentsState;
         this.locationService = locationService;
         this.featureToggles = featureToggles;
+        this.runtimeProperties = runtimeProperties;
         this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
     }
 
@@ -106,22 +110,56 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	@Override
 	public List<AppDescriptor> getAllEnabledApps() {
+
+        // first just get all apps
 		List<AppDescriptor> appDescriptors = getAllApps();
-		
-		ComponentState componentState;
+
+        // find out which ones are disabled
 		List<AppDescriptor> disabledAppDescriptors = new ArrayList<AppDescriptor>();
 		for (AppDescriptor appDescriptor : appDescriptors) {
-			componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
-			if (componentState != null && !componentState.getEnabled()
-                    || appDescriptor.getFeatureToggle() != null && !featureToggles.isFeatureEnabled(appDescriptor.getFeatureToggle())) {
+			if (disabledByComponentState(appDescriptor) || disabledByFeatureToggle(appDescriptor) || disabledInRuntimeProperties(appDescriptor)) {
 				disabledAppDescriptors.add(appDescriptor);
             }
 		}
-		
+
+		// remove disabled apps
 		appDescriptors.removeAll(disabledAppDescriptors);
 		return appDescriptors;
 	}
-	
+
+    private boolean disabledByComponentState(AppDescriptor appDescriptor) {
+        ComponentState componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
+        return componentState != null && !componentState.getEnabled();
+    }
+
+    private boolean disabledByFeatureToggle(AppDescriptor appDescriptor) {
+        return  appDescriptor.getFeatureToggle() != null && !featureToggles.isFeatureEnabled(appDescriptor.getFeatureToggle());
+    }
+
+    private boolean disabledInRuntimeProperties(AppDescriptor appDescriptor) {
+
+        if (runtimeProperties.getProperties() != null) {
+
+            // disabled if there is a enabledApps property and this app id is not within it
+            if (runtimeProperties.hasProperty("enabledApps")) {
+                List<String> enabledApps = Arrays.asList(((String) runtimeProperties.getProperty("enabledApps")).split(","));
+                if (!enabledApps.contains(appDescriptor.getId())) {
+                    return true;
+                }
+            }
+
+            // disabled if there is a disabledApps property and this app id is within it
+            if (runtimeProperties.hasProperty("disabledApps")) {
+                List<String> disabledApps = Arrays.asList(((String) runtimeProperties.getProperty("disabledApps")).split(","));
+                if (disabledApps.contains(appDescriptor.getId())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 	/**
 	 * @see org.openmrs.module.appframework.service.AppFrameworkService#getAllEnabledExtensions(java.lang.String)
 	 */
@@ -258,4 +296,9 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         return allAppDescriptors.getAppDescriptor(id);
     }
 
+    // allows us to override runtime properties in tests
+    @Override
+    public void setRuntimeProperties(RuntimeProperties runtimeProperties) {
+        this.runtimeProperties = runtimeProperties;
+    }
 }
