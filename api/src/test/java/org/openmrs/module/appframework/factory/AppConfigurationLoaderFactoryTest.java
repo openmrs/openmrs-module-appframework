@@ -28,11 +28,12 @@ public class AppConfigurationLoaderFactoryTest extends BaseModuleContextSensitiv
     @Test
     @DirtiesContext
     public void testConfigurationLoad() throws IOException {
+
         List<AppDescriptor> appDescriptors = appConfigurationLoaderFactory.getAppDescriptors();
         List<Extension> extensions = appConfigurationLoaderFactory.getExtensions();
 
-        assertEquals(4, appDescriptors.size());
-        assertEquals(3, extensions.size());
+        assertEquals(5, appDescriptors.size());
+        assertEquals(4, extensions.size());
     }
 
 }

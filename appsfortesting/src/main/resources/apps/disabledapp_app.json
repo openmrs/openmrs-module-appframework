@@ -1,0 +1,7 @@
+[
+    {
+        "id": "disabledApp",
+        "description": "App to test disabling via appframework-configuration.json (in test/resources of API project); should be disabled"
+    }
+
+]

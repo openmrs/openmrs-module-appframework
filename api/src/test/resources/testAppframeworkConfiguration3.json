@@ -1,0 +1,20 @@
+{
+
+    "appConfiguration": {
+        "someApp": {
+            "enabled": false
+        },
+        "anotherApp": {
+            "enabled": true
+        }
+    },
+
+    "extensionConfiguration": {
+        "someExtension": {
+            "enabled": true
+        },
+        "anotherExtension": {
+            "enabled": false
+        }
+    }
+}

@@ -1,0 +1,8 @@
+[
+    {
+        "id": "disabledExtension",
+        "appId": "patientDashboardApp",
+        "extensionPointId": "patientActions"
+
+    }
+]

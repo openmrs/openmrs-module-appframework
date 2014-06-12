@@ -21,6 +21,7 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
@@ -56,6 +57,8 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
         AllFreeStandingExtensions allFreeStandingExtensions = Context.getRegisteredComponents(AllFreeStandingExtensions.class).get(0);
 
         registerAppsAndExtensions(appFrameworkFactories, allAppTemplates, allAppDescriptors, allFreeStandingExtensions);
+
+        Context.getRegisteredComponent("appFrameworkConfig", AppFrameworkConfig.class).refreshContext();
     }
 
     public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions) {
