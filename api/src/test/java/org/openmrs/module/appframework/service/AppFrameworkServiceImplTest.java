@@ -3,7 +3,7 @@ package org.openmrs.module.appframework.service;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.module.appframework.config.AppFrameworkConfig;
+import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
@@ -37,7 +37,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     private FeatureToggleProperties featureToggles;
 
     @Autowired
-    private AppFrameworkConfig appFrameworkConfig;
+    private CustomAppFrameworkConfig customAppFrameworkConfig;
 
     @Before
     public void setUp() throws Exception {

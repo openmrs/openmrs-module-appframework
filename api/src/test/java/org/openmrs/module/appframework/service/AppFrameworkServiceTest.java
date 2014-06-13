@@ -23,7 +23,8 @@ import org.openmrs.User;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppFrameworkActivator;
-import org.openmrs.module.appframework.config.AppFrameworkConfig;
+import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
+import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
@@ -56,14 +57,14 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	private AppFrameworkService appFrameworkService;
 
     @Autowired
-    private AppFrameworkConfig appFrameworkConfig;
+    private CustomAppFrameworkConfig customAppFrameworkConfig;
 
 	@Before
 	public void setup() {
 
         // override app framework config with our test configuration file
-        appFrameworkConfig.setAppframeworkConfigFile(new File(this.getClass().getResource("/" + AppFrameworkConfig.APP_FRAMEWORK_CONFIGURATION_FILE_NAME).getFile()));
-        appFrameworkConfig.refreshContext();
+        customAppFrameworkConfig.setAppframeworkConfigFile(new File(this.getClass().getResource("/" + CustomAppFrameworkConfig.APP_FRAMEWORK_CONFIGURATION_FILE_NAME).getFile()));
+        customAppFrameworkConfig.refreshContext();
 
         //trigger loading of the apps
 		new AppFrameworkActivator().contextRefreshed();

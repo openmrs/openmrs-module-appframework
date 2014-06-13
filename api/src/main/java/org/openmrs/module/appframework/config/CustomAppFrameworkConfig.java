@@ -11,20 +11,20 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
- * Component used to access AppFrameworkConfigDescriptor
- * See AppFrameworkConfigDescriptor for more information
+ * Component used to access CustomAppFrameworkConfigDescriptor
+ * See CustomAppFrameworkConfigDescriptor for more information
  */
-@Component("appFrameworkConfig")
-public class AppFrameworkConfig {
+@Component("customAppFrameworkConfig")
+public class CustomAppFrameworkConfig {
 
     private static final String APP_FRAMEWORK_CONFIGURATION_ENV = "APP_FRAMEWORK_CONFIGURATION";
-    public static final String APP_FRAMEWORK_CONFIGURATION_FILE_NAME = "appframework-config.json";
+    public static final String APP_FRAMEWORK_CONFIGURATION_FILE_NAME = "custom-appframework-config.json";
 
     private File appFrameworkConfigFile;
 
-    private AppFrameworkConfigDescriptor descriptor;
+    private CustomAppFrameworkConfigDescriptor descriptor;
 
-    public AppFrameworkConfig() {
+    public CustomAppFrameworkConfig() {
 
         String appFrameworkConfigFileName = System.getenv(APP_FRAMEWORK_CONFIGURATION_ENV);
         if (appFrameworkConfigFileName == null) {
@@ -67,24 +67,30 @@ public class AppFrameworkConfig {
         if (this.appFrameworkConfigFile.exists()) {
             try {
                 InputStream inputStream = new FileInputStream(this.appFrameworkConfigFile);
-                descriptor = new ObjectMapper().readValue(inputStream, AppFrameworkConfigDescriptor.class);
+                descriptor = new ObjectMapper().readValue(inputStream, CustomAppFrameworkConfigDescriptor.class);
             } catch (Exception e) {
-                throw new RuntimeException("Unable to load app framework configuration file", e);
+                throw new IllegalStateException("Unable to load custom app framework configuration file", e);
             }
         }
         else {
-            descriptor = new AppFrameworkConfigDescriptor();
+            descriptor = new CustomAppFrameworkConfigDescriptor();
         }
 
     }
 
-    // the only reason we have this public setter is so we can overwrite in tests with proper file name for component tests
+    /**
+     * The only reason we have this public setter is so we can overwrite in tests with proper file name for component tests
+     * @param appFrameworkConfigFile
+     */
     public void setAppframeworkConfigFile(File appFrameworkConfigFile) {
         this.appFrameworkConfigFile = appFrameworkConfigFile;
     }
 
-    // for unit testing isEnabled methods
-    protected void setAppFrameworkConfigDescriptor(AppFrameworkConfigDescriptor descriptor) {
+    /**
+     * For unit testing isEnabled methods
+     * @param descriptor
+     */
+    protected void setAppFrameworkConfigDescriptor(CustomAppFrameworkConfigDescriptor descriptor) {
         this.descriptor = descriptor;
     }
 }

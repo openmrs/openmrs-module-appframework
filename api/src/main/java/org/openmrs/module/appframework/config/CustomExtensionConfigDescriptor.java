@@ -2,7 +2,7 @@ package org.openmrs.module.appframework.config;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class AppConfigDescriptor {
+public class CustomExtensionConfigDescriptor {
 
     @JsonProperty
     private Boolean enabled;
@@ -14,4 +14,5 @@ public class AppConfigDescriptor {
     public Boolean isEnabled() {
         return enabled;
     }
+
 }

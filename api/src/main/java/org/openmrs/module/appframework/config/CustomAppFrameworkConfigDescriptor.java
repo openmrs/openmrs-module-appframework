@@ -7,10 +7,12 @@ import java.util.Map;
 /**
  * Allows configuration of apps and extensions at runtime via a file "appframework-config.json"
  * This file is not mandatory, and currently allows only enabling and disabling apps and extensions.
- * Example use case would be disabling all apps and extensions except reporting-related apps on a
+ * A primary use case is customization of different servers using deployment tools like puppet/chef,
+ * so you can push server-specific configuration outside of a database (which may be replicated between servers) and the
+ * code (which may be shared).  For example, disabling all apps and extensions except reporting-related apps on a
  * reporting server.
  *
- * Accessible via the AppFrameworkConfig component which handles loading the appframework-config.json
+ * Accessible via the CustomAppFrameworkConfig component which handles loading the custom-appframework-config.json
  *
  * File format:
  *
@@ -38,7 +40,7 @@ import java.util.Map;
  *  }
  *}
  */
-public class AppFrameworkConfigDescriptor {
+public class CustomAppFrameworkConfigDescriptor {
 
     @JsonProperty
     private Boolean appsEnabledByDefault;
@@ -47,10 +49,10 @@ public class AppFrameworkConfigDescriptor {
     private Boolean extensionsEnabledByDefault;
 
     @JsonProperty
-    private Map<String,AppConfigDescriptor> appConfiguration;
+    private Map<String,CustomAppConfigDescriptor> appConfiguration;
 
     @JsonProperty
-    private Map<String,ExtensionConfigDescriptor> extensionConfiguration;
+    private Map<String,CustomExtensionConfigDescriptor> extensionConfiguration;
 
 
     public Boolean getAppsEnabledByDefault() {
@@ -62,19 +64,19 @@ public class AppFrameworkConfigDescriptor {
     }
 
 
-    public Map<String, AppConfigDescriptor> getAppConfiguration() {
+    public Map<String, CustomAppConfigDescriptor> getAppConfiguration() {
         return appConfiguration;
     }
 
-    public void setAppConfiguration(Map<String, AppConfigDescriptor> appConfiguration) {
+    public void setAppConfiguration(Map<String, CustomAppConfigDescriptor> appConfiguration) {
         this.appConfiguration = appConfiguration;
     }
 
-    public Map<String, ExtensionConfigDescriptor> getExtensionConfiguration() {
+    public Map<String, CustomExtensionConfigDescriptor> getExtensionConfiguration() {
         return extensionConfiguration;
     }
 
-    public void setExtensionConfiguration(Map<String, ExtensionConfigDescriptor> extensionConfiguration) {
+    public void setExtensionConfiguration(Map<String, CustomExtensionConfigDescriptor> extensionConfiguration) {
         this.extensionConfiguration = extensionConfiguration;
     }
 
