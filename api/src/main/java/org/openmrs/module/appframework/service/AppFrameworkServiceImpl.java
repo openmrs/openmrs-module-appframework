@@ -98,6 +98,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     }
 
     @Override
+    // TODO shouldn't this be getAllFreeStandingExtensions?
 	public List<Extension> getAllExtensions(String extensionPointId) {
         List<Extension> matchingExtensions = new ArrayList<Extension>();
 		for (Extension extension : allFreeStandingExtensions.getExtensions()) {
