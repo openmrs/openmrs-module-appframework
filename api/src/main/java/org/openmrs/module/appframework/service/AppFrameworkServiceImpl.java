@@ -133,7 +133,25 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     }
 
     private boolean disabledByFeatureToggle(AppDescriptor appDescriptor) {
-        return  appDescriptor.getFeatureToggle() != null && !featureToggles.isFeatureEnabled(appDescriptor.getFeatureToggle());
+        return disabledByFeatureToggle(appDescriptor.getFeatureToggle());
+    }
+
+    private boolean disabledByFeatureToggle(String featureToggle) {
+
+        if(StringUtils.isBlank(featureToggle)) {
+            return false;
+        }
+
+        Boolean negated = false;
+
+        if (featureToggle.startsWith("!")) {
+            featureToggle = featureToggle.substring(1);
+            negated = true;
+        }
+
+        Boolean featureEnabled = featureToggles.isFeatureEnabled(featureToggle);
+
+        return (!negated && !featureEnabled) || (negated && featureEnabled);
     }
 
     private boolean disabledByAppFrameworkConfig(AppDescriptor appDescriptor) {
@@ -180,7 +198,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     }
 
     private boolean disabledByFeatureToggle(Extension extension) {
-        return extension.getFeatureToggle() != null && !featureToggles.isFeatureEnabled(extension.getFeatureToggle());
+        return disabledByFeatureToggle(extension.getFeatureToggle());
     }
 
     private boolean disabledByAppFrameworkConfig(Extension extension) {
