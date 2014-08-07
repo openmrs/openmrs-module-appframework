@@ -8,4 +8,27 @@ import java.util.HashMap;
  */
 public class AppContextModel extends HashMap<String, Object> {
 
+    /**
+     * @param key
+     * @param value
+     * @return a shallow copy, with key->value added
+     */
+    public AppContextModel with(String key, Object value) {
+        AppContextModel clone = new AppContextModel();
+        clone.putAll(this);
+        clone.put(key, value);
+        return clone;
+    }
+
+    /**
+     * @param key
+     * @return a shallow copy, with 'key' removed
+     */
+    public AppContextModel without(String key) {
+        AppContextModel clone = new AppContextModel();
+        clone.putAll(this);
+        clone.remove(key);
+        return clone;
+    }
+
 }
