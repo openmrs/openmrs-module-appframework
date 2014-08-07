@@ -4,7 +4,9 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
+import org.openmrs.module.appframework.template.TemplateFactory;
 
 import java.util.Map;
 
@@ -225,12 +227,8 @@ public class Extension implements Comparable<Extension> {
     }
 
     /**
-     * The substitution algorithm implemented here is very simple. It does <em>not</em> support:
-     * <ul>
-     *     <li>whitespaces like {{ var }}</li>
-     *     <li>{{obj.prop}} unless you explicitly include "obj.prop" in variables</li>
-     *     <li>including the same variable twice in input</li>
-     * </ul>
+     * If the url contains any {{var}} then these are replaced using TemplateFactory#handlebars
+     *
      * @param contextPath e.g. "/openmrs"
      * @param contextModel
      * @return url, or "javascript:" + script if type == script, with contextModel substituted for any {{var}} in the url
@@ -252,9 +250,11 @@ public class Extension implements Comparable<Extension> {
 		if (url == null) {
 			return null;
 		}
-		for (Map.Entry<String, Object> entry : contextModel.entrySet()) {
-			url = url.replace("{{" + entry.getKey() + "}}", "" + entry.getValue());
-		}
+
+        if (url.contains("{{")) {
+            TemplateFactory templateFactory = getTemplateFactory();
+            url = templateFactory.handlebars(url, contextModel);
+        }
 
 		if (!"script".equals(type) && returnUrl != null) {
 			if (!url.contains("returnUrl=")) {
@@ -275,5 +275,9 @@ public class Extension implements Comparable<Extension> {
 		}
 		return url;
 	}
+
+    TemplateFactory getTemplateFactory() {
+        return Context.getRegisteredComponent("appframeworkTemplateFactory", TemplateFactory.class);
+    }
 
 }

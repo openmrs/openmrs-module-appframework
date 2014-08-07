@@ -77,6 +77,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+        </dependency>
+
 	</dependencies>
 
 	<build>
