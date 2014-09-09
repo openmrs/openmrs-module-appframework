@@ -256,8 +256,12 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     public boolean checkRequireExpression(Extension candidate, AppContextModel contextModel) {
         try {
             String requireExpression = candidate.getRequire();
-            javascriptEngine.setBindings(new SimpleBindings(contextModel), ScriptContext.ENGINE_SCOPE);
-            return requireExpression == null || javascriptEngine.eval("(" + requireExpression + ") == true").equals(Boolean.TRUE);
+            if (StringUtils.isBlank(requireExpression)) {
+            	return true;
+            } else {
+            	javascriptEngine.setBindings(new SimpleBindings(contextModel), ScriptContext.ENGINE_SCOPE);
+            	return javascriptEngine.eval("(" + requireExpression + ") == true").equals(Boolean.TRUE);
+            }
 
         } catch (ScriptException e) {
             log.error("Failed to evaluate 'require' check for extension " + candidate.getId(), e);
