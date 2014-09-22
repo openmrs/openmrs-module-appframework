@@ -22,8 +22,8 @@
 	</organization>
 
 	<scm>
-		<connection>scm:git:https://github.com/openmrs/openmrs-module-appframework.git</connection>
-		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-appframework.git</developerConnection>
+		<connection>scm:git:git@github.com:openmrs/openmrs-module-appframework.git</connection>
+		<developerConnection>scm:git:git@github.com:openmrs/openmrs-module-appframework.git</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-appframework</url>
 	  <tag>HEAD</tag>
   </scm>
