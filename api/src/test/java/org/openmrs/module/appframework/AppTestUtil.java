@@ -1,5 +1,6 @@
 package org.openmrs.module.appframework;
 
+import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.factory.AppConfigurationLoaderFactory;
@@ -8,10 +9,10 @@ import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import java.util.Arrays;
 import java.util.Collections;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
@@ -32,7 +33,9 @@ public class AppTestUtil {
         Validator validator = mock(Validator.class);
         when(validator.validate(anyObject())).thenReturn(Collections.<ConstraintViolation<Object>>emptySet());
         AllAppDescriptors allAppDescriptors = new AllAppDescriptors(validator);
-        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()), new AllAppTemplates(validator), allAppDescriptors, new AllFreeStandingExtensions(validator));
+        CustomAppFrameworkConfig config = mock(CustomAppFrameworkConfig.class);
+        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()),
+                new AllAppTemplates(validator), allAppDescriptors, new AllFreeStandingExtensions(validator), config);
         return allAppDescriptors.getAppDescriptor(id);
     }
 
@@ -46,7 +49,9 @@ public class AppTestUtil {
         Validator validator = mock(Validator.class);
         when(validator.validate(anyObject())).thenReturn(Collections.<ConstraintViolation<Object>>emptySet());
         AllAppTemplates allAppTemplates = new AllAppTemplates(validator);
-        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()), allAppTemplates, new AllAppDescriptors(validator), new AllFreeStandingExtensions(validator));
+        CustomAppFrameworkConfig config = mock(CustomAppFrameworkConfig.class);
+        new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()),
+                allAppTemplates, new AllAppDescriptors(validator), new AllFreeStandingExtensions(validator), config);
         return allAppTemplates.getAppTemplate(id);
     }
 

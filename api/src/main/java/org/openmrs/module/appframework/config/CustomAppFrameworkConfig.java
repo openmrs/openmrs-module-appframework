@@ -62,6 +62,11 @@ public class CustomAppFrameworkConfig {
         }
     }
 
+    public Boolean isDefaultConfigurationFactoryDisabled() {
+        return descriptor.getDefaultConfigurationFactoryDisabled() != null
+                ? descriptor.getDefaultConfigurationFactoryDisabled() : false;
+    }
+
     public void refreshContext() {
 
         if (this.appFrameworkConfigFile.exists()) {

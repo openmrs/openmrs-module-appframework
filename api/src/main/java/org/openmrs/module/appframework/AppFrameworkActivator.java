@@ -25,12 +25,14 @@ import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.factory.AppConfigurationLoaderFactory;
 import org.openmrs.module.appframework.factory.AppFrameworkFactory;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.module.appframework.service.AppFrameworkService;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -51,21 +53,31 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
         // in openmrs-core via newInstance() which doesn't instantiate it in a spring way. This should
         // later be changed.
 
+        // configuration file used to store various configuration properties
+        CustomAppFrameworkConfig config = Context.getRegisteredComponent("customAppFrameworkConfig", CustomAppFrameworkConfig.class);
+        config.refreshContext();
+
         List<AppFrameworkFactory> appFrameworkFactories = Context.getRegisteredComponents(AppFrameworkFactory.class);
         AllAppTemplates allAppTemplates = Context.getRegisteredComponents(AllAppTemplates.class).get(0);
         AllAppDescriptors allAppDescriptors = Context.getRegisteredComponents(AllAppDescriptors.class).get(0);
         AllFreeStandingExtensions allFreeStandingExtensions = Context.getRegisteredComponents(AllFreeStandingExtensions.class).get(0);
 
-        registerAppsAndExtensions(appFrameworkFactories, allAppTemplates, allAppDescriptors, allFreeStandingExtensions);
+        if (config.isDefaultConfigurationFactoryDisabled()) {
+            disableDefaultConfigurationFactory(appFrameworkFactories);
+        }
 
-        Context.getRegisteredComponent("customAppFrameworkConfig", CustomAppFrameworkConfig.class).refreshContext();
+        registerAppsAndExtensions(appFrameworkFactories, allAppTemplates, allAppDescriptors, allFreeStandingExtensions, config);
+
     }
 
-    public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions) {
+    public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates,
+                                          AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
+                                          CustomAppFrameworkConfig config) {
         allAppTemplates.clear();
         allAppDescriptors.clear();
         allFreeStandingExtensions.clear();
         for (AppFrameworkFactory appFrameworkFactory : appFrameworkFactories) {
+
             try {
                 List<AppTemplate> appTemplates = appFrameworkFactory.getAppTemplates();
                 if (appTemplates != null) {
@@ -107,5 +119,16 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
             locationService.saveLocationTag(supportsLogin);
         }
     }
+
+    private void disableDefaultConfigurationFactory(List<AppFrameworkFactory> appFrameworkFactories) {
+        Iterator i = appFrameworkFactories.iterator();
+        while (i.hasNext()) {
+            if (i.next().getClass().getCanonicalName().equals(AppConfigurationLoaderFactory.class.getCanonicalName())) {
+                i.remove();
+            }
+        }
+
+    }
+
 
 }

@@ -6,8 +6,10 @@ import java.util.Map;
 
 /**
  * Allows configuration of apps and extensions at runtime via a file "appframework-config.json"
- * This file is not mandatory, and currently allows only enabling and disabling apps and extensions.
- * A primary use case is customization of different servers using deployment tools like puppet/chef,
+ * This file is not mandatory, it currently allows 1) enabling and disabling apps and extensions, and
+ * 2) disabling the default configuration factory (so that no apps are extensions are loaded by default).
+ *
+ * A primary use case for enabled/disabling apps is customization of different servers using deployment tools like puppet/chef,
  * so you can push server-specific configuration outside of a database (which may be replicated between servers) and the
  * code (which may be shared).  For example, disabling all apps and extensions except reporting-related apps on a
  * reporting server.
@@ -17,6 +19,8 @@ import java.util.Map;
  * File format:
  *
  *{
+ *  "defaultConfigurationFactoryDisabled":  false,
+ *
  *  "appsEnabledByDefault": true,
  *
  *  "appConfiguration": {
@@ -43,6 +47,9 @@ import java.util.Map;
 public class CustomAppFrameworkConfigDescriptor {
 
     @JsonProperty
+    private Boolean defaultConfigurationFactoryDisabled;
+
+    @JsonProperty
     private Boolean appsEnabledByDefault;
 
     @JsonProperty
@@ -63,6 +70,9 @@ public class CustomAppFrameworkConfigDescriptor {
         return extensionsEnabledByDefault;
     }
 
+    public Boolean getDefaultConfigurationFactoryDisabled() {
+        return defaultConfigurationFactoryDisabled;
+    }
 
     public Map<String, CustomAppConfigDescriptor> getAppConfiguration() {
         return appConfiguration;

@@ -1,4 +1,6 @@
 {
+    "defaultConfigurationFactoryDisabled": false,
+
     "appsEnabledByDefault": true,
 
     "appConfiguration": {
