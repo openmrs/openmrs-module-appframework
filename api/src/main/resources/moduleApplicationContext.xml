@@ -33,7 +33,7 @@
             	<constructor-arg ref="allComponentsState"/>
             	<constructor-arg ref="locationService"/>
                 <constructor-arg ref="featureToggles"/>
-                <constructor-arg ref="customAppFrameworkConfig"/>
+                <constructor-arg ref="appFrameworkConfig"/>
             </bean>
         </property>
         <property name="preInterceptors">

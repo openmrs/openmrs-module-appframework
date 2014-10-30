@@ -2,7 +2,7 @@ package org.openmrs.module.appframework;
 
 import org.junit.Test;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
+import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
@@ -29,7 +29,7 @@ public class AppFrameworkActivatorComponentTest extends BaseModuleContextSensiti
         AllAppTemplates allAppTemplates = Context.getRegisteredComponents(AllAppTemplates.class).get(0);
         AllAppDescriptors allAppDescriptors = Context.getRegisteredComponents(AllAppDescriptors.class).get(0);
         AllFreeStandingExtensions allFreeStandingExtensions = Context.getRegisteredComponents(AllFreeStandingExtensions.class).get(0);
-        CustomAppFrameworkConfig config = Context.getRegisteredComponent("customAppFrameworkConfig", CustomAppFrameworkConfig.class);
+        AppFrameworkConfig config = Context.getRegisteredComponent("appFrameworkConfig", AppFrameworkConfig.class);
 
         List<AppFrameworkFactory> factories = new ArrayList<AppFrameworkFactory>();
         factories.add(new Factory("one"));

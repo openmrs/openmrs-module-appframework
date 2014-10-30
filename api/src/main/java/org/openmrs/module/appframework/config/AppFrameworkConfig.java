@@ -11,20 +11,20 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
- * Component used to access CustomAppFrameworkConfigDescriptor
- * See CustomAppFrameworkConfigDescriptor for more information
+ * Component used to access AppFrameworkConfigDescriptor
+ * See AppFrameworkConfigDescriptor for more information
  */
-@Component("customAppFrameworkConfig")
-public class CustomAppFrameworkConfig {
+@Component("appFrameworkConfig")
+public class AppFrameworkConfig {
 
     private static final String APP_FRAMEWORK_CONFIGURATION_ENV = "APP_FRAMEWORK_CONFIGURATION";
-    public static final String APP_FRAMEWORK_CONFIGURATION_FILE_NAME = "custom-appframework-config.json";
+    public static final String APP_FRAMEWORK_CONFIGURATION_FILE_NAME = "appframework-config.json";
 
     private File appFrameworkConfigFile;
 
-    private CustomAppFrameworkConfigDescriptor descriptor;
+    private AppFrameworkConfigDescriptor descriptor;
 
-    public CustomAppFrameworkConfig() {
+    public AppFrameworkConfig() {
 
         String appFrameworkConfigFileName = System.getenv(APP_FRAMEWORK_CONFIGURATION_ENV);
         if (appFrameworkConfigFileName == null) {
@@ -72,13 +72,13 @@ public class CustomAppFrameworkConfig {
         if (this.appFrameworkConfigFile.exists()) {
             try {
                 InputStream inputStream = new FileInputStream(this.appFrameworkConfigFile);
-                descriptor = new ObjectMapper().readValue(inputStream, CustomAppFrameworkConfigDescriptor.class);
+                descriptor = new ObjectMapper().readValue(inputStream, AppFrameworkConfigDescriptor.class);
             } catch (Exception e) {
                 throw new IllegalStateException("Unable to load custom app framework configuration file", e);
             }
         }
         else {
-            descriptor = new CustomAppFrameworkConfigDescriptor();
+            descriptor = new AppFrameworkConfigDescriptor();
         }
 
     }
@@ -95,7 +95,7 @@ public class CustomAppFrameworkConfig {
      * For unit testing isEnabled methods
      * @param descriptor
      */
-    protected void setAppFrameworkConfigDescriptor(CustomAppFrameworkConfigDescriptor descriptor) {
+    protected void setAppFrameworkConfigDescriptor(AppFrameworkConfigDescriptor descriptor) {
         this.descriptor = descriptor;
     }
 }

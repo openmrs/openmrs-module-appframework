@@ -14,7 +14,7 @@ import java.util.Map;
  * code (which may be shared).  For example, disabling all apps and extensions except reporting-related apps on a
  * reporting server.
  *
- * Accessible via the CustomAppFrameworkConfig component which handles loading the custom-appframework-config.json
+ * Accessible via the AppFrameworkConfig component which handles loading the appframework-config.json
  *
  * File format:
  *
@@ -44,7 +44,7 @@ import java.util.Map;
  *  }
  *}
  */
-public class CustomAppFrameworkConfigDescriptor {
+public class AppFrameworkConfigDescriptor {
 
     @JsonProperty
     private Boolean defaultConfigurationFactoryDisabled;
@@ -56,10 +56,10 @@ public class CustomAppFrameworkConfigDescriptor {
     private Boolean extensionsEnabledByDefault;
 
     @JsonProperty
-    private Map<String,CustomAppConfigDescriptor> appConfiguration;
+    private Map<String,AppConfigDescriptor> appConfiguration;
 
     @JsonProperty
-    private Map<String,CustomExtensionConfigDescriptor> extensionConfiguration;
+    private Map<String,ExtensionConfigDescriptor> extensionConfiguration;
 
 
     public Boolean getAppsEnabledByDefault() {
@@ -74,19 +74,19 @@ public class CustomAppFrameworkConfigDescriptor {
         return defaultConfigurationFactoryDisabled;
     }
 
-    public Map<String, CustomAppConfigDescriptor> getAppConfiguration() {
+    public Map<String, AppConfigDescriptor> getAppConfiguration() {
         return appConfiguration;
     }
 
-    public void setAppConfiguration(Map<String, CustomAppConfigDescriptor> appConfiguration) {
+    public void setAppConfiguration(Map<String, AppConfigDescriptor> appConfiguration) {
         this.appConfiguration = appConfiguration;
     }
 
-    public Map<String, CustomExtensionConfigDescriptor> getExtensionConfiguration() {
+    public Map<String, ExtensionConfigDescriptor> getExtensionConfiguration() {
         return extensionConfiguration;
     }
 
-    public void setExtensionConfiguration(Map<String, CustomExtensionConfigDescriptor> extensionConfiguration) {
+    public void setExtensionConfiguration(Map<String, ExtensionConfigDescriptor> extensionConfiguration) {
         this.extensionConfiguration = extensionConfiguration;
     }
 

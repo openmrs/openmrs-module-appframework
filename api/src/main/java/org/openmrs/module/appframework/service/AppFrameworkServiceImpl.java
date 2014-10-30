@@ -23,7 +23,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.AppFrameworkConstants;
-import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
+import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
@@ -65,19 +65,19 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private FeatureToggleProperties featureToggles;
 
-    private CustomAppFrameworkConfig customAppFrameworkConfig;
+    private AppFrameworkConfig appFrameworkConfig;
 
     private ScriptEngine javascriptEngine;
 
     public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
-	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles, CustomAppFrameworkConfig customAppFrameworkConfig) {
+	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles, AppFrameworkConfig appFrameworkConfig) {
         this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allFreeStandingExtensions = allFreeStandingExtensions;
 		this.allComponentsState = allComponentsState;
         this.locationService = locationService;
         this.featureToggles = featureToggles;
-        this.customAppFrameworkConfig = customAppFrameworkConfig;
+        this.appFrameworkConfig = appFrameworkConfig;
         this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
     }
 
@@ -155,7 +155,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     }
 
     private boolean disabledByAppFrameworkConfig(AppDescriptor appDescriptor) {
-        return !customAppFrameworkConfig.isEnabled(appDescriptor);
+        return !appFrameworkConfig.isEnabled(appDescriptor);
     }
 
 	/**
@@ -202,7 +202,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     }
 
     private boolean disabledByAppFrameworkConfig(Extension extension) {
-        return !customAppFrameworkConfig.isEnabled(extension);
+        return !appFrameworkConfig.isEnabled(extension);
     }
 
 	@Override

@@ -21,7 +21,7 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
-import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
+import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
@@ -54,7 +54,7 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
         // later be changed.
 
         // configuration file used to store various configuration properties
-        CustomAppFrameworkConfig config = Context.getRegisteredComponent("customAppFrameworkConfig", CustomAppFrameworkConfig.class);
+        AppFrameworkConfig config = Context.getRegisteredComponent("appFrameworkConfig", AppFrameworkConfig.class);
         config.refreshContext();
 
         List<AppFrameworkFactory> appFrameworkFactories = Context.getRegisteredComponents(AppFrameworkFactory.class);
@@ -72,7 +72,7 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
 
     public void registerAppsAndExtensions(List<AppFrameworkFactory> appFrameworkFactories, AllAppTemplates allAppTemplates,
                                           AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
-                                          CustomAppFrameworkConfig config) {
+                                          AppFrameworkConfig config) {
         allAppTemplates.clear();
         allAppDescriptors.clear();
         allFreeStandingExtensions.clear();

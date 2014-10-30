@@ -1,6 +1,6 @@
 package org.openmrs.module.appframework;
 
-import org.openmrs.module.appframework.config.CustomAppFrameworkConfig;
+import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.factory.AppConfigurationLoaderFactory;
@@ -33,7 +33,7 @@ public class AppTestUtil {
         Validator validator = mock(Validator.class);
         when(validator.validate(anyObject())).thenReturn(Collections.<ConstraintViolation<Object>>emptySet());
         AllAppDescriptors allAppDescriptors = new AllAppDescriptors(validator);
-        CustomAppFrameworkConfig config = mock(CustomAppFrameworkConfig.class);
+        AppFrameworkConfig config = mock(AppFrameworkConfig.class);
         new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()),
                 new AllAppTemplates(validator), allAppDescriptors, new AllFreeStandingExtensions(validator), config);
         return allAppDescriptors.getAppDescriptor(id);
@@ -49,7 +49,7 @@ public class AppTestUtil {
         Validator validator = mock(Validator.class);
         when(validator.validate(anyObject())).thenReturn(Collections.<ConstraintViolation<Object>>emptySet());
         AllAppTemplates allAppTemplates = new AllAppTemplates(validator);
-        CustomAppFrameworkConfig config = mock(CustomAppFrameworkConfig.class);
+        AppFrameworkConfig config = mock(AppFrameworkConfig.class);
         new AppFrameworkActivator().registerAppsAndExtensions(Arrays.<AppFrameworkFactory>asList(new AppConfigurationLoaderFactory()),
                 allAppTemplates, new AllAppDescriptors(validator), new AllFreeStandingExtensions(validator), config);
         return allAppTemplates.getAppTemplate(id);
