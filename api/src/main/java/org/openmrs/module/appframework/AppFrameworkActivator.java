@@ -62,7 +62,7 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
         AllAppDescriptors allAppDescriptors = Context.getRegisteredComponents(AllAppDescriptors.class).get(0);
         AllFreeStandingExtensions allFreeStandingExtensions = Context.getRegisteredComponents(AllFreeStandingExtensions.class).get(0);
 
-        if (config.isDefaultConfigurationFactoryDisabled()) {
+        if (!config.getLoadAppsFromClasspath()) {
             disableDefaultConfigurationFactory(appFrameworkFactories);
         }
 

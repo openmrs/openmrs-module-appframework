@@ -1,5 +1,5 @@
 {
-    "defaultConfigurationFactoryDisabled": false,
+    "loadAppsFromClasspath": true,
 
     "appsEnabledByDefault": true,
 

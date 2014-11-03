@@ -62,9 +62,9 @@ public class AppFrameworkConfig {
         }
     }
 
-    public Boolean isDefaultConfigurationFactoryDisabled() {
-        return descriptor.getDefaultConfigurationFactoryDisabled() != null
-                ? descriptor.getDefaultConfigurationFactoryDisabled() : false;
+    public Boolean getLoadAppsFromClasspath() {
+        return descriptor.getLoadAppsFromClasspath() != null
+                ? descriptor.getLoadAppsFromClasspath() : true;  // defaults to true
     }
 
     public void refreshContext() {

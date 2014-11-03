@@ -47,7 +47,7 @@ import java.util.Map;
 public class AppFrameworkConfigDescriptor {
 
     @JsonProperty
-    private Boolean defaultConfigurationFactoryDisabled;
+    private Boolean loadAppsFromClasspath;
 
     @JsonProperty
     private Boolean appsEnabledByDefault;
@@ -62,16 +62,28 @@ public class AppFrameworkConfigDescriptor {
     private Map<String,ExtensionConfigDescriptor> extensionConfiguration;
 
 
+    public Boolean getLoadAppsFromClasspath() {
+        return loadAppsFromClasspath;
+    }
+
+    public void setLoadAppsFromClasspath(Boolean loadAppsFromClasspath) {
+        this.loadAppsFromClasspath = loadAppsFromClasspath;
+    }
+
     public Boolean getAppsEnabledByDefault() {
         return appsEnabledByDefault;
+    }
+
+    public void setAppsEnabledByDefault(Boolean appsEnabledByDefault) {
+        this.appsEnabledByDefault = appsEnabledByDefault;
     }
 
     public Boolean getExtensionsEnabledByDefault() {
         return extensionsEnabledByDefault;
     }
 
-    public Boolean getDefaultConfigurationFactoryDisabled() {
-        return defaultConfigurationFactoryDisabled;
+    public void setExtensionsEnabledByDefault(Boolean extensionsEnabledByDefault) {
+        this.extensionsEnabledByDefault = extensionsEnabledByDefault;
     }
 
     public Map<String, AppConfigDescriptor> getAppConfiguration() {

@@ -16,7 +16,7 @@ public class AppFrameworkConfigDescriptorTest {
         AppFrameworkConfigDescriptor appFrameworkConfigDescriptor = new ObjectMapper().readValue(inputStream, AppFrameworkConfigDescriptor.class);
         assertThat(appFrameworkConfigDescriptor.getAppsEnabledByDefault(), is(true));
         assertThat(appFrameworkConfigDescriptor.getExtensionsEnabledByDefault(), is(false));
-        assertThat(appFrameworkConfigDescriptor.getDefaultConfigurationFactoryDisabled(), is(false));
+        assertThat(appFrameworkConfigDescriptor.getLoadAppsFromClasspath(), is(true));
         assertThat(appFrameworkConfigDescriptor.getAppConfiguration().get("someApp").getEnabled(), is(false));
         assertThat(appFrameworkConfigDescriptor.getAppConfiguration().get("anotherApp").getEnabled(), is(true));
         assertThat(appFrameworkConfigDescriptor.getExtensionConfiguration().get("someExtension").getEnabled(), is(true));
