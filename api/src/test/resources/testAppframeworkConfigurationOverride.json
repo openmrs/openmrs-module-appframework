@@ -1,0 +1,17 @@
+{
+    "appsEnabledByDefault": false,
+
+    "appConfiguration": {
+        "someApp": {
+            "enabled": true
+        }
+    },
+
+    "extensionsEnabledByDefault": true,
+
+    "extensionConfiguration": {
+        "someExtension": {
+            "enabled": false
+        }
+    }
+}

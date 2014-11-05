@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.appframework.service;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Person;
@@ -24,6 +25,7 @@ import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppFrameworkActivator;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
+import org.openmrs.module.appframework.config.AppFrameworkConfigDescriptor;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
@@ -35,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.script.Bindings;
@@ -59,11 +64,11 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
     private AppFrameworkConfig appFrameworkConfig;
 
 	@Before
-	public void setup() {
+	public void setup() throws IOException {
 
         // override app framework config with our test configuration file
-        appFrameworkConfig.setAppframeworkConfigFile(new File(this.getClass().getResource("/" + AppFrameworkConfig.APP_FRAMEWORK_CONFIGURATION_FILE_NAME).getFile()));
-        appFrameworkConfig.refreshContext();
+        File appFrameworkConfigFile = new File(this.getClass().getResource("/" + "appframework-config.json").getFile());
+        appFrameworkConfig.addAppFrameworkConfigDescriptor(new ObjectMapper().readValue(new FileInputStream(appFrameworkConfigFile), AppFrameworkConfigDescriptor.class));
 
         //trigger loading of the apps
 		new AppFrameworkActivator().contextRefreshed();
