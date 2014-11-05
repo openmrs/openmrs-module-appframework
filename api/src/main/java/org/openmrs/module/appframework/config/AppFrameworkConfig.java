@@ -113,6 +113,8 @@ public class AppFrameworkConfig {
 
     public void refreshContext() {
 
+        descriptors = new ArrayList<AppFrameworkConfigDescriptor>();
+
         // the base file is always loaded first, if it exists
         InputStream profileStream = findProfile(APP_FRAMEWORK_CONFIGURATION_DEFAULT_FILENAME);
         if (profileStream != null) {

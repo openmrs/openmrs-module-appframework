@@ -65,11 +65,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 
 	@Before
 	public void setup() throws IOException {
-
-        // override app framework config with our test configuration file
-        File appFrameworkConfigFile = new File(this.getClass().getResource("/" + "appframework-config.json").getFile());
-        appFrameworkConfig.addAppFrameworkConfigDescriptor(new ObjectMapper().readValue(new FileInputStream(appFrameworkConfigFile), AppFrameworkConfigDescriptor.class));
-
         //trigger loading of the apps
 		new AppFrameworkActivator().contextRefreshed();
 	}
