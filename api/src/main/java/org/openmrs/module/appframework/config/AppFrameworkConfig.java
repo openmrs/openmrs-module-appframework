@@ -128,7 +128,7 @@ public class AppFrameworkConfig {
         if (Context.getRuntimeProperties().containsKey(APP_FRAMEWORK_CONFIGURATION_RUNTIME_PROPERTY)) {
 
             for (String profile : Context.getRuntimeProperties().getProperty(APP_FRAMEWORK_CONFIGURATION_RUNTIME_PROPERTY).split(",")) {
-                profileStream = findProfile(profile.trim());
+                profileStream = findProfile("appframework-config-" + profile.trim() + ".json");
                 if (profileStream != null) {
                     try {
                         addAppFrameworkConfigDescriptor(objectMapper.readValue(profileStream, AppFrameworkConfigDescriptor.class));
@@ -150,13 +150,12 @@ public class AppFrameworkConfig {
         this.descriptors.add(descriptor);
     }
 
-    private InputStream findProfile(String profile) {
+    private InputStream findProfile(String profileFilename) {
 
-        String profileFilename = "appframework-config-" + profile + ".json";
         Exception exception = null;
 
         // first see if is in the .OpenMRS directory (which will override any file of the same name on the classpath)
-        File profileFile = new File(OpenmrsUtil.getApplicationDataDirectory() + File.separatorChar + profile);
+        File profileFile = new File(OpenmrsUtil.getApplicationDataDirectory() + File.separatorChar + profileFilename);
 
         if (profileFile.exists()) {
             try {
