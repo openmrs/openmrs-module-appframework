@@ -26,6 +26,7 @@
 	<!-- Maps hibernate files, if present -->
 	<mappingFiles>
         AppFramework.hbm.xml
+        UserApp.hbm.xml
 	</mappingFiles>
 
 	<!-- Internationalization -->

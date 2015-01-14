@@ -19,6 +19,7 @@ import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.domain.UserApp;
 
 import java.util.List;
 
@@ -122,7 +123,37 @@ public interface AppFrameworkService extends OpenmrsService {
      * Gets an app by its id
      * @param id
      * @return
+     * @should return a user app that matches the specified id
      */
     AppDescriptor getApp(String id);
+
+    /**
+     * Gets a UserApp that matches the specified appId
+     *
+     * @since 2.3
+     * @param appId
+     * @return UserApp
+     * @should return a user app that matches the specified appId
+     */
+    UserApp getUserApp(String appId);
+
+    /**
+     * Gets all UserApps
+     *
+     * @since 2.3
+     * @return List<UserApp>
+     * @should return a list of UserApps
+     */
+    List<UserApp> getUserApps();
+
+    /**
+     * Saves a new UserApp to the database or updates it in the DB in case it is an existing one
+     *
+     * @since 2.3
+     * @param userApp the UserApp to save
+     * @return UserApp
+     * @should save the user app to the database and update the list of loaded apps
+     */
+    UserApp saveUserApp(UserApp userApp);
 
 }

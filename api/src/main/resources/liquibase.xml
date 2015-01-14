@@ -68,4 +68,21 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="appframework-4" author="Wyclif">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="appframework_user_app" />
+            </not>
+        </preConditions>
+        <comment>Create table to store user defined apps</comment>
+        <createTable tableName="appframework_user_app">
+            <column name="app_id" type="varchar(50)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="json" type="mediumtext">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

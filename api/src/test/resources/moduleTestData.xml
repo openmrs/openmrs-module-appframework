@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <appframework_user_app app_id="test.someApp" json="{&quot;id&quot;:&quot;test.someApp&quot;,&quot;description&quot;:&quot;Some User App&quot;}" />
+    <appframework_user_app app_id="test.anotherApp" json="{&quot;id&quot;:&quot;test.anotherApp&quot;,&quot;description&quot;:&quot;Another User App&quot;}" />
+</dataset>

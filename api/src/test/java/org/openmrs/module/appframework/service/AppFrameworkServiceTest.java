@@ -30,6 +30,7 @@ import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.domain.UserApp;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.openmrs.util.RoleConstants;
@@ -338,6 +339,61 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         assertTrue(appIds.contains("archiveRoomApp"));
         assertTrue(appIds.contains("xrayApp"));
         assertTrue(appIds.contains("referenceapplication.registerPatient.outpatient"));
+    }
+
+    /**
+     * @verifies return a user app that matches the specified appId
+     * @see AppFrameworkService#getUserApp(String)
+     */
+    @Test
+    public void getUserApp_shouldReturnAUserAppThatMatchesTheSpecifiedAppId() throws Exception {
+        executeDataSet("moduleTestData.xml");
+        String expectedJson = "{\"id\":\"test.someApp\",\"description\":\"Some User App\"}";
+        UserApp app = appFrameworkService.getUserApp("test.someApp");
+        assertNotNull(app);
+        assertEquals(expectedJson, app.getJson());
+    }
+
+    /**
+     * @verifies return a list of UserApps
+     * @see AppFrameworkService#getUserApps()
+     */
+    @Test
+    public void getUserApps_shouldReturnAListOfUserApps() throws Exception {
+        executeDataSet("moduleTestData.xml");
+        assertEquals(2, appFrameworkService.getUserApps().size());
+    }
+
+    /**
+     * @verifies save the user app to the database and update the list of loaded apps
+     * @see AppFrameworkService#saveUserApp(org.openmrs.module.appframework.domain.UserApp)
+     */
+    @Test
+    public void saveUserApp_shouldSaveTheUserAppToTheDatabaseAndUpdateTheListOfLoadedApps() throws Exception {
+        String appId = "test.myApp";
+        assertNull(appFrameworkService.getUserApp(appId));
+        int originalAppDescriptorCount = appFrameworkService.getAllApps().size();
+        UserApp userApp = new UserApp();
+        userApp.setAppId(appId);
+        userApp.setJson("{\"id\":\"" + appId + "\",\"description\":\"My App Description\"}");
+        appFrameworkService.saveUserApp(userApp);
+        assertNotNull(appFrameworkService.getUserApp(appId));
+        assertEquals(++originalAppDescriptorCount, appFrameworkService.getAllApps().size());
+    }
+
+    /**
+     * @verifies return a user app that matches the specified id
+     * @see AppFrameworkService#getApp(String)
+     */
+    @Test
+    public void getApp_shouldReturnAUserAppThatMatchesTheSpecifiedId() throws Exception {
+        executeDataSet("moduleTestData.xml");
+        //Reload the apps to pick up the ones in our test dataset
+        new AppFrameworkActivator().contextRefreshed();
+        String expectedDescription = "Some User App";
+        AppDescriptor app = appFrameworkService.getApp("test.someApp");
+        assertNotNull(app);
+        assertEquals(expectedDescription, app.getDescription());
     }
 
     public class VisitStatus {

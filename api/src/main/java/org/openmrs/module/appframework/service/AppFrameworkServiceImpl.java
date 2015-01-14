@@ -22,6 +22,7 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.appframework.AppFrameworkActivator;
 import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
@@ -30,11 +31,13 @@ import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.domain.UserApp;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
+import org.openmrs.module.appframework.repository.AllUserApps;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -69,8 +72,11 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     private ScriptEngine javascriptEngine;
 
+    private AllUserApps allUserApps;
+
     public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
-	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles, AppFrameworkConfig appFrameworkConfig) {
+	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles, AppFrameworkConfig appFrameworkConfig,
+        AllUserApps allUserApps) {
         this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allFreeStandingExtensions = allFreeStandingExtensions;
@@ -79,6 +85,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         this.featureToggles = featureToggles;
         this.appFrameworkConfig = appFrameworkConfig;
         this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
+        this.allUserApps = allUserApps;
     }
 
     @Override
@@ -308,6 +315,24 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
     @Override
     public AppDescriptor getApp(String id) {
         return allAppDescriptors.getAppDescriptor(id);
+    }
+
+    @Override
+    public UserApp getUserApp(String appId) {
+        return allUserApps.getUserApp(appId);
+    }
+
+    @Override
+    public List<UserApp> getUserApps() {
+        return allUserApps.getUserApps();
+    }
+
+    @Override
+    public UserApp saveUserApp(UserApp userApp) {
+        UserApp toReturn = allUserApps.saveUserApp(userApp);
+        //Refresh to pick up the newly added ones and any changes
+        new AppFrameworkActivator().contextRefreshed();
+        return toReturn;
     }
 
 

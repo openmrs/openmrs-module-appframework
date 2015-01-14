@@ -20,6 +20,12 @@
             <ref bean="sessionFactory"/>
         </property>
     </bean>
+
+    <bean id="allUserApps" class="org.openmrs.module.appframework.repository.AllUserApps">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
 	
 	<bean id="appFrameworkService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
@@ -34,6 +40,7 @@
             	<constructor-arg ref="locationService"/>
                 <constructor-arg ref="featureToggles"/>
                 <constructor-arg ref="appFrameworkConfig"/>
+                <constructor-arg ref="allUserApps"/>
             </bean>
         </property>
         <property name="preInterceptors">
