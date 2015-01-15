@@ -6,7 +6,7 @@
 
     <class name="UserApp" table="appframework_user_app">
 
-        <id name="appId" type="string" column="app_id" />
+        <id name="appId" type="string" column="app_id" length="50" />
 
         <property name="json" type="string" length="16777215" not-null="true" />
 

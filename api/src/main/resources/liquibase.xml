@@ -76,7 +76,7 @@
         </preConditions>
         <comment>Create table to store user defined apps</comment>
         <createTable tableName="appframework_user_app">
-            <column name="app_id" type="varchar(50)" autoIncrement="true">
+            <column name="app_id" type="varchar(50)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="json" type="mediumtext">

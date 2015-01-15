@@ -17,6 +17,8 @@ import java.io.Serializable;
 
 /**
  * User to encapsulate data about a user defined app that is stored in the database
+ * 
+ * @since 2.3
  */
 public class UserApp implements Serializable {
 	

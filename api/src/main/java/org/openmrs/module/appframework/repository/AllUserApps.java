@@ -34,13 +34,13 @@ public class AllUserApps {
 		return (UserApp) sessionFactory.getCurrentSession().get(UserApp.class, appId);
 	}
 	
-	@Transactional(readOnly = true)
+	@Transactional
 	public UserApp saveUserApp(UserApp userApp) {
 		sessionFactory.getCurrentSession().saveOrUpdate(userApp);
 		return userApp;
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<UserApp> getUserApps() {
 		return sessionFactory.getCurrentSession().createCriteria(UserApp.class).list();
 	}
