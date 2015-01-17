@@ -403,6 +403,8 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
     @Test
     public void purgeUserApp_shouldRemoveTheUserAppFromTheDatabaseAndUpdateTheListOfLoadedApps() throws Exception {
         executeDataSet("moduleTestData.xml");
+        //Reload the apps to pick up the ones in our test dataset
+        new AppFrameworkActivator().contextRefreshed();
         UserApp app = appFrameworkService.getUserApp("test.someApp");
         assertNotNull(app);
         int originalAppDescriptorCount = appFrameworkService.getAllApps().size();
