@@ -396,6 +396,22 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         assertEquals(expectedDescription, app.getDescription());
     }
 
+    /**
+     * @verifies remove the user app from the database and update the list of loaded apps
+     * @see AppFrameworkService#purgeUserApp(org.openmrs.module.appframework.domain.UserApp)
+     */
+    @Test
+    public void purgeUserApp_shouldRemoveTheUserAppFromTheDatabaseAndUpdateTheListOfLoadedApps() throws Exception {
+        executeDataSet("moduleTestData.xml");
+        UserApp app = appFrameworkService.getUserApp("test.someApp");
+        assertNotNull(app);
+        int originalAppDescriptorCount = appFrameworkService.getAllApps().size();
+        appFrameworkService.purgeUserApp(app);
+        app = appFrameworkService.getUserApp("test.someApp");
+        assertNull(app);
+        assertEquals(--originalAppDescriptorCount, appFrameworkService.getAllApps().size());
+    }
+
     public class VisitStatus {
         public int id = 17;
         public boolean active;

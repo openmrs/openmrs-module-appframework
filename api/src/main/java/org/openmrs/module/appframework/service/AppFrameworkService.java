@@ -156,4 +156,13 @@ public interface AppFrameworkService extends OpenmrsService {
      */
     UserApp saveUserApp(UserApp userApp);
 
+    /**
+     * Deletes the UserApp from the database
+     *
+     * @since 2.3
+     * @param userApp the UserApp to purge
+     * @should remove the user app from the database and update the list of loaded apps
+     */
+    void purgeUserApp(UserApp userApp);
+
 }

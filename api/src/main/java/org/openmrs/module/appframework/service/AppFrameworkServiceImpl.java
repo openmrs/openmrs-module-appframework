@@ -335,5 +335,11 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         return toReturn;
     }
 
+    @Override
+    public void purgeUserApp(UserApp userApp) {
+        allUserApps.deleteUserApp(userApp);
+        new AppFrameworkActivator().contextRefreshed();
+    }
+
 
 }

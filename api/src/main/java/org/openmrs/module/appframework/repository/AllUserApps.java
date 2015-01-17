@@ -44,4 +44,10 @@ public class AllUserApps {
 	public List<UserApp> getUserApps() {
 		return sessionFactory.getCurrentSession().createCriteria(UserApp.class).list();
 	}
+	
+	@Transactional
+	public void deleteUserApp(UserApp userApp) {
+		sessionFactory.getCurrentSession().delete(userApp);
+	}
+	
 }
