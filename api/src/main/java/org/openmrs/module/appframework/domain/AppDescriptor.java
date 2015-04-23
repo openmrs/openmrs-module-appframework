@@ -9,6 +9,7 @@ import org.openmrs.module.appframework.domain.validators.NoDuplicateExtensionPoi
 import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoDuplicateExtensionPoint
@@ -65,7 +66,7 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	
 	public AppDescriptor() {
 	}
-	
+
 	public AppDescriptor(String id, String description, String label, String url, String icon, String tinyIcon, int order) {
 		this.id = id;
 		this.description = description;
@@ -92,33 +93,65 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
 	public String getId() {
 		return id;
 	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 	public String getDescription() {
 		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 	public String getLabel() {
 		return label;
 	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
 	
 	public String getUrl() {
 		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 	public String getIcon() {
 		return icon;
 	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
 	
 	public String getTinyIcon() {
 		return tinyIcon;
+	}
+
+	public void setTinyIcon(String tinyIcon) {
+		this.tinyIcon = tinyIcon;
 	}
 	
 	public int getOrder() {
 		return order;
 	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
 	
 	public String getRequiredPrivilege() {
 		return requiredPrivilege;
+	}
+
+	public void setRequiredPrivilege(String requiredPrivilege) {
+		this.requiredPrivilege = requiredPrivilege;
 	}
 
     public List<ExtensionPoint> getExtensionPoints() {
@@ -128,6 +161,13 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
     public void setExtensionPoints(List<ExtensionPoint> extensionPoints) {
         this.extensionPoints = extensionPoints;
     }
+
+	public void addExtensionPoint(ExtensionPoint extensionPoint) {
+		if (extensionPoints == null) {
+			extensionPoints = new ArrayList<ExtensionPoint>();
+		}
+		extensionPoints.add(extensionPoint);
+	}
 
 	public List<String> getContextModel() {
 		return contextModel;
@@ -231,4 +271,11 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
     public void setExtensions(List<Extension> extensions) {
         this.extensions = extensions;
     }
+
+	public void addExtension(Extension extension) {
+		if (extensions == null) {
+			extensions = new ArrayList<Extension>();
+		}
+		extensions.add(extension);
+	}
 }
