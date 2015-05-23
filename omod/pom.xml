@@ -19,6 +19,12 @@
 			<artifactId>appframework-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>appframework-appsfortesting</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+		</dependency>
 		
 		<!-- Begin OpenMRS core -->
 
@@ -57,7 +63,11 @@
 		
 		<!-- End OpenMRS core -->
 
-    </dependencies>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>webservices.rest-omod-common</artifactId>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<finalName>${project.parent.artifactId}-${project.parent.version}</finalName>

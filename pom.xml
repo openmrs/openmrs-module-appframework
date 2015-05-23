@@ -36,6 +36,7 @@
 	
 	<properties>
 		<openMRSVersion>1.9.4</openMRSVersion>
+		<webservicesRestVersion>2.12-SNAPSHOT</webservicesRestVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <handlebarsVersion>1.1.2</handlebarsVersion>
 	</properties>
@@ -85,6 +86,13 @@
 			</dependency>
 						
 			<!-- End OpenMRS core -->
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>webservices.rest-omod-common</artifactId>
+				<version>${webservicesRestVersion}</version>
+				<scope>provided</scope>
+			</dependency>
 
         	<dependency>
             	<groupId>org.powermock</groupId>
