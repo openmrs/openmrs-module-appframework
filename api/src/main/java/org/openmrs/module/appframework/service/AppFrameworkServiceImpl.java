@@ -165,7 +165,34 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         return !appFrameworkConfig.isEnabled(appDescriptor);
     }
 
-	/**
+    @Override
+    public List<Extension> getAllEnabledExtensions() {
+        List<Extension> extensions = new ArrayList<Extension>();
+
+        // first get all extensions from enabled apps
+        for (AppDescriptor app : getAllEnabledApps()) {
+            if (app.getExtensions() != null) {
+                for (Extension extension : app.getExtensions()) {
+                    // extensions that belong to apps can't be disabled independently of their app, so we don't check AllComponentsState here
+                    if (!disabledByFeatureToggle(extension) && !disabledByAppFrameworkConfig(extension)) {
+                        extensions.add(extension);
+                    }
+                }
+            }
+        }
+
+        // now get "standalone extensions"
+        for (Extension extension : allFreeStandingExtensions.getExtensions()) {
+            if (!disabledByFeatureToggle(extension) && !disabledByComponentState(extension) && !disabledByAppFrameworkConfig(extension)){
+                extensions.add(extension);
+            }
+        }
+
+        Collections.sort(extensions);
+        return extensions;
+    }
+
+    /**
 	 * @see org.openmrs.module.appframework.service.AppFrameworkService#getAllEnabledExtensions(java.lang.String)
 	 */
 	@Override

@@ -46,7 +46,9 @@ import java.util.List;
 import javax.script.Bindings;
 
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -104,7 +106,21 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		
 		return us.saveUser(u, "Openmr5xy");
 	}
-	
+
+	/**
+	 * @see {@link AppFrameworkService#getAllEnabledExtensions()}
+	 */
+	@Test
+	public void getAllEnabledExtensions_shouldGetAllEnabledExtensions() throws Exception {
+		List<Extension> visitExts = appFrameworkService.getAllEnabledExtensions();
+		assertEquals(4, visitExts.size());
+		assertThat(visitExts, containsInAnyOrder(
+				hasProperty("id", is("registerOutpatientHomepageLink")),
+				hasProperty("id", is("orderXrayExtension")),
+				hasProperty("id", is("gotoPatientExtension")),
+				hasProperty("id", is("gotoArchives"))));
+	}
+
 	/**
 	 * @see {@link AppFrameworkService#getAllEnabledExtensions(String)}
 	 */

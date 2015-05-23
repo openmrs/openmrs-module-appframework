@@ -37,7 +37,7 @@ import java.util.List;
 public interface AppFrameworkService extends OpenmrsService {
 	
 	List<AppDescriptor> getAllApps();
-	
+
 	List<Extension> getAllExtensions(String extensionPointId);
 
     List<Extension> getExtensionsById(String extensionPointId, String id);
@@ -52,7 +52,9 @@ public interface AppFrameworkService extends OpenmrsService {
 	 * @should get all extensions for the specified extensionPointId
 	 */
 	List<Extension> getAllEnabledExtensions(String extensionPointId);
-	
+
+	List<Extension> getAllEnabledExtensions();
+
 	void enableApp(String appId);
 	
 	void disableApp(String appId);
