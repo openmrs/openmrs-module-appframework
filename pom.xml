@@ -35,8 +35,8 @@
     </modules>
 	
 	<properties>
-		<openMRSVersion>1.9.4</openMRSVersion>
-		<webservicesRestVersion>2.12</webservicesRestVersion>
+		<openMRSVersion>1.10.2</openMRSVersion>
+		<webservicesRestVersion>2.12-SNAPSHOT</webservicesRestVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <handlebarsVersion>1.1.2</handlebarsVersion>
 	</properties>
