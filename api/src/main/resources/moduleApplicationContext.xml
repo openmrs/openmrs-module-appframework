@@ -17,13 +17,13 @@
 
     <bean id="allComponentsState" class="org.openmrs.module.appframework.repository.AllComponentsState">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref bean="dbSessionFactory"/>
         </property>
     </bean>
 
     <bean id="allUserApps" class="org.openmrs.module.appframework.repository.AllUserApps">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref bean="dbSessionFactory"/>
         </property>
     </bean>
 	

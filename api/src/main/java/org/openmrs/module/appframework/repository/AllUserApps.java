@@ -15,7 +15,7 @@ package org.openmrs.module.appframework.repository;
 
 import java.util.List;
 
-import org.hibernate.SessionFactory;
+import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.openmrs.module.appframework.domain.UserApp;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class AllUserApps {
 	
-	private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 	
-	public void setSessionFactory(SessionFactory sessionFactory) {
+	public void setSessionFactory(DbSessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 	

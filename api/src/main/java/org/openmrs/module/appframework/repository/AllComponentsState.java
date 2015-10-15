@@ -3,7 +3,7 @@ package org.openmrs.module.appframework.repository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
+import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
@@ -17,9 +17,9 @@ public class AllComponentsState {
 
     protected final Log log = LogFactory.getLog(getClass());
 
-    private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public void setSessionFactory(DbSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
