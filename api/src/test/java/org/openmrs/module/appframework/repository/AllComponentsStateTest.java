@@ -1,8 +1,8 @@
 package org.openmrs.module.appframework.repository;
 
 import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
+import org.openmrs.api.db.hibernate.DbSessionFactory;  
+import org.openmrs.api.db.hibernate.DbSession;  
 import org.hibernate.criterion.Criterion;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class AllComponentsStateTest {
 
     @Mock
-    private SessionFactory sessionFactory;
+    private DbSessionFactory sessionFactory;
 
     private AllComponentsState allComponentsState;
 
@@ -38,7 +38,7 @@ public class AllComponentsStateTest {
         String componentId = "componentId";
         ComponentType componentType = ComponentType.APP;
         Criteria mockCriteria = mock(Criteria.class);
-        Session mockSession = mock(Session.class);
+        DbSession mockSession = mock(DbSession.class);
         when(sessionFactory.getCurrentSession()).thenReturn(mockSession);
         when(mockSession.createCriteria(ComponentState.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(null);
@@ -62,7 +62,7 @@ public class AllComponentsStateTest {
         ComponentState existingComponentState = new ComponentState(componentId, componentType, false);
         existingComponentState.setId(componentStateId);
         Criteria mockCriteria = mock(Criteria.class);
-        Session mockSession = mock(Session.class);
+        DbSession mockSession = mock(DbSession.class);
         when(sessionFactory.getCurrentSession()).thenReturn(mockSession);
         when(mockSession.createCriteria(ComponentState.class)).thenReturn(mockCriteria);
         when(mockCriteria.uniqueResult()).thenReturn(existingComponentState);
