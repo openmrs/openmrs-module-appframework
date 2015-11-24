@@ -15,6 +15,15 @@
 		</property>
 	</bean>
 
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list>
+                <value>${project.parent.groupId}.${project.parent.artifactId}.service.AdministrativeNotificationService</value>
+                <ref local="administrativeNotificationService"/>
+            </list>
+        </property>
+    </bean>
+
     <bean id="allComponentsState" class="org.openmrs.module.appframework.repository.AllComponentsState">
         <property name="sessionFactory">
             <ref bean="dbSessionFactory"/>
@@ -42,6 +51,21 @@
                 <constructor-arg ref="appFrameworkConfig"/>
                 <constructor-arg ref="allUserApps"/>
             </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean id="administrativeNotificationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="${project.parent.groupId}.${project.parent.artifactId}.service.AdministrativeNotificationServiceImpl"/>
         </property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors" />
