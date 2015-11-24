@@ -29,6 +29,9 @@ public class AdministrativeNotification {
     private String icon;
 
     @JsonProperty
+    private String cssClass;
+
+    @JsonProperty
     private String label;
 
     @JsonProperty
@@ -56,6 +59,14 @@ public class AdministrativeNotification {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getCssClass() {
+        return cssClass;
+    }
+
+    public void setCssClass(String cssClass) {
+        this.cssClass = cssClass;
     }
 
     public String getLabel() {
