@@ -1,7 +1,6 @@
 package org.openmrs.module.appframework.rest;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -16,11 +15,10 @@ import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAda
 import org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -44,11 +42,10 @@ public class AdministrativeNotificationResourceTest extends BaseModuleWebContext
 
         assertThat(((List) results.get("results")).size(), is(1));
 
-        Object result = ((List) results.get("results")).get(0);
-        assertThat((Map) result, (Matcher<? super Map>) allOf(
-                hasEntry("id", "id"),
-                hasEntry("label", "label")
-        ));
+        Map<String, Object> result = (Map<String, Object>) ((List) results.get("results")).get(0);
+        assertThat((String) result.get("id"), is("id"));
+        assertThat((String) result.get("label"), is("label"));
+        assertThat(((Collection) result.get("actions")).size(), is(1));
     }
 
     /**
