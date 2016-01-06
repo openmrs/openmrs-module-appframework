@@ -15,6 +15,26 @@
 	<require_version>1.11.3, 1.10.2 - 1.10.*, 1.9.9 - 1.9.*</require_version>
 	<!-- / Module Properties -->
 
+	<conditionalResources>
+	
+	    <conditionalResource>
+	
+	        <path>/lib/appframework-omod-1.9.*</path>
+	
+	        <openmrsVersion>1.9-1.11</openmrsVersion>
+	
+	    </conditionalResource>
+	
+	    <conditionalResource>
+	
+	        <path>/lib/appframework-omod-2.0.*</path>
+	
+	        <openmrsVersion>2.0</openmrsVersion>
+	
+	    </conditionalResource>
+	
+	</conditionalResources>
+
 	<!-- Required Modules -->
 	<require_modules>
 		<require_module version="${webservicesRestVersion}">org.openmrs.module.webservices.rest</require_module>

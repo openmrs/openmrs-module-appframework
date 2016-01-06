@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.script.Bindings;
 
 import static junit.framework.Assert.assertNotNull;
@@ -56,6 +57,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 @DirtiesContext
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
@@ -72,6 +76,34 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		new AppFrameworkActivator().contextRefreshed();
 	}
 
+	private User saveUser(UserService us, User u, String password)
+	{
+		User user = null;
+		Class<?> userServiceClass = us.getClass();
+    	try {
+    		// openmrs 1.9
+    		Method saveUserMethod =  userServiceClass.getDeclaredMethod("saveUser", u.getClass(), password.getClass());
+    		user = (User)saveUserMethod.invoke(us, u, password);
+    		return user;
+    	} catch (NoSuchMethodException ex) {
+    		// do nothing
+ 		} catch (InvocationTargetException ex) {
+			// do nothing
+ 		} catch (IllegalAccessException ex) {
+			// do nothing
+		}
+    	try {
+    		// openmrs 2.0
+    		Method saveUserMethod =  userServiceClass.getDeclaredMethod("saveUser", u.getClass());
+    		user = us.createUser(u, password);
+    		//user = (User)saveUserMethod.invoke(us, user);
+    		return user;
+    	} catch (NoSuchMethodException ex) {
+    		// do nothing
+		}
+		return user;
+	}
+	
 	private User setupPrivilegesRolesAndUser(String privilegeToAssign) {
 		UserService us = Context.getUserService();
 		//Register the test privileges in the test *app.json and *extension.json files
@@ -104,7 +136,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		u.getPerson().setGender("M");
 		u.addRole(role);
 		
-		return us.saveUser(u, "Openmr5xy");
+		return saveUser(us, u, "Openmr5xy");
 	}
 
 	/**
@@ -279,7 +311,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         user.addRole(new Role(RoleConstants.SUPERUSER, "description"));
 
         UserService us = Context.getUserService();
-        us.saveUser(user, "Openmr5xy");
+		saveUser(us, user, "Openmr5xy");
 
         Context.authenticate(user.getUsername(), "Openmr5xy");
         assertEquals(user, Context.getAuthenticatedUser());
