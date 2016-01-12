@@ -30,12 +30,15 @@
 
 	<modules>
         <module>api</module>
+        <module>omod-1.9</module>
+        <module>omod-2.0</module>
         <module>omod</module>
         <module>appsfortesting</module>
     </modules>
 	
 	<properties>
 		<openMRSVersion>1.9.9</openMRSVersion>
+		<legacyUIVersion>1.0-SNAPSHOT</legacyUIVersion>
 		<webservicesRestVersion>2.12</webservicesRestVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <handlebarsVersion>1.1.2</handlebarsVersion>
@@ -93,6 +96,14 @@
 				<version>${webservicesRestVersion}</version>
 				<scope>provided</scope>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>legacyui-omod</artifactId>
+				<version>${legacyUIVersion}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
 
         	<dependency>
             	<groupId>org.powermock</groupId>
@@ -106,8 +117,20 @@
             	<artifactId>powermock-module-junit4</artifactId>
             	<version>1.4.10</version>
             	<scope>test</scope>
+	            <exclusions>
+	                <exclusion>
+	                    <groupId>org.javassist</groupId>
+	                    <artifactId>javassist</artifactId>
+	                </exclusion>
+	            </exclusions>
         	</dependency>
-
+        	
+			<dependency>
+		        <groupId>org.javassist</groupId>
+		        <artifactId>javassist</artifactId>
+		        <version>3.18.2-GA</version>
+		    </dependency>
+		    
             <dependency>
                 <groupId>com.github.jknack</groupId>
                 <artifactId>handlebars</artifactId>
@@ -214,5 +237,64 @@
         </snapshotRepository>
 	</distributionManagement>
 	
+
+	<!-- different profiles for building/testing against different version of 
+		openmrs -->
+	<profiles>
+		<profile>
+			<id>openmrs-1.9</id>
+
+			<properties>
+				<openMRSVersion>1.9.9</openMRSVersion>
+				<openMRSMinorVersion>1.9</openMRSMinorVersion>
+				<webservicesRestVersion>2.13-SNAPSHOT</webservicesRestVersion>
+			</properties>
+			
+			<dependencyManagement>
+				<dependencies>	
+
+					<dependency>
+						<groupId>org.openmrs.module</groupId>
+						<artifactId>webservices.rest-omod-common</artifactId>
+						<version>${webservicesRestVersion}</version>
+						<scope>provided</scope>
+					</dependency>
+				</dependencies>
+			</dependencyManagement>
+
+
+		</profile>
+		
+		<profile>
+			<id>openmrs-2.0</id>
+
+			<properties>
+				<openMRSVersion>2.1.0-SNAPSHOT</openMRSVersion>
+				<openMRSMinorVersion>2.0</openMRSMinorVersion>
+				<legacyUIVersion>1.0-SNAPSHOT</legacyUIVersion>
+				<webservicesRestVersion>2.12</webservicesRestVersion>
+			</properties>
+			
+			<dependencyManagement>
+				<dependencies>	
+					<dependency>
+						<groupId>org.openmrs.module</groupId>
+						<artifactId>legacyui-omod</artifactId>
+						<version>${legacyUIVersion}</version>
+						<type>jar</type>
+						<scope>provided</scope>
+					</dependency>
+
+					<dependency>
+						<groupId>org.openmrs.module</groupId>
+						<artifactId>webservices.rest-omod-common</artifactId>
+						<version>${webservicesRestVersion}</version>
+						<scope>provided</scope>
+					</dependency>
+				</dependencies>
+			</dependencyManagement>
+		</profile>
+
+	</profiles>
 
 </project>

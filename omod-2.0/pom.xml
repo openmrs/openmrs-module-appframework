@@ -7,24 +7,17 @@
 		<version>2.5-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>appframework-omod</artifactId>
+	<artifactId>appframework-omod-2.0</artifactId>
 	<packaging>jar</packaging>
-	<name>App Framework Module OMOD</name>
+	<name>App Framework Module OMOD - 2.0</name>
 	<description>OMOD project for AppFramework</description>
+	
+	<properties>
+		<openMRSVersion>2.1.0-SNAPSHOT</openMRSVersion>
+		<legacyUIVersion>1.0-SNAPSHOT</legacyUIVersion>
+	</properties>
 
 	<dependencies>
-		
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>${project.parent.artifactId}-omod-1.9</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>${project.parent.artifactId}-omod-2.0</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
@@ -90,6 +83,11 @@
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>webservices.rest-omod-common</artifactId>
+		</dependency>
+  
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>legacyui-omod</artifactId>
 		</dependency>
        	
 		<dependency>
@@ -184,27 +182,6 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.openmrs.maven.plugins</groupId>
-				<artifactId>maven-openmrs-plugin</artifactId>
-				<extensions>true</extensions>
-				<executions>
-					<execution>
-						<id>init</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>initialize-module</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>pack</id>
-						<phase>package</phase>
-						<goals>
-							<goal>package-module</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -227,64 +204,4 @@
 		</plugins>
 	</build>
 
-	<!-- different profiles for building/testing against different version of 
-		openmrs -->
- 
-	<profiles>
-		<profile>
-			<id>openmrs-1.9</id>
-
-			<properties>
-				<openMRSVersion>1.9.9</openMRSVersion>
-				<openMRSMinorVersion>1.9</openMRSMinorVersion>
-				<webservicesRestVersion>2.12</webservicesRestVersion>
-			</properties>
-			
-			<!-- <dependencyManagement> -->
-				<dependencies>	
-					<dependency>
-						<groupId>org.openmrs.module</groupId>
-						<artifactId>webservices.rest-omod-common</artifactId>
-						<version>${webservicesRestVersion}</version>
-						<scope>provided</scope>
-					</dependency>
-				</dependencies>
-
-			<!-- </dependencyManagement> -->
-
-
-		</profile>
-		
-		<profile>
-			<id>openmrs-2.0</id>
-
-			<properties>
-				<openMRSVersion>2.0.0-SNAPSHOT</openMRSVersion>
-				<openMRSMinorVersion>2.0</openMRSMinorVersion>
-				<legacyUIVersion>1.0-SNAPSHOT</legacyUIVersion>
-				<webservicesRestVersion>2.13-SNAPSHOT</webservicesRestVersion>
-			</properties>
-			
-			<!-- <dependencyManagement> -->
-				<dependencies>	
-					<dependency>
-						<groupId>org.openmrs.module</groupId>
-						<artifactId>legacyui-omod</artifactId>
-						<version>${legacyUIVersion}</version>
-						<type>jar</type>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>org.openmrs.module</groupId>
-						<artifactId>webservices.rest-omod-common</artifactId>
-						<version>${webservicesRestVersion}</version>
-						<scope>provided</scope>
-					</dependency>
-				</dependencies>
-
-			<!-- </dependencyManagement> -->
-		</profile>
-
-	</profiles>
- 
 </project>
