@@ -104,7 +104,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		u.getPerson().setGender("M");
 		u.addRole(role);
 		
-		return us.saveUser(u, "Openmr5xy");
+		return us.createUser(u, "Openmr5xy");
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         user.addRole(new Role(RoleConstants.SUPERUSER, "description"));
 
         UserService us = Context.getUserService();
-        us.saveUser(user, "Openmr5xy");
+        us.createUser(user, "Openmr5xy");
 
         Context.authenticate(user.getUsername(), "Openmr5xy");
         assertEquals(user, Context.getAuthenticatedUser());
