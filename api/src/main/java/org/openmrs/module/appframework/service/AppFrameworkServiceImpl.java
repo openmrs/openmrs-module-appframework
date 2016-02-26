@@ -16,6 +16,7 @@ package org.openmrs.module.appframework.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.api.LocationService;
@@ -42,11 +43,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 /**
@@ -293,11 +296,32 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
             if (StringUtils.isBlank(requireExpression)) {
             	return true;
             } else {
-            	javascriptEngine.setBindings(new SimpleBindings(contextModel), ScriptContext.ENGINE_SCOPE);
-            	return javascriptEngine.eval("(" + requireExpression + ") == true").equals(Boolean.TRUE);
+                // If any properties in contextModel are Maps, we want to allow scripts to access their subproperties
+                // with dot notation, but ScriptEngine and Bindings don't naturally handle this. Instead we will convert
+                // all Map-type properties to JSON and use this to define objects directly within the ScriptEngine.
+                // (Properties that are not Maps don't need this special treatment.)
+                Bindings bindings = new SimpleBindings();
+                Map<String, Object> mapProperties = new HashMap<String, Object>();
+                for (Map.Entry<String, Object> e : contextModel.entrySet()) {
+                    if (e.getValue() instanceof Map) {
+                        mapProperties.put(e.getKey(), e.getValue());
+                    }
+                    else {
+                        bindings.put(e.getKey(), e.getValue());
+                    }
+                }
+
+                // properties that are not Maps don't need any special treatment, we define them directly in Bindings
+                javascriptEngine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+                ObjectMapper jackson = new ObjectMapper();
+                for (Map.Entry<String, Object> e : mapProperties.entrySet()) {
+                    javascriptEngine.eval("var " + e.getKey() + " = " + jackson.writeValueAsString(e.getValue()) + ";");
+                }
+
+                return javascriptEngine.eval("(" + requireExpression + ") == true").equals(Boolean.TRUE);
             }
 
-        } catch (ScriptException e) {
+        } catch (Exception e) {
             log.error("Failed to evaluate 'require' check for extension " + candidate.getId(), e);
             return false;
         }
