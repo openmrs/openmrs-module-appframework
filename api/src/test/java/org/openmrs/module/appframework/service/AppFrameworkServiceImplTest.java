@@ -6,7 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -178,6 +180,17 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         assertTrue(service.checkRequireExpression(extensionRequiring("visit.active || visit.admitted"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted && visit.admitted"), contextModel));
+    }
+
+    @Test
+    public void testCheckRequireExpressionWithMapProperty() throws Exception {
+        AppContextModel contextModel = new AppContextModel();
+        Map<String, Object> obj = new HashMap<String, Object>();
+        obj.put("uuid", "abc-123");
+        contextModel.put("sessionLocation", obj);
+
+        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
+        assertTrue(service.checkRequireExpression(extensionRequiring("sessionLocation.uuid == 'abc-123'"), contextModel));
     }
 
     private Extension extensionRequiring(String requires) {
