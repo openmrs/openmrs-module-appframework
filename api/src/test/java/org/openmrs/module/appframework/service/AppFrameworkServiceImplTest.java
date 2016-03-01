@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -191,6 +192,22 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
         AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
         assertTrue(service.checkRequireExpression(extensionRequiring("sessionLocation.uuid == 'abc-123'"), contextModel));
+    }
+
+    @Test
+    public void testUtilityFunctionForRequireExpressions() throws Exception {
+        AppContextModel contextModel = new AppContextModel();
+        Map<String, Object> tag = new HashMap<String, Object>();
+        tag.put("display", "Login Location");
+        List<Map<String, Object>> tags = new ArrayList<Map<String, Object>>();
+        tags.add(tag);
+        Map<String, Object> obj = new HashMap<String, Object>();
+        obj.put("tags", tags);
+        contextModel.put("sessionLocation", obj);
+
+        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
+        assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
+        assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
     }
 
     private Extension extensionRequiring(String requires) {

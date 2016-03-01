@@ -50,6 +50,7 @@ import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 /**
@@ -79,7 +80,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
     public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors, AllFreeStandingExtensions allFreeStandingExtensions,
 	    AllComponentsState allComponentsState, LocationService locationService, FeatureToggleProperties featureToggles, AppFrameworkConfig appFrameworkConfig,
-        AllUserApps allUserApps) {
+        AllUserApps allUserApps) throws ScriptException {
         this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allFreeStandingExtensions = allFreeStandingExtensions;
@@ -89,6 +90,18 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         this.appFrameworkConfig = appFrameworkConfig;
         this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
         this.allUserApps = allUserApps;
+
+        // there is surely a cleaner way to define this utility function in the global scope
+        this.javascriptEngine.eval("function hasMemberWithProperty(list, propName, val) { " +
+                "if (!list) { return false; } " +
+                "var i, len=list.length; " +
+                "for (i=0; i<len; ++i) { " +
+                "  if (list[i][propName] == val) { return true; } " +
+                "} " +
+                "return false; " +
+                "}");
+        Object hasMemberWithProperty = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("hasMemberWithProperty");
+        javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("hasMemberWithProperty", hasMemberWithProperty);
     }
 
     @Override
