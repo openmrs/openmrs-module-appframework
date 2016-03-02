@@ -324,11 +324,15 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
                     }
                 }
 
-                // properties that are not Maps don't need any special treatment, we define them directly in Bindings
                 javascriptEngine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
                 ObjectMapper jackson = new ObjectMapper();
                 for (Map.Entry<String, Object> e : mapProperties.entrySet()) {
-                    javascriptEngine.eval("var " + e.getKey() + " = " + jackson.writeValueAsString(e.getValue()) + ";");
+                    try {
+                        javascriptEngine.eval("var " + e.getKey() + " = " + jackson.writeValueAsString(e.getValue()) + ";");
+                    } catch (ScriptException ex) {
+                        log.error("Failed to set '" + e.getKey() + "' scope variable while evaluating require check for extension " + candidate.getId(), ex);
+                        return false;
+                    }
                 }
 
                 return javascriptEngine.eval("(" + requireExpression + ") == true").equals(Boolean.TRUE);
