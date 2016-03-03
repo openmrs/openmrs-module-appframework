@@ -330,7 +330,17 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
                     try {
                         javascriptEngine.eval("var " + e.getKey() + " = " + jackson.writeValueAsString(e.getValue()) + ";");
                     } catch (Exception ex) {
-                        log.error("Failed to set '" + e.getKey() + "' scope variable while evaluating require check for extension " + candidate.getId(), ex);
+                        StringBuilder propertyTypes = new StringBuilder();
+                        for (String key : mapProperties.keySet()) {
+                            if (propertyTypes.length() > 0) {
+                                propertyTypes.append(", ");
+                            }
+                            propertyTypes.append(key)
+                                    .append(':')
+                                    .append(mapProperties.get(key) == null ? "null" : mapProperties.get(key).getClass().getName());
+                        }
+
+                        log.error("Failed to set '" + e.getKey() + "' scope variable (" + propertyTypes + ") while evaluating require check for extension " + candidate.getId(), ex);
                         return false;
                     }
                 }
