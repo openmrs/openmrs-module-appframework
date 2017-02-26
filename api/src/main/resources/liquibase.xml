@@ -47,7 +47,7 @@
     <changeSet id="appframework-3" author="nutsiepully">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="appframework_component_enabled"/>
+                <tableExists tableName="appframework_component_state"/>
             </not>
         </preConditions>
         <comment>Create table to track which AppFramework components are enabled</comment>
