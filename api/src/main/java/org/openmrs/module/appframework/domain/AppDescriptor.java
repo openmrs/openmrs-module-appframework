@@ -10,6 +10,7 @@ import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @NoDuplicateExtensionPoint
@@ -210,10 +211,16 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
             if (configuredValue != null) {
                 merged.put(optionName, configuredValue);
             } else {
-                merged.put(optionName, configurationOption.getDefaultValue());
+                merged.put(optionName, configurationOption.getDefaultValue().toString());
             }
         }
-        return merged;
+		if (config != null) {
+			for(Iterator<String> it = config.getFieldNames(); it.hasNext();){
+                String fieldName = it.next();
+                merged.put(fieldName, config.get(fieldName));
+            }
+		}
+		return merged;
     }
 
     public void setConfig(ObjectNode config) {
