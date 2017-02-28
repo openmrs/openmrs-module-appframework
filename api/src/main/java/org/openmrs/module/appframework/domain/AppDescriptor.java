@@ -202,6 +202,7 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
      */
     private ObjectNode getMergedConfig(AppTemplate template, ObjectNode config) {
         ObjectNode merged = new ObjectMapper().createObjectNode();
+        List<String> overridedObject = new ArrayList<String>();
         for (AppTemplateConfigurationOption configurationOption : template.getConfigOptions()) {
             String optionName = configurationOption.getName();
             JsonNode configuredValue = null;
@@ -210,15 +211,18 @@ public class AppDescriptor implements Comparable<AppDescriptor> {
             }
             if (configuredValue != null) {
                 merged.put(optionName, configuredValue);
+                overridedObject.add(optionName);
             } else {
-                merged.put(optionName, configurationOption.getDefaultValue().toString());
+                merged.put(optionName, configurationOption.getDefaultValue());
             }
         }
 		if (config != null) {
 			for(Iterator<String> it = config.getFieldNames(); it.hasNext();){
                 String fieldName = it.next();
-                merged.put(fieldName, config.get(fieldName));
-            }
+				if (!overridedObject.contains(fieldName)) {
+					merged.put(fieldName, config.get(fieldName));
+				}
+			}
 		}
 		return merged;
     }

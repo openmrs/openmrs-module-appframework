@@ -3,7 +3,8 @@
         "id": "referenceapplication.registerPatient.outpatient",
         "instanceOf": "testing.registrationapp.registerPatient",
         "config": {
-            "extraFields": [ "phoneNumber" ]
+            "extraFields": [ "phoneNumber" ],
+            "configDefinedOnlyInAppDescription": "someValue"
         },
         "extensions": [
             {

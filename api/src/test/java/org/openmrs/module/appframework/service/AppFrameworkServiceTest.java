@@ -13,7 +13,6 @@
  */
 package org.openmrs.module.appframework.service;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Person;
@@ -25,7 +24,6 @@ import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppFrameworkActivator;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
-import org.openmrs.module.appframework.config.AppFrameworkConfigDescriptor;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
@@ -37,13 +35,10 @@ import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.io.File;
-import java.io.FileInputStream;
+import javax.script.Bindings;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import javax.script.Bindings;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
@@ -51,11 +46,9 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 @DirtiesContext
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
@@ -337,9 +330,11 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         AppTemplate template = appFrameworkService.getAppTemplate("testing.registrationapp.registerPatient");
         AppDescriptor instance = appFrameworkService.getApp("referenceapplication.registerPatient.outpatient");
         assertThat(instance.getTemplate(), is(template));
+        assertThat(instance.getConfig().size(), is(3));
         assertThat(instance.getConfig().get("extraFields").size(), is(1));
         assertThat(instance.getConfig().get("extraFields").get(0).getTextValue(), is("phoneNumber"));
         assertThat(instance.getConfig().get("urlOnSuccess").getTextValue(), is("patientDashboard.page?patientId={{appContext.createdPatientId}}"));
+        assertThat(instance.getConfig().get("configDefinedOnlyInAppDescription").getTextValue(), is("someValue"));
     }
 
     @Test
