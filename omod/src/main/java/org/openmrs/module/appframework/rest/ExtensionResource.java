@@ -1,5 +1,11 @@
 package org.openmrs.module.appframework.rest;
 
+import io.swagger.models.Model;
+import io.swagger.models.ModelImpl;
+import io.swagger.models.properties.IntegerProperty;
+import io.swagger.models.properties.MapProperty;
+import io.swagger.models.properties.RefProperty;
+import io.swagger.models.properties.StringProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.domain.Extension;
@@ -8,6 +14,8 @@ import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.PropertyGetter;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
+import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
 import org.openmrs.module.webservices.rest.web.resource.api.Searchable;
@@ -103,5 +111,32 @@ public class ExtensionResource extends BaseDelegatingReadableResource<Extension>
             }
         }
         return new NeedsPaging<Extension>(results, context);
+    }
+
+    @Override
+    public Model getGETModel(Representation rep) {
+        ModelImpl modelImpl = (ModelImpl) super.getGETModel(rep);
+
+        modelImpl
+                .property("uuid", new StringProperty())
+                .property("display", new StringProperty());
+
+        if (rep instanceof DefaultRepresentation) {
+            modelImpl
+                    .property("appId", new StringProperty())
+                    .property("extensionPointId", new StringProperty())
+                    .property("type", new StringProperty())
+                    .property("label", new StringProperty())
+                    .property("url", new StringProperty())
+                    .property("icon", new StringProperty())
+                    .property("order", new IntegerProperty())
+                    .property("requiredPrivilege", new StringProperty())
+                    .property("featureToggle", new StringProperty())
+                    .property("require", new StringProperty())
+                    .property("script", new StringProperty())
+                    .property("extensionParams", new MapProperty(new StringProperty()))
+                    .property("belongsTo", new RefProperty());
+        }
+        return modelImpl;
     }
 }
