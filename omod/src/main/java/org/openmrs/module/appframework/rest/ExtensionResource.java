@@ -135,7 +135,7 @@ public class ExtensionResource extends BaseDelegatingReadableResource<Extension>
                     .property("require", new StringProperty())
                     .property("script", new StringProperty())
                     .property("extensionParams", new MapProperty(new StringProperty()))
-                    .property("belongsTo", new RefProperty());
+                    .property("belongsTo", new RefProperty("#/definitions/AppGetRef"));
         }
         return modelImpl;
     }
