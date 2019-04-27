@@ -114,8 +114,10 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 	public void testGetAllEnabledAppsShouldIgnoreAppsToggledOffInFeatureTogglesFile() throws Exception {
 		List<AppDescriptor> allApps = appFrameworkService.getAllEnabledApps();
 
-		assertEquals(1, allApps.size());
+		assertEquals(2, allApps.size());
 		assertEquals("app1", allApps.get(0).getId());
+		assertEquals("app2", allApps.get(1).getId());
+		
 	}
 
 	@Test
