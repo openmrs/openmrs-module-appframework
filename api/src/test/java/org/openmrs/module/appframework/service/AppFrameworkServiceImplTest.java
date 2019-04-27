@@ -147,8 +147,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 	@Test
 	public void testGetAllExtensions() throws Exception {
 		List<Extension> allExtensions = appFrameworkService.getAllExtensions();
-		assertEquals(3, allExtensions.s
-
+		assertEquals(3, allExtension
 	}
 
 	@Test
