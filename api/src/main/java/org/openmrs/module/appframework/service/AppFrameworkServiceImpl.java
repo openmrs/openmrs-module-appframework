@@ -421,5 +421,18 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         new AppFrameworkActivator().contextRefreshed();
     }
 
+    @Override
+	public List<Extension> getAllExtensions() {
+
+		List<Extension> matchingExtensions = new ArrayList<Extension>();
+		for (Extension extension : allFreeStandingExtensions.getExtensions()) {
+
+			matchingExtensions.add(extension);
+		}
+		return matchingExtensions;
+	}
+
+
+
 
 }
