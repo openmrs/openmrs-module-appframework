@@ -1,5 +1,7 @@
 package org.openmrs.module.appframework.rest;
 
+import java.util.List;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.domain.AdministrativeNotification;
 import org.openmrs.module.appframework.service.AdministrativeNotificationService;
@@ -11,8 +13,6 @@ import org.openmrs.module.webservices.rest.web.resource.api.Listable;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
-import java.util.List;
-
 @Resource(name = RestConstants.VERSION_1 + "/administrativenotification", supportedClass = AdministrativeNotification.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*"})
 public class AdministrativeNotificationResource implements Listable {
 
@@ -21,6 +21,14 @@ public class AdministrativeNotificationResource implements Listable {
         List<AdministrativeNotification> notifications = Context.getService(AdministrativeNotificationService.class).getAdministrativeNotifications();
         return new NeedsPaging<AdministrativeNotification>(notifications, requestContext).toSimpleObject(null);
     }
+
+
+
+	public SimpleObject getAllTheAbove(RequestContext requestContext) throws ResponseException {
+		List<AdministrativeNotification> notifications = Context.getService(AdministrativeNotificationService.class)
+				.getAdministrativeNotifications();
+		return new NeedsPaging<AdministrativeNotification>(notifications, requestContext).toSimpleObject(null);
+	}
 
     @Override
     public String getUri(Object o) {

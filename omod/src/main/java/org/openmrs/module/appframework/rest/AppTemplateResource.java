@@ -20,6 +20,7 @@ public class AppTemplateResource extends BaseDelegatingReadableResource<AppTempl
         return Context.getService(AppFrameworkService.class);
     }
 
+
     @Override
     public AppTemplate getByUniqueId(String uid) {
         return getService().getAppTemplate(uid);
@@ -27,6 +28,7 @@ public class AppTemplateResource extends BaseDelegatingReadableResource<AppTempl
 
     @Override
     public AppTemplate newDelegate() {
+
         return new AppTemplate();
     }
 
@@ -59,4 +61,10 @@ public class AppTemplateResource extends BaseDelegatingReadableResource<AppTempl
     public PageableResult doGetAll(RequestContext context) {
         return new NeedsPaging<AppTemplate>(getService().getAllAppTemplates(), context);
     }
+
+
+	public AppTemplate newKey() {
+		return new AppTemplate();
+	}
+
 }
