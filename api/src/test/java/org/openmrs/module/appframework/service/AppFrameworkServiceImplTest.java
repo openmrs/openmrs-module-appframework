@@ -101,6 +101,14 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         allFreeStandingExtensions.clear();
     }
 
+	@Test
+	public void testGetAllExtensions() throws Exception {
+		List<Extension> extensionPoints = appFrameworkService.getAllExtensions();
+		assertEquals(3, extensionPoints.size());
+		assertEquals("ext5", extensionPoints.get(0).getId());
+		assertEquals("ext4", extensionPoints.get(1).getId());
+		assertEquals("ext3", extensionPoints.get(2).getId());
+	}
     @Test
     public void testGetAllAppsAndIsSortedByOrder() throws Exception {
         List<AppDescriptor> allApps = appFrameworkService.getAllApps();
