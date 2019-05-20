@@ -157,7 +157,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         assertEquals(2, extensionPoints.size());
         assertEquals("ext5", extensionPoints.get(0).getId());
         assertEquals("ext2", extensionPoints.get(1).getId());
-		deleteAllData();
+
     }
 
     @Test
@@ -175,6 +175,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         assertEquals(2, extensionPoints.size());
         assertEquals("ext4", extensionPoints.get(0).getId());
         assertEquals("ext1", extensionPoints.get(1).getId());
+		deleteAllData();
 
     }
 
