@@ -59,6 +59,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     private Extension ext5;
 
 
+
     @Before
     public void setUp() throws Exception {
 
