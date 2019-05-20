@@ -60,6 +60,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
 
 
+
     @Before
     public void setUp() throws Exception {
 
