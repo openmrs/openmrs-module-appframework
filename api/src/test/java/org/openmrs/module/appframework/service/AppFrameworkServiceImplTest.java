@@ -62,6 +62,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
 
     @Before
+
     public void setUp() throws Exception {
 
         featureToggles.setPropertiesFile(new File(this.getClass().getResource("/" + FeatureToggleProperties.FEATURE_TOGGLE_PROPERTIES_FILE_NAME).getFile()));
