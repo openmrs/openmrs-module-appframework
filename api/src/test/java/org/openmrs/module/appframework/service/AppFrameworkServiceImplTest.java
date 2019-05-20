@@ -95,6 +95,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         allFreeStandingExtensions.add(Arrays.asList(ext3, ext4, ext5));
     }
 
+
     @After
     public void tearDown() throws Exception {
         allAppDescriptors.clear();
