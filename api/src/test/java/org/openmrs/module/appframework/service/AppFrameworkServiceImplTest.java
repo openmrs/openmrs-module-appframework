@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @SkipBaseSetup
 public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest {
 
+
     @Autowired
     private AppFrameworkService appFrameworkService;
 
