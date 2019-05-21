@@ -38,5 +38,6 @@ public class AppFrameworkConfigRuntimeTest extends BaseModuleContextSensitiveTes
     @After
     public void teardown() {
         runtimeProperties.remove(AppFrameworkConfig.APP_FRAMEWORK_CONFIGURATION_RUNTIME_PROPERTY);
+        new AppFrameworkActivator().contextRefreshed();
     }
 }
