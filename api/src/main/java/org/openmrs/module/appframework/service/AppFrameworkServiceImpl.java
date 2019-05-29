@@ -13,6 +13,19 @@
  */
 package org.openmrs.module.appframework.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,18 +53,6 @@ import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.module.appframework.repository.AllUserApps;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -420,6 +421,25 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
         allUserApps.deleteUserApp(userApp);
         new AppFrameworkActivator().contextRefreshed();
     }
+
+	@Override
+	public List<Extension> getAllExtensions() {
+
+		List<Extension> extensions = new ArrayList<Extension>();
+
+		// Get all extensions from enabled apps
+		for (AppDescriptor app : getAllEnabledApps()) {
+			if (app.getExtensions() != null) {
+				for (Extension extension : app.getExtensions()) {
+
+					extensions.add(extension);
+
+				}
+			}
+		}
+		return extensions;
+
+	}
 
 
 }
