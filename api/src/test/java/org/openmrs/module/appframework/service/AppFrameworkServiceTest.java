@@ -440,7 +440,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
 	@DirtiesContext
 	@Test
-	public void getLoginLocations_() {
+	public void getLoginLocations_shouldReturnLoginLocationsConfiguredForTheUser() {
 		LocationTag tag = new LocationTag();
 		tag.setName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
 		locationService.saveLocationTag(tag);
