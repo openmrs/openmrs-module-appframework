@@ -31,14 +31,19 @@ import javax.script.Bindings;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Location;
+import org.openmrs.LocationTag;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
 import org.openmrs.User;
+import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.AppFrameworkActivator;
+import org.openmrs.module.appframework.AppFrameworkConstants;
+import org.openmrs.module.appframework.TestLoginLocationFilter;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
@@ -53,6 +58,13 @@ import org.springframework.test.annotation.DirtiesContext;
 
 @DirtiesContext
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
+	
+	public static final String LOCATION_UUID1 = "6f42abbc-caac-40ae-a94e-9277ea15c125";
+	
+	public static final String LOCATION_UUID2 = "400d343b-75ed-4243-af42-7b9b1b72f0a9";
+	
+	@Autowired
+	private LocationService locationService;
 	
 	@Autowired
 	private AppFrameworkService appFrameworkService;
@@ -424,6 +436,33 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		app = appFrameworkService.getUserApp("test.someApp");
 		assertNull(app);
 		assertEquals(--originalAppDescriptorCount, appFrameworkService.getAllApps().size());
+	}
+	
+	@DirtiesContext
+	@Test
+	public void getLoginLocations_shouldReturnLoginLocationsConfiguredForTheUser() {
+		LocationTag tag = new LocationTag();
+		tag.setName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
+		locationService.saveLocationTag(tag);
+		createLocation("some uuid a");
+		createLocation("some uuid b");
+		Location location1 = createLocation(LOCATION_UUID1);
+		Location location2 = createLocation(LOCATION_UUID2);
+		List<Location> locations = appFrameworkService.getLoginLocations();
+		assertEquals(4, locations.size());
+		Context.getRegisteredComponents(TestLoginLocationFilter.class).get(0).enable();
+		locations = appFrameworkService.getLoginLocations();
+		assertEquals(2, locations.size());
+		assertTrue(locations.contains(location1));
+		assertTrue(locations.contains(location2));
+	}
+	
+	private Location createLocation(String uuid) {
+		Location location = new Location();
+		location.setUuid(uuid);
+		location.setName("Some name " + uuid);
+		location.addTag(locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN));
+		return locationService.saveLocation(location);
 	}
 	
 	public class VisitStatus {

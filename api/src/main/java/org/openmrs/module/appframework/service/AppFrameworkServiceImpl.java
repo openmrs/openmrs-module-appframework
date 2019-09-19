@@ -38,6 +38,7 @@ import org.openmrs.api.context.UserContext;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.appframework.AppFrameworkActivator;
 import org.openmrs.module.appframework.AppFrameworkConstants;
+import org.openmrs.module.appframework.LoginLocationFilter;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
@@ -378,7 +379,28 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	@Transactional(readOnly = true)
 	public List<Location> getLoginLocations() {
 		LocationTag supportsLogin = locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
-		return locationService.getLocationsByTag(supportsLogin);
+		List<Location> locations = locationService.getLocationsByTag(supportsLogin);
+		List<LoginLocationFilter> filters = Context.getRegisteredComponents(LoginLocationFilter.class);
+		if (filters.isEmpty()) {
+			return locations;
+		}
+		
+		List<Location> allowedLocations = new ArrayList();
+		for (Location location : locations) {
+			boolean exclude = false;
+			for (LoginLocationFilter filter : filters) {
+				if (!filter.accept(location)) {
+					exclude = true;
+					break;
+				}
+			}
+			
+			if (!exclude) {
+				allowedLocations.add(location);
+			}
+		}
+		
+		return allowedLocations;
 	}
 	
 	private boolean hasPrivilege(UserContext userContext, String privilege) {
