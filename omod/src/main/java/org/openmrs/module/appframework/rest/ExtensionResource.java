@@ -25,7 +25,7 @@ import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/extension", supportedClass = Extension.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*" })
+@Resource(name = RestConstants.VERSION_1 + "/extension", supportedClass = Extension.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*", "2.4.*" })
 public class ExtensionResource extends BaseDelegatingReadableResource<Extension> implements Searchable {
 
     private AppFrameworkService getService() {
