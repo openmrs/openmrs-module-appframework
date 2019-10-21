@@ -20,6 +20,12 @@
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
 			<type>jar</type>
+			<exclusions>
+				<exclusion>
+	                <groupId>javassist</groupId>
+	                <artifactId>javassist</artifactId>
+	            </exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -33,6 +39,12 @@
 			<artifactId>openmrs-api</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+	                <groupId>javassist</groupId>
+	                <artifactId>javassist</artifactId>
+	            </exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -70,6 +82,13 @@
             <artifactId>handlebars</artifactId>
         </dependency>
 
+		<dependency>
+	        <groupId>org.javassist</groupId>
+	        <artifactId>javassist</artifactId>
+	        <version>3.18.2-GA</version>
+	        <scope>test</scope>
+	    </dependency>
+		    
 	</dependencies>
 
 	<build>

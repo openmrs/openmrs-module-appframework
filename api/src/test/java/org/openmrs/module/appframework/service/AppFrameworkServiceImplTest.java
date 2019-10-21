@@ -3,6 +3,7 @@ package org.openmrs.module.appframework.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,12 +11,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.script.ScriptException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.module.appframework.config.AppFrameworkConfig;
+import org.openmrs.Patient;
+import org.openmrs.PatientProgram;
+import org.openmrs.api.APIException;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.appframework.context.AppContextModel;
+import org.openmrs.module.appframework.context.ProgramConfiguration;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
@@ -23,10 +29,8 @@ import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.test.SkipBaseSetup;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@SkipBaseSetup
 public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
@@ -40,9 +44,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Autowired
     private FeatureToggleProperties featureToggles;
-
-    @Autowired
-    private AppFrameworkConfig appFrameworkConfig;
+    
+    private AppFrameworkServiceImpl appFrameworkServiceImpl;
 
     private AppDescriptor app1;
 
@@ -57,7 +60,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     private Extension ext4;
 
     private Extension ext5;
-
+    
+    private static final String PATIENT_UUID = "0cbe2ed3-cd5f-4f46-9459-26127c9265ab";
 
     @Before
     public void setUp() throws Exception {
@@ -93,6 +97,10 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
         // now add some free-standing extension
         allFreeStandingExtensions.add(Arrays.asList(ext3, ext4, ext5));
+        
+        appFrameworkServiceImpl = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
+        
+        executeDataSet("AppFrameworkServiceImplTest-createPatientProgram.xml");
     }
 
     @After
@@ -130,7 +138,6 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         assertEquals(1, allApps.size());
         assertEquals("app2", allApps.get(0).getId());
     }
-
 
     @Test
     public void testGetAllExtensionsAndIsSortedByOrder() throws Exception {
@@ -171,16 +178,14 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testCheckRequireExpression() throws Exception {
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
-
         VisitStatus visit = new VisitStatus(true, false);
         AppContextModel contextModel = new AppContextModel();
         contextModel.put("visit", visit);
 
-        assertTrue(service.checkRequireExpression(extensionRequiring("visit.active"), contextModel));
-        assertTrue(service.checkRequireExpression(extensionRequiring("visit.active || visit.admitted"), contextModel));
-        assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted"), contextModel));
-        assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted && visit.admitted"), contextModel));
+        assertTrue(appFrameworkServiceImpl.checkRequireExpression(extensionRequiring("visit.active"), contextModel));
+        assertTrue(appFrameworkServiceImpl.checkRequireExpression(extensionRequiring("visit.active || visit.admitted"), contextModel));
+        assertFalse(appFrameworkServiceImpl.checkRequireExpression(extensionRequiring("visit.admitted"), contextModel));
+        assertFalse(appFrameworkServiceImpl.checkRequireExpression(extensionRequiring("visit.admitted && visit.admitted"), contextModel));
     }
 
     @Test
@@ -190,8 +195,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         obj.put("uuid", "abc-123");
         contextModel.put("sessionLocation", obj);
 
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
-        assertTrue(service.checkRequireExpression(extensionRequiring("sessionLocation.uuid == 'abc-123'"), contextModel));
+        assertTrue(appFrameworkServiceImpl.checkRequireExpression(extensionRequiring("sessionLocation.uuid == 'abc-123'"), contextModel));
     }
 
     @Test
@@ -205,17 +209,100 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         obj.put("tags", tags);
         contextModel.put("sessionLocation", obj);
 
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
-        assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
-        assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
+        assertTrue(appFrameworkServiceImpl.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
+        assertFalse(appFrameworkServiceImpl.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
     }
 
+    @Test
+    public void testGetPatientUuid() throws ScriptException {
+    	// Setup
+    	AppContextModel contextModel = new AppContextModel();
+    	contextModel.put("patient", new PatientContextModel(PATIENT_UUID));
+    	
+    	// Replay
+        String uuid = appFrameworkServiceImpl.getPatientUuid(contextModel);
+        
+        // Verify
+        assertEquals(PATIENT_UUID, uuid);
+    }
+    
+    @Test
+    public void testCheckRequiredProgramsOnCurrentPatient() {
+    	// Setup
+    	final String STATE_NOT_IN_CURRENT_PATIENT_STATES = "588a31bb-7923-4ef8-a6fc-b8f2ae5d1352";
+    	AppContextModel contextModel = new AppContextModel();
+    	contextModel.put("patient", new PatientContextModel(PATIENT_UUID));
+    	
+    	assertTrue(appFrameworkServiceImpl.checkRequiredProgramsOnCurrentPatient(extensionRequiringProgramConfigurations(Arrays.asList(new ProgramConfiguration("CIEL:123", "1743", "CIEL:124"))), 
+    			contextModel));
+    	assertTrue(appFrameworkServiceImpl.checkRequiredProgramsOnCurrentPatient(extensionRequiringProgramConfigurations(Arrays.asList(new ProgramConfiguration(null, "1743", "CIEL:124"))), 
+    			contextModel));
+    	// Configuration with a state that's not a member of the patient's current states
+    	assertFalse(appFrameworkServiceImpl.checkRequiredProgramsOnCurrentPatient(extensionRequiringProgramConfigurations(Arrays.asList(new ProgramConfiguration(null, null, STATE_NOT_IN_CURRENT_PATIENT_STATES))), 
+    			contextModel));
+    	assertTrue(appFrameworkServiceImpl.checkRequiredProgramsOnCurrentPatient(extensionRequiringProgramConfigurations(Arrays.asList(new ProgramConfiguration(null, null, STATE_NOT_IN_CURRENT_PATIENT_STATES),
+    			new ProgramConfiguration("CIEL:123", "1743", null))), contextModel));
+    }
+    
+    @Test
+    public void hasProgramAssignableToConfiguration_shouldReturnTrueIfConfigIsAssignableToAnyOfThePatientPrograms() throws ScriptException {
+    	// Setup
+    	List<PatientProgram> patientPrograms = Context.getProgramWorkflowService().getPatientPrograms(new Patient(2), 
+    			null, null, null, null, null, false);
+    	ProgramConfiguration config = new ProgramConfiguration("CIEL:123", "1743", "CIEL:124");
+
+    	// Replay
+        boolean isAssignable = appFrameworkServiceImpl.hasProgramAssignableToConfiguration(patientPrograms, config);
+        
+        // Verify
+        assertTrue(isAssignable);
+    }
+    
+    @Test
+    public void hasProgramAssignableToConfiguration_shouldReturnFalseIfConfigIsNotAssignableToAnyOfThePatientPrograms() throws ScriptException {
+    	// Setup
+    	List<PatientProgram> patientPrograms = Context.getProgramWorkflowService().getPatientPrograms(new Patient(2), 
+    			null, null, null, null, null, false);
+    	// Configuration with a state that's not a member of the patient's current states
+    	ProgramConfiguration config = new ProgramConfiguration("CIEL:123", "1743", "1740");
+
+    	// Replay
+        boolean isAssignable = appFrameworkServiceImpl.hasProgramAssignableToConfiguration(patientPrograms, config);
+        
+        // Verify
+        assertFalse(isAssignable);
+    }
+    
+    @Test
+    public void hasProgramAssignableToConfiguration_shouldFailWithAnExceptionIfConfigurationHasAnInvalidProgramTree() {
+    	// Setup
+    	List<PatientProgram> patientPrograms = Context.getProgramWorkflowService().getPatientPrograms(new Patient(2), 
+    			null, null, null, null, null, false);
+    	// Configuration with invalid program tree
+    	ProgramConfiguration config = new ProgramConfiguration("CIEL:124", "1738", "1743");
+    	
+    	try {
+    		// Replay
+    		appFrameworkServiceImpl.hasProgramAssignableToConfiguration(patientPrograms, config);
+    		fail("Should throw exception if configuration has an invalid program tree");
+    	} catch(APIException e) {
+    		// Verify
+    		assertEquals("ProgramConfiguration has an invalid program tree", e.getMessage());
+    	}
+    }
+    
     private Extension extensionRequiring(String requires) {
         Extension extension = new Extension();
         extension.setRequire(requires);
         return extension;
     }
-
+    
+    private Extension extensionRequiringProgramConfigurations(List<ProgramConfiguration> programConfigurations) {
+    	Extension extension = new Extension();
+        extension.setRequiredPrograms(programConfigurations);
+        return extension;
+    }
+    
     public class VisitStatus {
         public boolean active;
         public boolean admitted;
@@ -223,5 +310,13 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
             this.active = active;
             this.admitted = admitted;
         }
+    }
+    
+    public static class PatientContextModel {
+    	public String uuid;
+    	public Patient patient;
+    	public PatientContextModel(String uuid) {
+    		this.uuid = uuid;
+    	}
     }
 }

@@ -24,5 +24,16 @@
             }
         ],
         "contextModel": [ "xrayConceptId", "patientId" ]
+    },
+    {
+        "id": "programApp",
+        "description": "Program Application",
+        "requiredPrivilege": "Manage Programs",
+        "extensionPoints": [
+            {
+                "id": "programActions"
+            }
+        ],
+        "contextModel": null
     }
 ]
