@@ -3,6 +3,9 @@ package org.openmrs.module.appframework.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,38 +14,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Validator;
+
+import org.hibernate.Criteria;
+import org.hibernate.SessionFactory;
+import org.hibernate.classic.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
+import org.openmrs.module.appframework.feature.TestFeatureTogglePropertiesFactory;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
+import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.test.SkipBaseSetup;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@SkipBaseSetup
-public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest {
+public class AppFrameworkServiceImplTest  {
+	
+	private Validator validator = mock(Validator.class);
+	
+    private AllAppDescriptors allAppDescriptors = new AllAppDescriptors(validator);
 
-    @Autowired
-    private AppFrameworkService appFrameworkService;
+    private AllFreeStandingExtensions allFreeStandingExtensions = new AllFreeStandingExtensions(validator);
+    
+    private AllComponentsState allComponentsState = new AllComponentsState();
 
-    @Autowired
-    private AllAppDescriptors allAppDescriptors;
+    private FeatureToggleProperties featureToggles = TestFeatureTogglePropertiesFactory.get();
 
-    @Autowired
-    private AllFreeStandingExtensions allFreeStandingExtensions;
-
-    @Autowired
-    private FeatureToggleProperties featureToggles;
-
-    @Autowired
-    private AppFrameworkConfig appFrameworkConfig;
+    private AppFrameworkConfig appFrameworkConfig = new AppFrameworkConfig();
 
     private AppDescriptor app1;
 
@@ -57,7 +61,6 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
     private Extension ext4;
 
     private Extension ext5;
-
 
     @Before
     public void setUp() throws Exception {
@@ -93,6 +96,13 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
         // now add some free-standing extension
         allFreeStandingExtensions.add(Arrays.asList(ext3, ext4, ext5));
+        
+        // to go through all the Hibernate stuff
+        SessionFactory sessionFactory = mock(SessionFactory.class);
+    	Session session = mock(Session.class);
+    	when(session.createCriteria(any(Class.class))).thenReturn(mock(Criteria.class));
+    	when(sessionFactory.getCurrentSession()).thenReturn(session);
+    	allComponentsState.setSessionFactory(new DbSessionFactory(sessionFactory));
     }
 
     @After
@@ -103,7 +113,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testGetAllAppsAndIsSortedByOrder() throws Exception {
-        List<AppDescriptor> allApps = appFrameworkService.getAllApps();
+    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
+        List<AppDescriptor> allApps = service.getAllApps();
 
         assertEquals(2, allApps.size());
         assertEquals("app2", allApps.get(0).getId());
@@ -112,7 +123,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testGetAllEnabledAppsShouldIgnoreAppsToggledOffInFeatureTogglesFile() throws Exception {
-        List<AppDescriptor> allApps = appFrameworkService.getAllEnabledApps();
+    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
+        List<AppDescriptor> allApps = service.getAllEnabledApps();
 
         assertEquals(1, allApps.size());
         assertEquals("app1", allApps.get(0).getId());
@@ -120,21 +132,23 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testGetAllEnabledAppsShouldCorrectlyHandleNegatedFeatureToggles() throws Exception {
+    	
+    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
 
         // we change these so that app1 should only be enabled if app toggle 1 is not enabled, same for app2
         app1.setFeatureToggle("!app1Toggle");
         app2.setFeatureToggle("!app2Toggle");
 
-        List<AppDescriptor> allApps = appFrameworkService.getAllEnabledApps();
+        List<AppDescriptor> allApps = service.getAllEnabledApps();
 
         assertEquals(1, allApps.size());
         assertEquals("app2", allApps.get(0).getId());
     }
 
-
     @Test
     public void testGetAllExtensionsAndIsSortedByOrder() throws Exception {
-        List<Extension> extensionPoints = appFrameworkService.getAllExtensions("extensionPoint2");
+    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
+        List<Extension> extensionPoints = service.getAllExtensions("extensionPoint2");
 
         assertEquals(2, extensionPoints.size());
         assertEquals("ext5", extensionPoints.get(0).getId());
@@ -144,7 +158,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testGetAllEnabledExtensionsShouldIgnoreEnabledToggledOffInFeatureTogglesFile() throws Exception {
-        List<Extension> extensionPoints = appFrameworkService.getAllEnabledExtensions("extensionPoint2");
+    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
+        List<Extension> extensionPoints = service.getAllEnabledExtensions("extensionPoint2");
 
         assertEquals(2, extensionPoints.size());
         assertEquals("ext5", extensionPoints.get(0).getId());
@@ -153,6 +168,8 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
 
     @Test
     public void testGetAllEnabledExtensionsShouldCorrectlyHandleNegatedFeatureToggles() throws Exception {
+    	
+    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
 
         // invert the feature toggles
         ext1.setFeatureToggle("!ext1Toggle");
@@ -160,18 +177,17 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         ext3.setFeatureToggle("!ext3Toggle");
         ext4.setFeatureToggle("!ext4Toggle");
         ext5.setFeatureToggle("!ext5Toggle");
-
-        List<Extension> extensionPoints = appFrameworkService.getAllEnabledExtensions("extensionPoint2");
+        
+        List<Extension> extensionPoints = service.getAllEnabledExtensions("extensionPoint2");
 
         assertEquals(2, extensionPoints.size());
         assertEquals("ext4", extensionPoints.get(0).getId());
         assertEquals("ext1", extensionPoints.get(1).getId());
-
     }
 
     @Test
     public void testCheckRequireExpression() throws Exception {
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
+    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, null, null, featureToggles, appFrameworkConfig, null);
 
         VisitStatus visit = new VisitStatus(true, false);
         AppContextModel contextModel = new AppContextModel();
@@ -190,7 +206,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         obj.put("uuid", "abc-123");
         contextModel.put("sessionLocation", obj);
 
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
+        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, null, null, featureToggles, appFrameworkConfig, null);
         assertTrue(service.checkRequireExpression(extensionRequiring("sessionLocation.uuid == 'abc-123'"), contextModel));
     }
 
@@ -205,7 +221,7 @@ public class AppFrameworkServiceImplTest extends BaseModuleContextSensitiveTest 
         obj.put("tags", tags);
         contextModel.put("sessionLocation", obj);
 
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, null, null, null, null, null, null, null);
+        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, null, null, featureToggles, appFrameworkConfig, null);
         assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
     }
