@@ -61,6 +61,8 @@ public class AppFrameworkServiceImplTest  {
     private Extension ext4;
 
     private Extension ext5;
+    
+    private AppFrameworkServiceImpl service;
 
     @Before
     public void setUp() throws Exception {
@@ -103,6 +105,8 @@ public class AppFrameworkServiceImplTest  {
     	when(session.createCriteria(any(Class.class))).thenReturn(mock(Criteria.class));
     	when(sessionFactory.getCurrentSession()).thenReturn(session);
     	allComponentsState.setSessionFactory(new DbSessionFactory(sessionFactory));
+    	
+    	service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
     }
 
     @After
@@ -113,7 +117,6 @@ public class AppFrameworkServiceImplTest  {
 
     @Test
     public void testGetAllAppsAndIsSortedByOrder() throws Exception {
-    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
         List<AppDescriptor> allApps = service.getAllApps();
 
         assertEquals(2, allApps.size());
@@ -123,7 +126,6 @@ public class AppFrameworkServiceImplTest  {
 
     @Test
     public void testGetAllEnabledAppsShouldIgnoreAppsToggledOffInFeatureTogglesFile() throws Exception {
-    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
         List<AppDescriptor> allApps = service.getAllEnabledApps();
 
         assertEquals(1, allApps.size());
@@ -132,9 +134,6 @@ public class AppFrameworkServiceImplTest  {
 
     @Test
     public void testGetAllEnabledAppsShouldCorrectlyHandleNegatedFeatureToggles() throws Exception {
-    	
-    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
-
         // we change these so that app1 should only be enabled if app toggle 1 is not enabled, same for app2
         app1.setFeatureToggle("!app1Toggle");
         app2.setFeatureToggle("!app2Toggle");
@@ -147,7 +146,6 @@ public class AppFrameworkServiceImplTest  {
 
     @Test
     public void testGetAllExtensionsAndIsSortedByOrder() throws Exception {
-    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
         List<Extension> extensionPoints = service.getAllExtensions("extensionPoint2");
 
         assertEquals(2, extensionPoints.size());
@@ -158,7 +156,6 @@ public class AppFrameworkServiceImplTest  {
 
     @Test
     public void testGetAllEnabledExtensionsShouldIgnoreEnabledToggledOffInFeatureTogglesFile() throws Exception {
-    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
         List<Extension> extensionPoints = service.getAllEnabledExtensions("extensionPoint2");
 
         assertEquals(2, extensionPoints.size());
@@ -168,9 +165,6 @@ public class AppFrameworkServiceImplTest  {
 
     @Test
     public void testGetAllEnabledExtensionsShouldCorrectlyHandleNegatedFeatureToggles() throws Exception {
-    	
-    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
-
         // invert the feature toggles
         ext1.setFeatureToggle("!ext1Toggle");
         ext2.setFeatureToggle("!ext2Toggle");
@@ -187,8 +181,6 @@ public class AppFrameworkServiceImplTest  {
 
     @Test
     public void testCheckRequireExpression() throws Exception {
-    	AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, null, null, featureToggles, appFrameworkConfig, null);
-
         VisitStatus visit = new VisitStatus(true, false);
         AppContextModel contextModel = new AppContextModel();
         contextModel.put("visit", visit);
@@ -206,7 +198,6 @@ public class AppFrameworkServiceImplTest  {
         obj.put("uuid", "abc-123");
         contextModel.put("sessionLocation", obj);
 
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, null, null, featureToggles, appFrameworkConfig, null);
         assertTrue(service.checkRequireExpression(extensionRequiring("sessionLocation.uuid == 'abc-123'"), contextModel));
     }
 
@@ -221,7 +212,6 @@ public class AppFrameworkServiceImplTest  {
         obj.put("tags", tags);
         contextModel.put("sessionLocation", obj);
 
-        AppFrameworkServiceImpl service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, null, null, featureToggles, appFrameworkConfig, null);
         assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
     }
