@@ -1,10 +1,10 @@
-/.settings
-/.project
-/.DS_Store
 /.idea
 
-omod/.DS_Store
+**/.DS_Store
 target
 
 *.iml
-/.classpath
+
+**/.classpath
+**/.project
+**/.settings
