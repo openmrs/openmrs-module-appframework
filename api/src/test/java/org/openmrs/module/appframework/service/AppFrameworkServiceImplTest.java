@@ -154,6 +154,13 @@ public class AppFrameworkServiceImplTest  {
 
     }
 
+	@Test
+	public void testGetAllExtensionsWithNoExtensionPointId() throws Exception {
+		List<Extension> extensionPoints = service.getAllExtensions();
+
+		assertEquals(3, extensionPoints.size());
+	}
+
     @Test
     public void testGetAllEnabledExtensionsShouldIgnoreEnabledToggledOffInFeatureTogglesFile() throws Exception {
         List<Extension> extensionPoints = service.getAllEnabledExtensions("extensionPoint2");

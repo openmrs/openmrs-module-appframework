@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.appframework.service;
 
+import java.util.List;
+
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.appframework.context.AppContextModel;
@@ -20,8 +22,6 @@ import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.UserApp;
-
-import java.util.List;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured
@@ -39,6 +39,8 @@ public interface AppFrameworkService extends OpenmrsService {
 	List<AppDescriptor> getAllApps();
 
 	List<Extension> getAllExtensions(String extensionPointId);
+
+	List<Extension> getAllExtensions();
 
     List<Extension> getExtensionsById(String extensionPointId, String id);
 	
