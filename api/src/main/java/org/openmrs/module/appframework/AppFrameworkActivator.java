@@ -68,6 +68,7 @@ public class AppFrameworkActivator extends BaseModuleActivator implements Module
             disableDefaultConfigurationFactory(appFrameworkFactories);
         }
 
+        // The login locations are updated by LoginLocationsAdvisor
         registerLoginLocations(allLoginLocations, (AppFrameworkService) Context.getRegisteredComponent("appFrameworkService", AppFrameworkService.class));
         registerAppsAndExtensions(appFrameworkFactories, allAppTemplates, allAppDescriptors, allFreeStandingExtensions, config);
 
