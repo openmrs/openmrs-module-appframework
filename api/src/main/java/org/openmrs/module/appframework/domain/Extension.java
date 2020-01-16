@@ -5,9 +5,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.appframework.context.ProgramConfiguration;
 import org.openmrs.module.appframework.domain.validators.ValidationErrorMessages;
 import org.openmrs.module.appframework.template.TemplateFactory;
 
+import java.util.List;
 import java.util.Map;
 
 public class Extension implements Comparable<Extension> {
@@ -52,6 +54,9 @@ public class Extension implements Comparable<Extension> {
 	@JsonProperty
 	protected Map<String, Object> extensionParams;
 
+	@JsonProperty
+	protected List<ProgramConfiguration> requiredPrograms;
+	
     /**
      * Will be set by {@link org.openmrs.module.appframework.AppFrameworkActivator} if this extension is defined within
      * an app
@@ -280,4 +285,12 @@ public class Extension implements Comparable<Extension> {
         return Context.getRegisteredComponent("appframeworkTemplateFactory", TemplateFactory.class);
     }
 
+	public List<ProgramConfiguration> getRequiredPrograms() {
+		return requiredPrograms;
+	}
+
+	public void setRequiredPrograms(List<ProgramConfiguration> requiredPrograms) {
+		this.requiredPrograms = requiredPrograms;
+	}
+    
 }

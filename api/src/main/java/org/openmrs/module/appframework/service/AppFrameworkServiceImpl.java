@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -33,6 +34,13 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
+import org.openmrs.Patient;
+import org.openmrs.PatientProgram;
+import org.openmrs.PatientState;
+import org.openmrs.Program;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
+import org.openmrs.api.APIException;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
@@ -42,6 +50,7 @@ import org.openmrs.module.appframework.AppFrameworkConstants;
 import org.openmrs.module.appframework.LoginLocationFilter;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
+import org.openmrs.module.appframework.context.ProgramConfiguration;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.ComponentState;
@@ -294,20 +303,22 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	@Override
 	public List<Extension> getExtensionsForCurrentUser(String extensionPointId, AppContextModel contextModel) {
-		List<Extension> extensions = new ArrayList<Extension>();
-		UserContext userContext = Context.getUserContext();
-		
-		for (Extension candidate : getAllEnabledExtensions(extensionPointId)) {
-			if ((candidate.getBelongsTo() == null
-			        || hasPrivilege(userContext, candidate.getBelongsTo().getRequiredPrivilege()))
-			        && hasPrivilege(userContext, candidate.getRequiredPrivilege())) {
-				if (contextModel == null || checkRequireExpression(candidate, contextModel)) {
-					extensions.add(candidate);
-				}
-			}
-		}
-		
-		return extensions;
+	    List<Extension> extensions = new ArrayList<Extension>();
+	    UserContext userContext = Context.getUserContext();
+	
+	    for (Extension candidate : getAllEnabledExtensions(extensionPointId)) {
+	        if ((candidate.getBelongsTo() == null || hasPrivilege(userContext, candidate.getBelongsTo().getRequiredPrivilege()))
+	                && hasPrivilege(userContext, candidate.getRequiredPrivilege()) ) {
+	        	if (contextModel == null) {
+	        		extensions.add(candidate);
+	        		
+	        	} else if (checkRequireExpression(candidate, contextModel) && checkRequiredProgramsOnCurrentPatient(candidate, contextModel)) {
+	        		extensions.add(candidate);
+	        	}
+	        }
+	    }
+	
+	    return extensions;
 	}
 	
 	// making it public is a hack so we can test this directly in the appui module
@@ -364,8 +375,129 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			return false;
 		}
 	}
+
+    /**
+     * Gets the patient's <code>uuid</code> from a given <code>contextModel</code>.
+     * 
+     * @param contextModel
+     */
+    protected String getPatientUuid(AppContextModel contextModel) {
+    	Bindings bindings = new SimpleBindings();
+	    for (Map.Entry<String, Object> e : contextModel.entrySet()) {
+             bindings.put(e.getKey(), e.getValue());
+	    }
+        javascriptEngine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+    	try {
+			String uuid = (String) javascriptEngine.eval("patient.uuid;");
+			if (StringUtils.isBlank(uuid)) {
+	    		throw new APIException("Patient uuid cannot be empty");
+			}
+			return uuid;
+		} catch (ScriptException e) {
+    		     throw new APIException("Failed to get patient uuid", e);
+		 }
+    }
+    
+    /**
+     * Determines whether a given <code>extension</code> requires a <code>program</code> that's associated with
+     * the <code>patient</code> in the current visit.
+     * 
+     * <p>
+     * For instance if an <code>extension</code> had such a program configuration: 
+     * 	<pre>
+     * 	  {
+     * 		"programRef" : "CIEL:123",
+     * 		"workflowRef" : "CIEL:124",
+     * 		"stateRef" : "CIEL:125"
+     * 	  }
+     *  </pre>
+     *  This method would return <code>true</code> if patient is enrolled to program("CIEL:123") with 
+     *  workflow("CIEL:124") and in state("CIEL:125")
+     * </p>
+     *
+     */
+    protected boolean checkRequiredProgramsOnCurrentPatient(Extension extension, AppContextModel contextModel) {
+    	List<ProgramConfiguration> requiredPrograms = extension.getRequiredPrograms();
+    	if (CollectionUtils.isEmpty(requiredPrograms)) {
+    		return true;
+    	}
+    	Patient patient = Context.getPatientService().getPatientByUuid(getPatientUuid(contextModel));
+    	
+    	List<PatientProgram> patientPrograms = Context.getProgramWorkflowService().getPatientPrograms(patient, null, null,
+			    null, null, null, false);
+    	if (CollectionUtils.isEmpty(patientPrograms)) {
+    		// This patient isn't enrolled to any program
+    		return false;
+    	}
+    	
+    	for (ProgramConfiguration configuration : requiredPrograms) {
+    		boolean configAssignableToPatient =   hasProgramAssignableToConfiguration(patientPrograms, configuration);
+    		if (configAssignableToPatient) {
+    			// Return early
+    			return configAssignableToPatient;
+    		}
+    	}
+    	return false;
+    }
+     
+    /**
+	 * Determines whether a given {@link ProgramConfiguration} is assignable to any of the
+	 * <code>patientPrograms</code>
+	 * 
+	 * @param patientPrograms
+	 * @param config
+	 * @return <code>true</code> if <code>config</code> is assignable to any of the <code>patientPrograms</code>
+	 */
+	protected boolean hasProgramAssignableToConfiguration(List<PatientProgram> patientPrograms, 
+			ProgramConfiguration config) {
+		if (!config.hasValidProgramTree()) {
+			throw new APIException("ProgramConfiguration has an invalid program tree");
+		}
+		Program program = config.getProgram();
+		ProgramWorkflow workflow = config.getWorkflow();
+		ProgramWorkflowState state = config.getState();
+		
+		List<Program> programs = new ArrayList<Program>();
+		List<ProgramWorkflow> allWorkflows = new ArrayList<ProgramWorkflow>();
+		List<ProgramWorkflowState> patientCurrentStates = new ArrayList<ProgramWorkflowState>();
+		for (PatientProgram patientProgram : patientPrograms) {
+			Set<PatientState> patientStates = patientProgram.getCurrentStates();
+			for (PatientState patientState : patientStates) {
+				patientCurrentStates.add(patientState.getState());
+			}			
+			programs.add(patientProgram.getProgram());
+			allWorkflows.addAll(patientProgram.getProgram().getAllWorkflows());
+		}
+		if (config.hasProgram() && !config.hasWorkflow() && !config.hasState()) {
+			return programs.contains(config.getProgram());
+		}
+		if (!config.hasProgram() && config.hasWorkflow() && !config.hasState()) {
+			return allWorkflows.contains(workflow);
+		}
+		if (!config.hasProgram() && !config.hasWorkflow() && config.hasState()) {
+			return patientCurrentStates.contains(state);
+		}
+		if (config.hasAll()) {
+			return programs.contains(config.getProgram()) && 
+				  allWorkflows.contains(workflow) && 
+				  patientCurrentStates.contains(state);
+		}
+		if (config.hasWorkflow() && config.hasState()) {
+			return allWorkflows.contains(workflow) && 
+				  patientCurrentStates.contains(state);
+		}
+		if (config.hasProgram() && config.hasWorkflow()) {
+			return programs.contains(program) &&
+				   allWorkflows.contains(workflow);
+		}
+		if (config.hasProgram() && config.hasState()) {
+			return programs.contains(program) &&
+				   patientCurrentStates.contains(state);
+		}
+		return false;
+	}
 	
-	@Override
+    @Override
 	public List<AppDescriptor> getAppsForCurrentUser() {
 		List<AppDescriptor> userApps = new ArrayList<AppDescriptor>();
 		UserContext userContext = Context.getUserContext();
