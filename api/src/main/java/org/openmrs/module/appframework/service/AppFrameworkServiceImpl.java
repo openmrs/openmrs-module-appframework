@@ -26,6 +26,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,6 +53,7 @@ import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllAppTemplates;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
+import org.openmrs.module.appframework.repository.AllLoginLocations;
 import org.openmrs.module.appframework.repository.AllUserApps;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,10 +82,12 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	
 	private AllUserApps allUserApps;
 	
+	private AllLoginLocations allLoginLocations;
+
 	public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors,
 	    AllFreeStandingExtensions allFreeStandingExtensions, AllComponentsState allComponentsState,
 	    LocationService locationService, FeatureToggleProperties featureToggles, AppFrameworkConfig appFrameworkConfig,
-	    AllUserApps allUserApps) throws ScriptException {
+	    AllUserApps allUserApps, AllLoginLocations allLoginLocations) throws ScriptException {
 		this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allFreeStandingExtensions = allFreeStandingExtensions;
@@ -93,6 +97,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.appFrameworkConfig = appFrameworkConfig;
 		this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
 		this.allUserApps = allUserApps;
+		this.allLoginLocations = allLoginLocations;
 		
 		// there is surely a cleaner way to define this utility function in the global scope
 		this.javascriptEngine.eval("function hasMemberWithProperty(list, propName, val) { " + "if (!list) { return false; } "
@@ -378,8 +383,15 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	@Override
 	@Transactional(readOnly = true)
 	public List<Location> getLoginLocations() {
-		LocationTag supportsLogin = locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
-		List<Location> locations = locationService.getLocationsByTag(supportsLogin);
+		List<Location> locations = null;
+		
+		if (CollectionUtils.isEmpty(allLoginLocations.getLoginLocations())) {
+			LocationTag supportsLogin = locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN);
+			locations = locationService.getLocationsByTag(supportsLogin);
+		} else {
+			locations = allLoginLocations.getLoginLocations();
+		}
+		
 		List<LoginLocationFilter> filters = Context.getRegisteredComponents(LoginLocationFilter.class);
 		if (filters.isEmpty()) {
 			return locations;

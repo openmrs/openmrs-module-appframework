@@ -50,6 +50,7 @@
                 <constructor-arg ref="featureToggles"/>
                 <constructor-arg ref="appFrameworkConfig"/>
                 <constructor-arg ref="allUserApps"/>
+                <constructor-arg ref="allLoginLocations"/>
             </bean>
         </property>
         <property name="preInterceptors">
