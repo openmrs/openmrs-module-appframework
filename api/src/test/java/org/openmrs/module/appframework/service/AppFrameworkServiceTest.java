@@ -69,9 +69,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	@Autowired
 	private AppFrameworkService appFrameworkService;
 
-    @Autowired
-    private AppFrameworkConfig appFrameworkConfig;
-
     private static String UUID_OF_PATIENT_NOT_ENROLLED_IN_ANY_PROGRAM = "0cbe2ed3-cd5x-4f46-9459-26127c226b9i";
     
     private static String UUID_OF_PATIENT_ENROLLED_TO_PROGRAMS = "0cbe2ed3-cd5f-4f46-9459-26127c9265ab";
@@ -478,25 +475,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertTrue(locations.contains(location2));
 	}
 	
-	private Location createLocation(String uuid) {
-		Location location = new Location();
-		location.setUuid(uuid);
-		location.setName("Some name " + uuid);
-		location.addTag(locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN));
-		return locationService.saveLocation(location);
-	}
-	
-	public class VisitStatus {
-		
-		public int id = 17;
-		
-		public boolean active;
-		
-		public VisitStatus(boolean visitActive) {
-			this.active = visitActive;
-		}
-	}
-
 	@Test
 	public void getExtensionsForCurrentUser_shouldGetEnabledExtensionsForTheCurrentUserByProgramConfiguration() throws Exception {
 		executeDataSet("AppFrameworkServiceImplTest-createPatientProgram.xml");
@@ -514,6 +492,25 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
         
         assertEquals(1, extensions.size());
         assertEquals("gotoProgramSection", extensions.get(0).getId());
+	}
+
+	private Location createLocation(String uuid) {
+		Location location = new Location();
+		location.setUuid(uuid);
+		location.setName("Some name " + uuid);
+		location.addTag(locationService.getLocationTagByName(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN));
+		return locationService.saveLocation(location);
+	}
+	
+	public class VisitStatus {
+		
+		public int id = 17;
+		
+		public boolean active;
+		
+		public VisitStatus(boolean visitActive) {
+			this.active = visitActive;
+		}
 	}
 	
     private AppContextModel setupContextModel(boolean isVisitActive, String patientUuid) {

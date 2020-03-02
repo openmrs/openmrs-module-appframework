@@ -99,13 +99,12 @@ public class ProgramConfigurationTest {
 		when(AppFrameworkUtil.getProgramsByConcept(concept1)).thenReturn(programsSharingConcept);
 		when(AppFrameworkUtil.getWorkflowsByConcept(concept2)).thenReturn(workflowsSharingConcept);
 		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(statesSharingConcept);
-
 	}
 	
 	@Test
 	public void getProgram_shouldHandleCasesWhereUnderlyingProgramIsObvious() {
 		// Setup
-		when(AppFrameworkUtil.getProgramsByConcept(concept1)).thenReturn(Arrays.asList(program1));
+		when(AppFrameworkUtil.getProgramsByConcept(concept1)).thenReturn(new ArrayList<Program>(Arrays.asList(program1)));
 		
 		// Replay
 		Program program = configuration.getProgram();
@@ -117,7 +116,7 @@ public class ProgramConfigurationTest {
 	@Test
 	public void getProgram_shouldHandleCasesWhereUnderlyingProgramIsNotObvious() {
 		// Setup
-		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(Arrays.asList(state1));
+		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(new ArrayList<ProgramWorkflowState>(Arrays.asList(state1)));
 		
 		// Replay
 		Program program = configuration.getProgram();
@@ -134,7 +133,7 @@ public class ProgramConfigurationTest {
 			fail("Should have failed since we have two programs, states and workflows identified by the smae concept");
 		} catch(APIException e) {	
 			// Verify
-			Assert.assertEquals("Could not choose the intended program out of the many programs identified by concept: " 
+			Assert.assertEquals("Failed to figure out the intended program identified by: " 
 					+ PROGRAM_CONCEPT, e.getMessage());
 		}
 	}
@@ -142,7 +141,7 @@ public class ProgramConfigurationTest {
 	@Test
 	public void getWorkflow_shouldHandleCasesWhereUnderlyingWorkflowIsObvious() {
 		// Setup
-		when(AppFrameworkUtil.getWorkflowsByConcept(concept2)).thenReturn(Arrays.asList(workflow1));
+		when(AppFrameworkUtil.getWorkflowsByConcept(concept2)).thenReturn(new ArrayList<ProgramWorkflow>(Arrays.asList(workflow1)));
 		
 		// Replay
 		ProgramWorkflow worklow = configuration.getWorkflow();
@@ -154,7 +153,7 @@ public class ProgramConfigurationTest {
 	@Test
 	public void getWorkflow_shouldHandleCasesWhereUnderlyingWorkflowIsNotObvious() {
 		// Setup
-		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(Arrays.asList(state1));
+		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(new ArrayList<ProgramWorkflowState>(Arrays.asList(state1)));
 		
 		// Replay
 		ProgramWorkflow worklow = configuration.getWorkflow();
@@ -172,7 +171,7 @@ public class ProgramConfigurationTest {
 					+ " same concept.");
 		} catch(APIException e) {
 			// Verify
-			Assert.assertEquals("Could not choose the intended program out of the many programs identified by concept: " 
+			Assert.assertEquals("Failed to figure out the intended program identified by: " 
 					+ PROGRAM_CONCEPT, e.getMessage());
 		}
 		
@@ -185,7 +184,7 @@ public class ProgramConfigurationTest {
 					+ " concept yet this config has no program or state specified.");
 		} catch(APIException e) {
 			// Verify
-			Assert.assertEquals("Could not choose the intended workflow out of the many workflows identified by concept: " 
+			Assert.assertEquals("Failed to figure out the intended workflow identified by: " 
 					+ WORKFLOW_CONCEPT, e.getMessage());	
 		}
 	}
@@ -193,7 +192,7 @@ public class ProgramConfigurationTest {
 	@Test
 	public void getState_shouldHandleCasesWhereUnderlyingStateIsObvious() {
 		// Setup
-		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(Arrays.asList(state1));
+		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(new ArrayList<ProgramWorkflowState>(Arrays.asList(state1)));
 
 		// Replay
 		ProgramWorkflowState state = configuration.getState();
@@ -205,7 +204,7 @@ public class ProgramConfigurationTest {
 	@Test
 	public void getState_shouldHandleCasesWhereUnderlyingStateIsNotObvious() {
 		// Setup
-		when(AppFrameworkUtil.getProgramsByConcept(concept1)).thenReturn(Arrays.asList(program1));
+		when(AppFrameworkUtil.getProgramsByConcept(concept1)).thenReturn(new ArrayList<Program>(Arrays.asList(program1)));
 		
 		// Replay
 		ProgramWorkflowState state = configuration.getState();
@@ -223,7 +222,7 @@ public class ProgramConfigurationTest {
 					+ "identified by the same concept");
 		} catch(APIException e) {
 			// Verify
-			Assert.assertEquals("Could not choose the intended program out of the many programs identified by concept: " 
+			Assert.assertEquals("Failed to figure out the intended program identified by: " 
 					+ PROGRAM_CONCEPT, e.getMessage());
 		}
 		
@@ -237,119 +236,9 @@ public class ProgramConfigurationTest {
 					+ "by the same  concept yet this config has no program or workflow specified.");
 		} catch(APIException e) {
 			// Verify
-			Assert.assertEquals("Could not choose the intended state out of the many states identified by concept: " 
+			Assert.assertEquals("Failed to figure out the intended state identified by: " 
 					+ STATE_CONCEPT, e.getMessage());	
 		}		
-	}
-	
-	@Test
-	public void programWithBestWorflowAndStateCombination_shouldUseUniqueStateToDetermineTargetProgram() {
-		// setup
-		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(Arrays.asList(state1));
-		
-		// replay
-		Program program = configuration.programWithBestWorflowAndStateCombination(
-				programsSharingConcept);
-		
-		// verify
-		Assert.assertEquals(program1, program);
-	}
-	
-	@Test
-	public void programWithBestWorflowAndStateCombination_shouldUseUniqueWorkflowToDetermineTargetProgram() {
-		// setup
-		when(AppFrameworkUtil.getWorkflowsByConcept(concept2)).thenReturn(Arrays.asList(workflow1));
-		
-		// replay
-		Program program = configuration.programWithBestWorflowAndStateCombination(
-				programsSharingConcept);
-		
-		// verify
-		Assert.assertEquals(program1, program);
-	}
-	
-	@Test
-	public void programWithBestWorflowAndStateCombination_shouldFailInAmbigiousConditions() {		
-		try {
-			// replay
-			configuration.programWithBestWorflowAndStateCombination(programsSharingConcept);
-			fail("Should have failed since we have more than one program, workflow and states "
-					+ "identified by the same concept");
-		} catch(APIException e) {
-			// Verify
-			Assert.assertEquals("Could not choose the intended program out of the many programs identified by concept: " 
-					+ PROGRAM_CONCEPT, e.getMessage());
-		}
-	}
-	
-	@Test
-	public void workflowWithBestProgramAndStateCombination_shouldUseUniqueStateToDetermineTargetWorkflow() {
-		// setup
-		when(AppFrameworkUtil.getStatesByConcept(concept3)).thenReturn(Arrays.asList(state1));
-		
-		// replay
-		ProgramWorkflow workflow = configuration.workflowWithBestProgramAndStateCombination(workflowsSharingConcept, null);
-		
-		// verify
-		Assert.assertEquals(workflow1, workflow);
-	}
-	
-	@Test
-	public void workflowWithBestProgramAndStateCombination_shouldUseUniqueProgramToDetermineTargetWorkflow() {			
-		// replay
-		ProgramWorkflow workflow = configuration.workflowWithBestProgramAndStateCombination(workflowsSharingConcept, program1);
-		
-		// verify
-		Assert.assertEquals(workflow1, workflow);
-	}
-	
-	@Test
-	public void workflowWithBestProgramAndStateCombination_shouldFailInAmbigiousConditions() {	
-		try {
-			// replay
-			configuration.workflowWithBestProgramAndStateCombination(workflowsSharingConcept, null);
-			fail("Should have failed at the program level since we have more than one program, workflow and states "
-					+ "identified by the same concept"); 
-		} catch (APIException e) {
-			// Verify
-			Assert.assertEquals("Could not choose the intended workflow out of the many workflows identified by concept: " 
-					+ WORKFLOW_CONCEPT, e.getMessage());
-		}
-	}
-	
-	@Test
-	public void stateWithBestProgramAndWorkflowCombination_shouldUseUniqueWorkflowToDetermineTargetState() {
-		// setup
-		when(AppFrameworkUtil.getWorkflowsByConcept(concept2)).thenReturn(Arrays.asList(workflow1));
-		
-		// replay
-		ProgramWorkflowState state = configuration.stateWithBestProgramAndWorkflowCombination(statesSharingConcept, null, workflow1);
-		
-		// verify
-		Assert.assertEquals(state1, state);
-	}
-	
-	@Test
-	public void stateWithBestProgramAndWorkflowCombination_shouldUseUniqueProgramToDetermineTargetState() {
-		// replay
-		ProgramWorkflowState state = configuration.stateWithBestProgramAndWorkflowCombination(statesSharingConcept, program1, null);
-		
-		// verify
-		Assert.assertEquals(state1, state);
-	}
-	
-	@Test
-	public void stateWithBestProgramAndWorkflowCombination_shouldFailInAmbigiousConditions() {		
-		try {
-			// replay
-			configuration.stateWithBestProgramAndWorkflowCombination(statesSharingConcept, null, null);
-			fail("Should have failed at the program level since we have more than one program, workflow and states "
-					+ "identified by the same concept");
-		} catch(APIException e) {
-			// Verify
-			Assert.assertEquals("Could not choose the intended state out of the many states identified by concept: " 
-					+ STATE_CONCEPT, e.getMessage());
-		}				
 	}
 	
 	@Test
@@ -458,6 +347,5 @@ public class ProgramConfigurationTest {
 		concept2 = new Concept(2);	
 		when(concept3.getName()).thenReturn(new ConceptName("State One", null));
 		when(concept4.getName()).thenReturn(new ConceptName("State Two", null));
-
 	}
 }

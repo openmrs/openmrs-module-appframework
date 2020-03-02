@@ -452,7 +452,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			ProgramConfiguration config) {
 		if (!config.hasValidProgramTree()) {
 			throw new APIException("ProgramConfiguration has an invalid program tree");
-		}
+		}	
+		boolean passForProgram = true, passForWorkflow = true, passForState = true;		
 		Program program = config.getProgram();
 		ProgramWorkflow workflow = config.getWorkflow();
 		ProgramWorkflowState state = config.getState();
@@ -468,33 +469,16 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			programs.add(patientProgram.getProgram());
 			allWorkflows.addAll(patientProgram.getProgram().getAllWorkflows());
 		}
-		if (config.hasProgram() && !config.hasWorkflow() && !config.hasState()) {
-			return programs.contains(config.getProgram());
+		if (program != null) {
+			passForProgram = programs.contains(config.getProgram());
 		}
-		if (!config.hasProgram() && config.hasWorkflow() && !config.hasState()) {
-			return allWorkflows.contains(workflow);
+		if (workflow != null) {
+			passForWorkflow = allWorkflows.contains(workflow);
 		}
-		if (!config.hasProgram() && !config.hasWorkflow() && config.hasState()) {
-			return patientCurrentStates.contains(state);
-		}
-		if (config.hasAll()) {
-			return programs.contains(config.getProgram()) && 
-				  allWorkflows.contains(workflow) && 
-				  patientCurrentStates.contains(state);
-		}
-		if (config.hasWorkflow() && config.hasState()) {
-			return allWorkflows.contains(workflow) && 
-				  patientCurrentStates.contains(state);
-		}
-		if (config.hasProgram() && config.hasWorkflow()) {
-			return programs.contains(program) &&
-				   allWorkflows.contains(workflow);
-		}
-		if (config.hasProgram() && config.hasState()) {
-			return programs.contains(program) &&
-				   patientCurrentStates.contains(state);
-		}
-		return false;
+		if (state != null) {
+			passForState = patientCurrentStates.contains(state);
+		}	
+		return passForProgram && passForWorkflow && passForState;
 	}
 	
     @Override
