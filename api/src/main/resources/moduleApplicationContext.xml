@@ -10,7 +10,7 @@
 		<property name="moduleService">
 			<list>
 				<value>${project.parent.groupId}.${project.parent.artifactId}.service.AppFrameworkService</value>
-				<ref local="appFrameworkService"/>
+				<ref bean="appFrameworkService"/>
 			</list>
 		</property>
 	</bean>
@@ -19,7 +19,7 @@
         <property name="moduleService">
             <list>
                 <value>${project.parent.groupId}.${project.parent.artifactId}.service.AdministrativeNotificationService</value>
-                <ref local="administrativeNotificationService"/>
+                <ref bean="administrativeNotificationService"/>
             </list>
         </property>
     </bean>
