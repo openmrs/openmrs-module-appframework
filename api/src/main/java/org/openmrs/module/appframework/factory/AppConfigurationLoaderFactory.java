@@ -1,13 +1,13 @@
 package org.openmrs.module.appframework.factory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import java.util.List;
 @Component
 public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -41,7 +41,7 @@ public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
                 forResource = objectMapper.readValue(appDefinitionResource.getInputStream(), new TypeReference<List<AppTemplate>>() {});
                 templates.addAll(forResource);
             } catch (IOException e) {
-                logger.fatal("Error reading AppTemplates configuration file", e);
+                logger.error("Error reading AppTemplates configuration file: {}", appDefinitionResource.getDescription(), e);
             }
         }
         return templates;
@@ -56,7 +56,7 @@ public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
                 List<AppDescriptor> appDescriptorsForResource = getAppDescriptorsForResource(appDefinitionResource.getInputStream());
                 appDescriptors.addAll(appDescriptorsForResource);
             } catch (IOException e) {
-                logger.fatal("Error reading app configuration file: " + appDefinitionResource.getFile().getPath(), e);
+                logger.error("Error reading app configuration file: {}", appDefinitionResource.getDescription(), e);
             }
         }
         return appDescriptors;
@@ -76,7 +76,7 @@ public class AppConfigurationLoaderFactory implements AppFrameworkFactory {
                 extensionsForResource = objectMapper.readValue(extensionResource.getInputStream(), new TypeReference<List<Extension>>() {});
                 extensions.addAll(extensionsForResource);
             } catch (IOException e) {
-                logger.fatal("Error reading extension configuration file: " + extensionResource.getFilename(), e);
+                logger.error("Error reading extension configuration file: {}", extensionResource.getDescription(), e);
             }
         }
         return extensions;
