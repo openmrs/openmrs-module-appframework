@@ -99,6 +99,11 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.allUserApps = allUserApps;
 		this.allLoginLocations = allLoginLocations;
 		
+		if (javascriptEngine == null) {
+			javascriptEngine = new jdk.nashorn.api.scripting.NashornScriptEngineFactory().getScriptEngine();
+			javascriptEngine.setBindings(javascriptEngine.createBindings(), ScriptContext.GLOBAL_SCOPE);
+		}
+		
 		// there is surely a cleaner way to define this utility function in the global scope
 		this.javascriptEngine.eval("function hasMemberWithProperty(list, propName, val) { " + "if (!list) { return false; } "
 		        + "var i, len=list.length; " + "for (i=0; i<len; ++i) { "
