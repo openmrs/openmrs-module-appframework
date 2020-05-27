@@ -10,7 +10,7 @@ import org.openmrs.module.appframework.template.TemplateFactory;
 
 import java.util.Map;
 
-public class Extension implements Comparable<Extension> {
+public class Extension implements Requireable, Comparable<Extension> {
 	
 	@NotEmpty(message = ValidationErrorMessages.EXTENSION_ID_NOT_EMPTY_MESSAGE)
 	@JsonProperty

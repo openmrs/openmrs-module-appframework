@@ -47,6 +47,7 @@ import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.domain.Requireable;
 import org.openmrs.module.appframework.domain.UserApp;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
@@ -315,8 +316,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		return extensions;
 	}
 	
-	// making it public is a hack so we can test this directly in the appui module
-	public boolean checkRequireExpression(Extension candidate, AppContextModel contextModel) {
+	@Override
+	public boolean checkRequireExpression(Requireable candidate, AppContextModel contextModel) {
 		try {
 			String requireExpression = candidate.getRequire();
 			if (StringUtils.isBlank(requireExpression)) {
@@ -344,18 +345,19 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 					}
 					catch (Exception ex) {
 						StringBuilder extraInfo = new StringBuilder();
-						extraInfo.append("type:" + e.getValue().getClass().getName());
+						extraInfo.append("type:").append(e.getValue().getClass().getName());
 						if (e.getValue() instanceof Map) {
 							Map<?, ?> map = (Map<?, ?>) e.getValue();
 							extraInfo.append(" properties:");
 							for (Map.Entry entry : map.entrySet()) {
 								extraInfo.append(" ").append(entry.getKey().toString()).append(":")
-								        .append(entry.getValue() == null ? "null" : entry.getValue().getClass().toString());
+										.append(entry.getValue() == null ? "null" : entry.getValue().getClass().toString());
 							}
 						}
 						log.error("Failed to set '" + e.getKey() + "' scope variable (" + extraInfo
-						        + ") while evaluating require check for extension " + candidate.getId(),
-						    ex);
+										+ ") while evaluating require check for " + candidate.getClass().getSimpleName()
+										.toLowerCase() + " " + candidate.getId(),
+								ex);
 						return false;
 					}
 				}
