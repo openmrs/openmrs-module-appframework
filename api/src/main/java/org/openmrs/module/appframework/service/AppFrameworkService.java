@@ -19,6 +19,7 @@ import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
+import org.openmrs.module.appframework.domain.Requireable;
 import org.openmrs.module.appframework.domain.UserApp;
 
 import java.util.List;
@@ -167,4 +168,13 @@ public interface AppFrameworkService extends OpenmrsService {
      */
     void purgeUserApp(UserApp userApp);
 
+	/**
+	 * Checks whether a Requireable object should be included in the current context
+	 *
+	 * @since 2.15.0
+	 * @param candidate the requireable object to check
+	 * @param contextModel the current context to check against
+	 * @return true if the requireable should be included in this context; false otherwise
+	 */
+	boolean checkRequireExpression(Requireable candidate, AppContextModel contextModel);
 }
