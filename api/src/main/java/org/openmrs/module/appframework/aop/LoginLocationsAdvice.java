@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,15 +45,25 @@ public class LoginLocationsAdvice implements AfterReturningAdvice {
         if(!loginLocationsUpdateTriggers.contains(method.getName())) {
             return;
         }
-        Set<LocationTag> tags = ((Location) returnValue).getTags();
-        for (Iterator<LocationTag> tagsIterator = tags.iterator(); tagsIterator.hasNext(); ) {
-            if(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN_UUID.equals(tagsIterator.next().getUuid())) {
-                // The login locations are first set in AppFrameworkActivator
-                AllLoginLocations allLoginLocations = Context.getRegisteredComponents(AllLoginLocations.class).get(0);
-                allLoginLocations.clear();
-                allLoginLocations.add(((AppFrameworkService) Context.getRegisteredComponent("appFrameworkService", AppFrameworkService.class)).getLoginLocations());
-                return;
-            }
-        }
+        final Location returnedLocation = (Location) returnValue;
+        AllLoginLocations allLoginLocations = Context.getRegisteredComponents(AllLoginLocations.class).get(0);
+        if (returnedLocation.isRetired() || "retireLocation".equals(method.getName())) {
+        	allLoginLocations.getLoginLocations().removeIf(new Predicate<Location>() {
+				@Override
+				public boolean test(Location location) {
+					return location.getUuid().equalsIgnoreCase(returnedLocation.getUuid());
+				}
+			});
+        	return;
+        } else {
+	        Set<LocationTag> tags = returnedLocation.getTags();
+	        for (Iterator<LocationTag> tagsIterator = tags.iterator(); tagsIterator.hasNext(); ) {
+	            if(AppFrameworkConstants.LOCATION_TAG_SUPPORTS_LOGIN_UUID.equals(tagsIterator.next().getUuid())) {
+	                // The login locations are first set in AppFrameworkActivator
+	                allLoginLocations.getLoginLocations().add(returnedLocation);
+	                return;
+	            }
+	        }
+	   }
     }
 }
