@@ -68,10 +68,11 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
 	@Autowired
 	private AppFrameworkService appFrameworkService;
-	
-	@Autowired
-	private AppFrameworkConfig appFrameworkConfig;
-	
+
+    private static String UUID_OF_PATIENT_NOT_ENROLLED_IN_ANY_PROGRAM = "0cbe2ed3-cd5x-4f46-9459-26127c226b9i";
+    
+    private static String UUID_OF_PATIENT_ENROLLED_TO_PROGRAMS = "0cbe2ed3-cd5f-4f46-9459-26127c9265ab";
+
 	@Before
 	public void setup() throws IOException {
 		//trigger loading of the apps
@@ -113,17 +114,38 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		return us.createUser(u, "Openmr5xy");
 	}
 	
+	private Role viewPatientProgramRole() {
+		UserService us = Context.getUserService();
+		Role role = new Role("View patient program", "Set of privileges required to view a Patient and their programs");
+		Privilege p1 = new Privilege("View Patients", "description");
+        us.savePrivilege(p1);
+        Privilege p2 = new Privilege("View Patient Programs", "description");
+        us.savePrivilege(p2);
+        Privilege p3 = new Privilege("View Concepts", "description");
+        us.savePrivilege(p3);
+        Privilege p4 = new Privilege("View Programs", "description");
+        us.savePrivilege(p4);
+
+        role.addPrivilege(p1);
+        role.addPrivilege(p2);
+        role.addPrivilege(p3);
+        role.addPrivilege(p4);
+        return us.saveRole(role);
+	}
+
 	/**
 	 * @see {@link AppFrameworkService#getAllEnabledExtensions()}
 	 */
 	@Test
 	public void getAllEnabledExtensions_shouldGetAllEnabledExtensions() throws Exception {
 		List<Extension> visitExts = appFrameworkService.getAllEnabledExtensions();
-		assertEquals(4, visitExts.size());
-		assertThat(visitExts,
-		    containsInAnyOrder(hasProperty("id", is("registerOutpatientHomepageLink")),
-		        hasProperty("id", is("orderXrayExtension")), hasProperty("id", is("gotoPatientExtension")),
-		        hasProperty("id", is("gotoArchives"))));
+		assertEquals(5, visitExts.size());
+		assertThat(visitExts, containsInAnyOrder(
+				hasProperty("id", is("registerOutpatientHomepageLink")),
+				hasProperty("id", is("orderXrayExtension")),
+				hasProperty("id", is("gotoPatientExtension")),
+				hasProperty("id", is("gotoArchives")),
+				hasProperty("id", is("gotoProgramSection"))));
 	}
 	
 	/**
@@ -172,7 +194,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertEquals(user, Context.getAuthenticatedUser());
 		
 		List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser();
-		assertEquals(2, userExts.size());
+		assertEquals(3, userExts.size());
 		List<String> userAppIds = new ArrayList<String>();
 		for (Extension ext : userExts) {
 			userAppIds.add(ext.getId());
@@ -218,8 +240,9 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		if (Context.getAuthenticatedUser() != null)
 			Context.logout();
 		assertNull(Context.getAuthenticatedUser());
-		assertThat(appFrameworkService.getExtensionsForCurrentUser(), hasSize(1));
-		assertThat(appFrameworkService.getExtensionsForCurrentUser().get(0).getId(), is("gotoArchives"));
+
+		assertThat(appFrameworkService.getExtensionsForCurrentUser(), hasSize(2));
+        assertThat(appFrameworkService.getExtensionsForCurrentUser().get(0).getId(), is("gotoArchives"));
 	}
 	
 	/**
@@ -300,29 +323,24 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	public void getExtensionsForCurrentUser_shouldGetEnabledExtensionsForTheCurrentUserByRequireProperty() throws Exception {
+		executeDataSet("AppFrameworkServiceImplTest-createPatientProgram.xml");
 		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
+		user.addRole(viewPatientProgramRole());
 		Context.authenticate(user.getUsername(), "Openmr5xy");
 		assertEquals(user, Context.getAuthenticatedUser());
 		
-		AppContextModel contextModel = setupContextModel(true);
+		AppContextModel contextModel = setupContextModel(true, UUID_OF_PATIENT_NOT_ENROLLED_IN_ANY_PROGRAM);
 		
 		List<Extension> extensions = appFrameworkService.getExtensionsForCurrentUser(null, contextModel);
 		assertEquals(1, extensions.size());
 		assertEquals("orderXrayExtension", extensions.get(0).getId());
 		
-		contextModel = setupContextModel(false);
+		contextModel = setupContextModel(false, UUID_OF_PATIENT_NOT_ENROLLED_IN_ANY_PROGRAM);
 		extensions = appFrameworkService.getExtensionsForCurrentUser(null, contextModel);
 		assertEquals(1, extensions.size());
 		assertEquals("gotoArchives", extensions.get(0).getId());
 	}
-	
-	private AppContextModel setupContextModel(boolean isVisitActive) {
-		AppContextModel bindings = new AppContextModel();
-		bindings.put("patientId", 7);
-		bindings.put("visit", new VisitStatus(isVisitActive));
-		return bindings;
-	}
-	
+		
 	@Test
 	public void getAllAppTemplates_shouldGetAppTemplates() throws Exception {
 		List<AppTemplate> actual = appFrameworkService.getAllAppTemplates();
@@ -354,7 +372,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	@Verifies(value = "should get all enabled apps", method = "getAllEnabledApps()")
 	public void getAllEnabledApps_shouldGetAllEnabledApps() throws Exception {
 		List<AppDescriptor> apps = appFrameworkService.getAllEnabledApps();
-		assertEquals(4, apps.size());//should include the app with that requires no privilege
+		assertEquals(5, apps.size());//should include the app with that requires no privilege
 		List<String> appIds = new ArrayList<String>();
 		for (AppDescriptor app : apps) {
 			appIds.add(app.getId());
@@ -457,6 +475,25 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertTrue(locations.contains(location2));
 	}
 	
+	@Test
+	public void getExtensionsForCurrentUser_shouldGetEnabledExtensionsForTheCurrentUserByProgramConfiguration() throws Exception {
+		executeDataSet("AppFrameworkServiceImplTest-createPatientProgram.xml");
+        User user = setupPrivilegesRolesAndUser(null);
+        user.addRole(viewPatientProgramRole());      
+        Context.authenticate(user.getUsername(), "Openmr5xy");
+
+        AppContextModel contextModel = setupContextModel(true, UUID_OF_PATIENT_NOT_ENROLLED_IN_ANY_PROGRAM);
+        List<Extension> extensions = appFrameworkService.getExtensionsForCurrentUser(null, contextModel);
+        
+        assertEquals(0, extensions.size());
+        
+        contextModel = setupContextModel(true, UUID_OF_PATIENT_ENROLLED_TO_PROGRAMS);
+        extensions = appFrameworkService.getExtensionsForCurrentUser(null, contextModel);
+        
+        assertEquals(1, extensions.size());
+        assertEquals("gotoProgramSection", extensions.get(0).getId());
+	}
+
 	private Location createLocation(String uuid) {
 		Location location = new Location();
 		location.setUuid(uuid);
@@ -475,4 +512,11 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 			this.active = visitActive;
 		}
 	}
+	
+    private AppContextModel setupContextModel(boolean isVisitActive, String patientUuid) {
+        AppContextModel bindings = new AppContextModel();
+        bindings.put("patient", new AppFrameworkServiceImplTest.PatientContextModel(patientUuid));
+        bindings.put("visit", new VisitStatus(isVisitActive));
+        return bindings;
+    }
 }

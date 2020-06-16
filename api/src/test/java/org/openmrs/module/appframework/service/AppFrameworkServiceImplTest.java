@@ -3,18 +3,22 @@ package org.openmrs.module.appframework.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.script.ScriptException;
 import javax.validation.Validator;
 
 import org.hibernate.Criteria;
@@ -22,19 +26,31 @@ import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.openmrs.Location;
+import org.openmrs.Patient;
+import org.openmrs.PatientProgram;
+import org.openmrs.PatientState;
+import org.openmrs.Program;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
+import org.openmrs.api.APIException;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.openmrs.Location;
+import org.openmrs.module.appframework.LoginLocationFilter;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
+import org.openmrs.module.appframework.context.ProgramConfiguration;
+import org.openmrs.module.appframework.context.ProgramConfiguration.ResolvedConfiguration;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.feature.TestFeatureTogglePropertiesFactory;
-import org.openmrs.module.appframework.LoginLocationFilter;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
@@ -47,11 +63,12 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest(Context.class)
 public class AppFrameworkServiceImplTest  {
 	
-	private Validator validator = mock(Validator.class);
+	@Mock()
+	private Validator validator;
 	
-    private AllAppDescriptors allAppDescriptors = new AllAppDescriptors(validator);
+    private AllAppDescriptors allAppDescriptors;
 
-    private AllFreeStandingExtensions allFreeStandingExtensions = new AllFreeStandingExtensions(validator);
+    private AllFreeStandingExtensions allFreeStandingExtensions;
     
     private AllComponentsState allComponentsState = new AllComponentsState();
 
@@ -60,7 +77,7 @@ public class AppFrameworkServiceImplTest  {
     private FeatureToggleProperties featureToggles = TestFeatureTogglePropertiesFactory.get();
 
     private AppFrameworkConfig appFrameworkConfig = new AppFrameworkConfig();
-
+    
     private AppDescriptor app1;
 
     private AppDescriptor app2;
@@ -82,6 +99,17 @@ public class AppFrameworkServiceImplTest  {
     private AppFrameworkServiceImpl service;
 
     private LoginLocationFilter loginLocationFilter;
+    
+    private PatientProgram patientProgram;
+    
+    private Program program;
+
+	private ProgramWorkflowState state;
+
+	private ProgramWorkflow workflow;
+    
+    private static final String PATIENT_UUID = "0cbe2ed3-cd5f-4f46-9459-26127c9265ab";
+
 
     @Before
     public void setUp() throws Exception {
@@ -95,6 +123,11 @@ public class AppFrameworkServiceImplTest  {
         PowerMockito.mockStatic(Context.class);
         when(Context.getRegisteredComponents(eq(LoginLocationFilter.class)))
                 .thenReturn(Arrays.asList(loginLocationFilter));
+        
+    	setUpPatientProgram();
+    	
+    	allAppDescriptors = new AllAppDescriptors(validator);
+    	allFreeStandingExtensions = new AllFreeStandingExtensions(validator);
 
         featureToggles.setPropertiesFile(new File(this.getClass().getResource("/" + FeatureToggleProperties.FEATURE_TOGGLE_PROPERTIES_FILE_NAME).getFile()));
 
@@ -279,12 +312,134 @@ public class AppFrameworkServiceImplTest  {
         assertEquals(loginLocations.get(1).getUuid(), actualLoginLocations.get(1).getUuid());
     }
 
+    public void testGetPatientUuid() throws ScriptException {
+    	// Setup
+    	AppContextModel contextModel = new AppContextModel();
+    	contextModel.put("patient", new PatientContextModel(PATIENT_UUID));
+    	
+    	// Replay
+        String uuid = service.getPatientUuid(contextModel);
+        
+        // Verify
+        assertEquals(PATIENT_UUID, uuid);
+    }
+    
+    @Test
+    public void testCheckRequiredProgramsOnCurrentPatient() {
+    	// Setup
+    	mockStatic(Context.class);
+    	Patient patient = new Patient();
+    	PatientService patientService = mock(PatientService.class);
+    	ProgramWorkflowService workflowService = mock(ProgramWorkflowService.class);
+    	
+    	when(patientService.getPatientByUuid(PATIENT_UUID)).thenReturn(patient);
+    	when(workflowService.getPatientPrograms(patient, null, null,
+			    null, null, null, false)).thenReturn(Arrays.asList(patientProgram));
+    	when(Context.getPatientService()).thenReturn(patientService);
+    	when(Context.getProgramWorkflowService()).thenReturn(workflowService);
+    	
+    	AppContextModel contextModel = new AppContextModel();
+    	contextModel.put("patient", new PatientContextModel(PATIENT_UUID));	
+    	ProgramConfiguration config = new ProgramConfiguration();
+    	config.setResolvedConfig(new ResolvedConfiguration(program, workflow, state));
+    	
+    	// Replay
+    	boolean hasRequiredPrograms = service.checkRequiredProgramsOnCurrentPatient(extensionRequiringProgramConfigurations(Arrays.asList(config)), contextModel);
+    	
+    	// Verify
+    	assertTrue(hasRequiredPrograms);
+    	
+    	// Re-setup
+    	config.setResolvedConfig(new ResolvedConfiguration(null, workflow, state));
+    	
+    	// Replay
+    	hasRequiredPrograms = service.checkRequiredProgramsOnCurrentPatient(extensionRequiringProgramConfigurations(Arrays.asList(config)), contextModel);
+    	
+    	// Verify
+    	assertTrue(hasRequiredPrograms);
+    	
+    	// Re-setup
+    	// Configuration with a state that's not a member of the patient's current states
+    	ProgramWorkflowState pastState = new ProgramWorkflowState();
+    	workflow.addState(pastState);
+    	config.setResolvedConfig(new ResolvedConfiguration(null, null, pastState));
+    	
+    	// Replay
+    	hasRequiredPrograms = service.checkRequiredProgramsOnCurrentPatient(extensionRequiringProgramConfigurations(Arrays.asList(config)), contextModel);
+    	
+    	// Verify
+    	assertFalse(hasRequiredPrograms);
+    }
+    
+    @Test
+    public void hasProgramAssignableToConfiguration_shouldReturnTrueIfConfigIsAssignableToAnyOfThePatientPrograms() throws ScriptException {
+    	// Setup
+    	PatientProgram emptyPatientProgram = new PatientProgram();
+    	emptyPatientProgram.setProgram(new Program());
+    	List<PatientProgram> patientPrograms = Arrays.asList(emptyPatientProgram, patientProgram);
+    	
+    	ProgramConfiguration config = new ProgramConfiguration();
+    	config.setResolvedConfig(new ResolvedConfiguration(program, workflow, state));
+
+    	// Replay
+        boolean isAssignable = service.hasProgramAssignableToConfiguration(patientPrograms, config);
+        
+        // Verify
+        assertTrue(isAssignable);
+    }
+    
+    @Test
+    public void hasProgramAssignableToConfiguration_shouldReturnFalseIfConfigIsNotAssignableToAnyOfThePatientPrograms() throws ScriptException {
+    	// Setup
+    	PatientProgram emptyPatientProgram = new PatientProgram();
+    	emptyPatientProgram.setProgram(new Program());
+    	List<PatientProgram> patientPrograms = Arrays.asList(emptyPatientProgram, patientProgram);
+    	
+    	ProgramWorkflowState pastState = new ProgramWorkflowState();
+    	workflow.addState(pastState);
+    	
+    	// Configuration with a state that's not a member of the patient's current states
+    	ProgramConfiguration config = new ProgramConfiguration();
+    	config.setResolvedConfig(new ResolvedConfiguration(program, workflow, pastState));
+    	
+    	// Replay
+        boolean isAssignable = service.hasProgramAssignableToConfiguration(patientPrograms, config);
+        
+        // Verify
+        assertFalse(isAssignable);
+    }
+    
+    @Test
+    public void hasProgramAssignableToConfiguration_shouldFailWithAnExceptionIfConfigurationHasAnInvalidProgramTree() {
+    	// Setup
+    	
+    	// Configuration with invalid program tree
+    	ProgramConfiguration config = new ProgramConfiguration();
+    	config.setResolvedConfig(new ResolvedConfiguration(program, workflow, new ProgramWorkflowState()));
+    	
+    	try {
+    		// Replay
+    		service.hasProgramAssignableToConfiguration(Arrays.asList(patientProgram), config);
+    		fail("Should throw exception if configuration has an invalid program tree");
+    	} catch(APIException e) {
+    		// Verify
+    		assertEquals("ProgramConfiguration has an invalid program tree", e.getMessage());
+    	}
+    }
+    
     private Extension extensionRequiring(String requires) {
         Extension extension = new Extension();
         extension.setRequire(requires);
         return extension;
     }
-
+    
+    private Extension extensionRequiringProgramConfigurations(List<ProgramConfiguration> programConfigurations) {
+    	Extension extension = new Extension();
+        extension.setRequiredPrograms(programConfigurations);
+        return extension;
+    }
+    
+    
     public class VisitStatus {
         public boolean active;
         public boolean admitted;
@@ -292,5 +447,33 @@ public class AppFrameworkServiceImplTest  {
             this.active = active;
             this.admitted = admitted;
         }
+    }
+    
+    public static class PatientContextModel {
+    	public String uuid;
+    	public Patient patient;
+    	public PatientContextModel(String uuid) {
+    		this.uuid = uuid;
+    	}
+    }
+    
+    private void setUpPatientProgram() {  	
+    	program = new Program();
+    	program.setUuid("588a31bb-7923-4ef8-a6fc-b8f2ae5d1343");
+    	
+    	state = new ProgramWorkflowState();
+    	state.setUuid("588a31bb-7923-4ef8-a6fc-b8f2ae5d1344");
+    	
+    	workflow = new ProgramWorkflow();
+    	workflow.setUuid("588a31bb-7923-4ef8-a6fc-b8f2ae5d1345");
+    	
+    	workflow.addState(state);
+    	program.addWorkflow(workflow);
+    	
+    	patientProgram = mock(PatientProgram.class);
+    	when(patientProgram.getProgram()).thenReturn(program);
+    	PatientState currentState = new PatientState();
+    	currentState.setState(state);
+    	when(patientProgram.getCurrentStates()).thenReturn(new HashSet(Arrays.asList(currentState)));
     }
 }

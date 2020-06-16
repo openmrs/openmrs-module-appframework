@@ -29,5 +29,20 @@
         "label": "Go to Archives",
         "url": "/archives.page?patientId={{patientId}}",
         "require": "!visit.active"
+    },
+    {
+        "id": "gotoProgramSection",
+        "appId": "programApp",
+        "extensionPointId": "programActions",
+        "type": "link",
+        "label": "Go to Program",
+        "url": "/program.page?patientId={{patientId}}",
+        "requiredPrograms": [
+        	{
+        	  "programRef": "CIEL:123",
+        	  "workflowRef": "1743", 
+        	  "stateRef": "CIEL:124"
+        	}
+        ]
     }
 ]
