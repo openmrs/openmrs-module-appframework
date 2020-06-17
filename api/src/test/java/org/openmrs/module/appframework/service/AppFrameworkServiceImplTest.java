@@ -1,32 +1,16 @@
 package org.openmrs.module.appframework.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.Validator;
-
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.openmrs.Location;
+import org.openmrs.module.appframework.LoginLocationFilter;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
@@ -34,7 +18,6 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.feature.TestFeatureTogglePropertiesFactory;
-import org.openmrs.module.appframework.LoginLocationFilter;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
@@ -43,16 +26,32 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.validation.Validator;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
 public class AppFrameworkServiceImplTest  {
-	
+
 	private Validator validator = mock(Validator.class);
-	
+
     private AllAppDescriptors allAppDescriptors = new AllAppDescriptors(validator);
 
     private AllFreeStandingExtensions allFreeStandingExtensions = new AllFreeStandingExtensions(validator);
-    
+
     private AllComponentsState allComponentsState = new AllComponentsState();
 
     private AllLoginLocations allLoginLocations = new AllLoginLocations();
@@ -78,7 +77,7 @@ public class AppFrameworkServiceImplTest  {
     private Location location1;
 
     private Location location2;
-    
+
     private AppFrameworkServiceImpl service;
 
     private LoginLocationFilter loginLocationFilter;
@@ -143,14 +142,14 @@ public class AppFrameworkServiceImplTest  {
 
         // now add some free-standing extension
         allFreeStandingExtensions.add(Arrays.asList(ext3, ext4, ext5));
-        
+
         // to go through all the Hibernate stuff
         SessionFactory sessionFactory = mock(SessionFactory.class);
     	Session session = mock(Session.class);
     	when(session.createCriteria(any(Class.class))).thenReturn(mock(Criteria.class));
     	when(sessionFactory.getCurrentSession()).thenReturn(session);
     	allComponentsState.setSessionFactory(new DbSessionFactory(sessionFactory));
-    	
+
     	service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null, allLoginLocations);
     }
 
@@ -216,7 +215,7 @@ public class AppFrameworkServiceImplTest  {
         ext3.setFeatureToggle("!ext3Toggle");
         ext4.setFeatureToggle("!ext4Toggle");
         ext5.setFeatureToggle("!ext5Toggle");
-        
+
         List<Extension> extensionPoints = service.getAllEnabledExtensions("extensionPoint2");
 
         assertEquals(2, extensionPoints.size());
@@ -247,7 +246,7 @@ public class AppFrameworkServiceImplTest  {
     }
 
     @Test
-    public void testUtilityFunctionForRequireExpressions() throws Exception {
+    public void testHasMemberWithPropertyUtilityFunctionForRequireExpressions() throws Exception {
         AppContextModel contextModel = new AppContextModel();
         Map<String, Object> tag = new HashMap<String, Object>();
         tag.put("display", "Login Location");
@@ -260,6 +259,25 @@ public class AppFrameworkServiceImplTest  {
         assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
     }
+
+
+    @Test
+    public void testHasMemberThatEvaluatesTrueUtilityFunctionForRequireExpression() throws Exception {
+
+        List<Map<String,Map>> test = new ArrayList<Map<String, Map>>();
+        test.add(new HashMap<String, Map>());
+        test.add(new HashMap<String, Map>());
+        test.get(0).put("encounter", new HashMap<String, Integer>());
+        test.get(0).get("encounter").put("encounterType", 1);
+        test.get(1).put("encounter", new HashMap<String, Integer>());
+        test.get(1).get("encounter").put("encounterType", 2);
+
+        AppContextModel contextModel = new AppContextModel();
+        contextModel.put("test", test);
+
+        assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberThatEvaluatesTrue(test, function(it) { return it.encounter.encounterType === 1})"), contextModel));
+    }
+
 
     @Test
     public void testGetLoginLocationsShouldReturnAllLoginLocations() throws Exception {
