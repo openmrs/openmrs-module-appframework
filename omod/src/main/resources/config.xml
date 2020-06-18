@@ -38,12 +38,5 @@
 	</messages>
 	<!-- /Internationalization -->
 
-	<!-- Advice -->
-	<advice>
-		<point>org.openmrs.api.LocationService</point>
-		<class>org.openmrs.module.appframework.aop.LoginLocationsAdvice</class>
-	</advice>
-	<!-- Advice -->
-
 </module>
 

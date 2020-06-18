@@ -14,17 +14,7 @@
 
 	<dependencies>
 
-		<!-- Hack to begin with javassist dependency in orderd to override that which  
-			 ships with openmrs api for successful tests purpose
-		-->
-		<dependency>
-		        <groupId>org.javassist</groupId>
-		        <artifactId>javassist</artifactId>
-		        <version>3.18.2-GA</version>
-		        <scope>test</scope>
-	    </dependency>
-
-	    <!-- Begin OpenMRS core -->
+		<!-- Begin OpenMRS core -->
 
 		<dependency>
 			<groupId>org.openmrs.api</groupId>

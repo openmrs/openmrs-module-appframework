@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,11 +21,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.junit.Test;
-import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.openmrs.Location;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
 import org.openmrs.module.appframework.domain.AppDescriptor;
@@ -34,17 +30,10 @@ import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
 import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.appframework.feature.TestFeatureTogglePropertiesFactory;
-import org.openmrs.module.appframework.LoginLocationFilter;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
-import org.openmrs.module.appframework.repository.AllLoginLocations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
 public class AppFrameworkServiceImplTest  {
 	
 	private Validator validator = mock(Validator.class);
@@ -54,8 +43,6 @@ public class AppFrameworkServiceImplTest  {
     private AllFreeStandingExtensions allFreeStandingExtensions = new AllFreeStandingExtensions(validator);
     
     private AllComponentsState allComponentsState = new AllComponentsState();
-
-    private AllLoginLocations allLoginLocations = new AllLoginLocations();
 
     private FeatureToggleProperties featureToggles = TestFeatureTogglePropertiesFactory.get();
 
@@ -74,27 +61,11 @@ public class AppFrameworkServiceImplTest  {
     private Extension ext4;
 
     private Extension ext5;
-
-    private Location location1;
-
-    private Location location2;
     
     private AppFrameworkServiceImpl service;
 
-    private LoginLocationFilter loginLocationFilter;
-
     @Before
     public void setUp() throws Exception {
-        loginLocationFilter = new LoginLocationFilter() {
-            @Override
-            public boolean accept(Location location) {
-                return true;
-            }
-        };
-
-        PowerMockito.mockStatic(Context.class);
-        when(Context.getRegisteredComponents(eq(LoginLocationFilter.class)))
-                .thenReturn(Arrays.asList(loginLocationFilter));
 
         featureToggles.setPropertiesFile(new File(this.getClass().getResource("/" + FeatureToggleProperties.FEATURE_TOGGLE_PROPERTIES_FILE_NAME).getFile()));
 
@@ -109,22 +80,6 @@ public class AppFrameworkServiceImplTest  {
         ext3 = new Extension("ext3", "app2", "extensionPoint1", "link", "label", "url", 2);
         ext4 = new Extension("ext4", "", "extensionPoint2", "link", "label", "url", 1);
         ext5 = new Extension("ext5", "", "extensionPoint2", "link", "label", "url", 0);
-
-        location1 = new Location();
-        location2 = new Location();
-
-        // populate login locations with data
-        location1.setId(1);
-        location1.setUuid("loginLocation1_uuid");
-        location1.setName("loginLocation1");
-
-        location2.setId(2);
-        location2.setUuid("loginLocation2_uuid");
-        location2.setName("loginLocation2");
-
-        // add the login locations
-        allLoginLocations.add(location1);
-        allLoginLocations.add(location2);
 
         // add some feature toggles to these apps & extensions
         app1.setFeatureToggle("app1Toggle");
@@ -151,7 +106,7 @@ public class AppFrameworkServiceImplTest  {
     	when(sessionFactory.getCurrentSession()).thenReturn(session);
     	allComponentsState.setSessionFactory(new DbSessionFactory(sessionFactory));
     	
-    	service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null, allLoginLocations);
+    	service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
     }
 
     @After
@@ -259,24 +214,6 @@ public class AppFrameworkServiceImplTest  {
 
         assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
-    }
-
-    @Test
-    public void testGetLoginLocationsShouldReturnAllLoginLocations() throws Exception {
-        // setup
-        List<Location> loginLocations = allLoginLocations.getLoginLocations();
-
-        // replay
-        List<Location> actualLoginLocations = service.getLoginLocations();
-
-        // verify
-        assertEquals(loginLocations.size(), actualLoginLocations.size());
-        assertEquals(loginLocations.get(0).getId(), actualLoginLocations.get(0).getId());
-        assertEquals(loginLocations.get(0).getName(), actualLoginLocations.get(0).getName());
-        assertEquals(loginLocations.get(0).getUuid(), actualLoginLocations.get(0).getUuid());
-        assertEquals(loginLocations.get(1).getId(), actualLoginLocations.get(1).getId());
-        assertEquals(loginLocations.get(1).getName(), actualLoginLocations.get(1).getName());
-        assertEquals(loginLocations.get(1).getUuid(), actualLoginLocations.get(1).getUuid());
     }
 
     private Extension extensionRequiring(String requires) {
