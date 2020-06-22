@@ -262,7 +262,7 @@ public class AppFrameworkServiceImplTest  {
 
 
     @Test
-    public void testHasMemberThatEvaluatesTrueUtilityFunctionForRequireExpression() throws Exception {
+    public void testSomeUtilityFunctionForRequireExpression() throws Exception {
 
         List<Map<String,Map>> test = new ArrayList<Map<String, Map>>();
         test.add(new HashMap<String, Map>());
@@ -275,7 +275,7 @@ public class AppFrameworkServiceImplTest  {
         AppContextModel contextModel = new AppContextModel();
         contextModel.put("test", test);
 
-        assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberThatEvaluatesTrue(test, function(it) { return it.encounter.encounterType === 1})"), contextModel));
+        assertTrue(service.checkRequireExpression(extensionRequiring("some(test, function(it) { return it.encounter.encounterType === 1})"), contextModel));
     }
 
 

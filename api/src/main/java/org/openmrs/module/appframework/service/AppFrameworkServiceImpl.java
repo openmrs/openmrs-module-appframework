@@ -111,11 +111,11 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		Object hasMemberWithProperty = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("hasMemberWithProperty");
 		javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("hasMemberWithProperty", hasMemberWithProperty);
 
-		this.javascriptEngine.eval("function hasMemberThatEvaluatesTrue(list, func) { " + "if (!list) { return false; } "
+		this.javascriptEngine.eval("function some(list, func) { " + "if (!list) { return false; } "
                 + "var i, len=list.length; " + "for (i=0; i<len; ++i) { "
                 + "  if (func(list[i]) === true) { return true; } " + "} " + "return false; " + "}");
-        Object hasMemberThatEvaluatesTrue = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("hasMemberThatEvaluatesTrue");
-        javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("hasMemberThatEvaluatesTrue", hasMemberThatEvaluatesTrue);
+        Object hasMemberThatEvaluatesTrue = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("some");
+        javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("some", hasMemberThatEvaluatesTrue);
 	}
 
 	@Override
