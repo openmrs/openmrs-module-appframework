@@ -35,13 +35,13 @@ import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 
 public class AppFrameworkServiceImplTest  {
-	
+
 	private Validator validator = mock(Validator.class);
-	
+
     private AllAppDescriptors allAppDescriptors = new AllAppDescriptors(validator);
 
     private AllFreeStandingExtensions allFreeStandingExtensions = new AllFreeStandingExtensions(validator);
-    
+
     private AllComponentsState allComponentsState = new AllComponentsState();
 
     private FeatureToggleProperties featureToggles = TestFeatureTogglePropertiesFactory.get();
@@ -61,7 +61,7 @@ public class AppFrameworkServiceImplTest  {
     private Extension ext4;
 
     private Extension ext5;
-    
+
     private AppFrameworkServiceImpl service;
 
     @Before
@@ -98,14 +98,14 @@ public class AppFrameworkServiceImplTest  {
 
         // now add some free-standing extension
         allFreeStandingExtensions.add(Arrays.asList(ext3, ext4, ext5));
-        
+
         // to go through all the Hibernate stuff
         SessionFactory sessionFactory = mock(SessionFactory.class);
     	Session session = mock(Session.class);
     	when(session.createCriteria(any(Class.class))).thenReturn(mock(Criteria.class));
     	when(sessionFactory.getCurrentSession()).thenReturn(session);
     	allComponentsState.setSessionFactory(new DbSessionFactory(sessionFactory));
-    	
+
     	service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
     }
 
@@ -171,7 +171,7 @@ public class AppFrameworkServiceImplTest  {
         ext3.setFeatureToggle("!ext3Toggle");
         ext4.setFeatureToggle("!ext4Toggle");
         ext5.setFeatureToggle("!ext5Toggle");
-        
+
         List<Extension> extensionPoints = service.getAllEnabledExtensions("extensionPoint2");
 
         assertEquals(2, extensionPoints.size());
@@ -202,7 +202,7 @@ public class AppFrameworkServiceImplTest  {
     }
 
     @Test
-    public void testUtilityFunctionForRequireExpressions() throws Exception {
+    public void testHasMemberWithPropertyUtilityFunctionForRequireExpressions() throws Exception {
         AppContextModel contextModel = new AppContextModel();
         Map<String, Object> tag = new HashMap<String, Object>();
         tag.put("display", "Login Location");
@@ -214,6 +214,43 @@ public class AppFrameworkServiceImplTest  {
 
         assertTrue(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Login Location')"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
+    }
+
+
+    @Test
+    public void testSomeUtilityFunctionForRequireExpression() throws Exception {
+
+        List<Map<String,Map>> test = new ArrayList<Map<String, Map>>();
+        test.add(new HashMap<String, Map>());
+        test.add(new HashMap<String, Map>());
+        test.get(0).put("encounter", new HashMap<String, Integer>());
+        test.get(0).get("encounter").put("encounterType", 1);
+        test.get(1).put("encounter", new HashMap<String, Integer>());
+        test.get(1).get("encounter").put("encounterType", 2);
+
+        AppContextModel contextModel = new AppContextModel();
+        contextModel.put("test", test);
+
+        assertTrue(service.checkRequireExpression(extensionRequiring("some(test, function(it) { return it.encounter.encounterType === 1})"), contextModel));
+    }
+
+
+    @Test
+    public void testGetLoginLocationsShouldReturnAllLoginLocations() throws Exception {
+        // setup
+        List<Location> loginLocations = allLoginLocations.getLoginLocations();
+
+        // replay
+        List<Location> actualLoginLocations = service.getLoginLocations();
+
+        // verify
+        assertEquals(loginLocations.size(), actualLoginLocations.size());
+        assertEquals(loginLocations.get(0).getId(), actualLoginLocations.get(0).getId());
+        assertEquals(loginLocations.get(0).getName(), actualLoginLocations.get(0).getName());
+        assertEquals(loginLocations.get(0).getUuid(), actualLoginLocations.get(0).getUuid());
+        assertEquals(loginLocations.get(1).getId(), actualLoginLocations.get(1).getId());
+        assertEquals(loginLocations.get(1).getName(), actualLoginLocations.get(1).getName());
+        assertEquals(loginLocations.get(1).getUuid(), actualLoginLocations.get(1).getUuid());
     }
 
     private Extension extensionRequiring(String requires) {

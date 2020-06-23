@@ -13,19 +13,7 @@
  */
 package org.openmrs.module.appframework.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,31 +44,43 @@ import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.module.appframework.repository.AllUserApps;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * It is a default implementation of {@link AppFrameworkService}.
  */
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
-	
+
 	private final Log log = LogFactory.getLog(getClass());
-	
+
 	private AllAppTemplates allAppTemplates;
-	
+
 	private AllAppDescriptors allAppDescriptors;
-	
+
 	private AllFreeStandingExtensions allFreeStandingExtensions;
-	
+
 	private AllComponentsState allComponentsState;
-	
+
 	private LocationService locationService;
-	
+
 	private FeatureToggleProperties featureToggles;
-	
+
 	private AppFrameworkConfig appFrameworkConfig;
-	
+
 	private ScriptEngine javascriptEngine;
-	
+
 	private AllUserApps allUserApps;
-	
+
 	public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors,
 	    AllFreeStandingExtensions allFreeStandingExtensions, AllComponentsState allComponentsState,
 	    LocationService locationService, FeatureToggleProperties featureToggles, AppFrameworkConfig appFrameworkConfig,
@@ -94,25 +94,31 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.appFrameworkConfig = appFrameworkConfig;
 		this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
 		this.allUserApps = allUserApps;
-		
+
 		if (javascriptEngine == null) {
 			javascriptEngine = new jdk.nashorn.api.scripting.NashornScriptEngineFactory().getScriptEngine();
 			javascriptEngine.setBindings(javascriptEngine.createBindings(), ScriptContext.GLOBAL_SCOPE);
 		}
-		
+
 		// there is surely a cleaner way to define this utility function in the global scope
 		this.javascriptEngine.eval("function hasMemberWithProperty(list, propName, val) { " + "if (!list) { return false; } "
 		        + "var i, len=list.length; " + "for (i=0; i<len; ++i) { "
 		        + "  if (list[i][propName] == val) { return true; } " + "} " + "return false; " + "}");
 		Object hasMemberWithProperty = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("hasMemberWithProperty");
 		javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("hasMemberWithProperty", hasMemberWithProperty);
+
+		this.javascriptEngine.eval("function some(list, func) { " + "if (!list) { return false; } "
+                + "var i, len=list.length; " + "for (i=0; i<len; ++i) { "
+                + "  if (func(list[i]) === true) { return true; } " + "} " + "return false; " + "}");
+        Object hasMemberThatEvaluatesTrue = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("some");
+        javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("some", hasMemberThatEvaluatesTrue);
 	}
-	
+
 	@Override
 	public List<AppDescriptor> getAllApps() {
 		return allAppDescriptors.getAppDescriptors();
 	}
-	
+
 	@Override
 	public List<Extension> getExtensionsById(String extensionPointId, String id) {
 		List<Extension> matchingExtensions = new ArrayList<Extension>();
@@ -123,7 +129,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		}
 		return matchingExtensions;
 	}
-	
+
 	@Override
 	// TODO shouldn't this be getAllFreeStandingExtensions?
 	public List<Extension> getAllExtensions(String extensionPointId) {
@@ -134,13 +140,13 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		}
 		return matchingExtensions;
 	}
-	
+
 	@Override
 	public List<AppDescriptor> getAllEnabledApps() {
-		
+
 		// first just get all apps
 		List<AppDescriptor> appDescriptors = getAllApps();
-		
+
 		// find out which ones are disabled
 		List<AppDescriptor> disabledAppDescriptors = new ArrayList<AppDescriptor>();
 		for (AppDescriptor appDescriptor : appDescriptors) {
@@ -149,47 +155,47 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				disabledAppDescriptors.add(appDescriptor);
 			}
 		}
-		
+
 		// remove disabled apps
 		appDescriptors.removeAll(disabledAppDescriptors);
 		return appDescriptors;
 	}
-	
+
 	private boolean disabledByComponentState(AppDescriptor appDescriptor) {
 		ComponentState componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
 		return componentState != null && !componentState.getEnabled();
 	}
-	
+
 	private boolean disabledByFeatureToggle(AppDescriptor appDescriptor) {
 		return disabledByFeatureToggle(appDescriptor.getFeatureToggle());
 	}
-	
+
 	private boolean disabledByFeatureToggle(String featureToggle) {
-		
+
 		if (StringUtils.isBlank(featureToggle)) {
 			return false;
 		}
-		
+
 		Boolean negated = false;
-		
+
 		if (featureToggle.startsWith("!")) {
 			featureToggle = featureToggle.substring(1);
 			negated = true;
 		}
-		
+
 		Boolean featureEnabled = featureToggles.isFeatureEnabled(featureToggle);
-		
+
 		return (!negated && !featureEnabled) || (negated && featureEnabled);
 	}
-	
+
 	private boolean disabledByAppFrameworkConfig(AppDescriptor appDescriptor) {
 		return !appFrameworkConfig.isEnabled(appDescriptor);
 	}
-	
+
 	@Override
 	public List<Extension> getAllEnabledExtensions() {
 		List<Extension> extensions = new ArrayList<Extension>();
-		
+
 		// first get all extensions from enabled apps
 		for (AppDescriptor app : getAllEnabledApps()) {
 			if (app.getExtensions() != null) {
@@ -201,7 +207,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				}
 			}
 		}
-		
+
 		// now get "standalone extensions"
 		for (Extension extension : allFreeStandingExtensions.getExtensions()) {
 			if (!disabledByFeatureToggle(extension) && !disabledByComponentState(extension)
@@ -209,18 +215,18 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				extensions.add(extension);
 			}
 		}
-		
+
 		Collections.sort(extensions);
 		return extensions;
 	}
-	
+
 	/**
 	 * @see org.openmrs.module.appframework.service.AppFrameworkService#getAllEnabledExtensions(java.lang.String)
 	 */
 	@Override
 	public List<Extension> getAllEnabledExtensions(String extensionPointId) {
 		List<Extension> extensions = new ArrayList<Extension>();
-		
+
 		// first get all extensions from enabled apps
 		for (AppDescriptor app : getAllEnabledApps()) {
 			if (app.getExtensions() != null) {
@@ -233,7 +239,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				}
 			}
 		}
-		
+
 		// now get "standalone extensions"
 		for (Extension extension : allFreeStandingExtensions.getExtensions()) {
 			if (matchesExtensionPoint(extension, extensionPointId) && !disabledByFeatureToggle(extension)
@@ -241,63 +247,63 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				extensions.add(extension);
 			}
 		}
-		
+
 		Collections.sort(extensions);
 		return extensions;
 	}
-	
+
 	private boolean matchesExtensionPoint(Extension extension, String extensionPointId) {
 		return extensionPointId == null || extensionPointId.equals(extension.getExtensionPointId());
 	}
-	
+
 	private boolean disabledByComponentState(Extension extension) {
 		ComponentState componentState = allComponentsState.getComponentState(extension.getId(), ComponentType.EXTENSION);
 		return componentState != null && !componentState.getEnabled();
 	}
-	
+
 	private boolean disabledByFeatureToggle(Extension extension) {
 		return disabledByFeatureToggle(extension.getFeatureToggle());
 	}
-	
+
 	private boolean disabledByAppFrameworkConfig(Extension extension) {
 		return !appFrameworkConfig.isEnabled(extension);
 	}
-	
+
 	@Override
 	public void enableApp(String appId) {
 		allComponentsState.setComponentState(appId, ComponentType.APP, true);
 	}
-	
+
 	@Override
 	public void disableApp(String appId) {
 		allComponentsState.setComponentState(appId, ComponentType.APP, false);
 	}
-	
+
 	@Override
 	public void enableExtension(String extensionId) {
 		allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, true);
 	}
-	
+
 	@Override
 	public void disableExtension(String extensionId) {
 		allComponentsState.setComponentState(extensionId, ComponentType.EXTENSION, false);
 	}
-	
+
 	@Override
 	public List<Extension> getExtensionsForCurrentUser() {
 		return getExtensionsForCurrentUser(null);
 	}
-	
+
 	@Override
 	public List<Extension> getExtensionsForCurrentUser(String extensionPointId) {
 		return getExtensionsForCurrentUser(extensionPointId, null);
 	}
-	
+
 	@Override
 	public List<Extension> getExtensionsForCurrentUser(String extensionPointId, AppContextModel contextModel) {
 		List<Extension> extensions = new ArrayList<Extension>();
 		UserContext userContext = Context.getUserContext();
-		
+
 		for (Extension candidate : getAllEnabledExtensions(extensionPointId)) {
 			if ((candidate.getBelongsTo() == null
 			        || hasPrivilege(userContext, candidate.getBelongsTo().getRequiredPrivilege()))
@@ -307,10 +313,10 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				}
 			}
 		}
-		
+
 		return extensions;
 	}
-	
+
 	@Override
 	public boolean checkRequireExpression(Requireable candidate, AppContextModel contextModel) {
 		try {
@@ -331,7 +337,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 						bindings.put(e.getKey(), e.getValue());
 					}
 				}
-				
+
 				javascriptEngine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 				ObjectMapper jackson = new ObjectMapper();
 				for (Map.Entry<String, Object> e : mapProperties.entrySet()) {
@@ -356,24 +362,24 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 						return false;
 					}
 				}
-				
+
 				return javascriptEngine.eval("(" + requireExpression + ") == true").equals(Boolean.TRUE);
 			}
-			
+
 		}
 		catch (Exception e) {
 			log.error("Failed to evaluate 'require' check for extension " + candidate.getId(), e);
 			return false;
 		}
 	}
-	
+
 	@Override
 	public List<AppDescriptor> getAppsForCurrentUser() {
 		List<AppDescriptor> userApps = new ArrayList<AppDescriptor>();
 		UserContext userContext = Context.getUserContext();
-		
+
 		List<AppDescriptor> enabledApps = getAllEnabledApps();
-		
+
 		for (AppDescriptor candidate : enabledApps) {
 			if (hasPrivilege(userContext, candidate.getRequiredPrivilege())) {
 				userApps.add(candidate);
@@ -381,7 +387,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		}
 		return userApps;
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<Location> getLoginLocations() {
@@ -391,7 +397,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		if (filters.isEmpty()) {
 			return locations;
 		}
-		
+
 		List<Location> allowedLocations = new ArrayList();
 		for (Location location : locations) {
 			boolean exclude = false;
@@ -401,44 +407,44 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 					break;
 				}
 			}
-			
+
 			if (!exclude) {
 				allowedLocations.add(location);
 			}
 		}
-		
+
 		return allowedLocations;
 	}
-	
+
 	private boolean hasPrivilege(UserContext userContext, String privilege) {
 		return StringUtils.isBlank(privilege) || userContext.hasPrivilege(privilege);
 	}
-	
+
 	@Override
 	public List<AppTemplate> getAllAppTemplates() {
 		return allAppTemplates.getAppTemplates();
 	}
-	
+
 	@Override
 	public AppTemplate getAppTemplate(String id) {
 		return allAppTemplates.getAppTemplate(id);
 	}
-	
+
 	@Override
 	public AppDescriptor getApp(String id) {
 		return allAppDescriptors.getAppDescriptor(id);
 	}
-	
+
 	@Override
 	public UserApp getUserApp(String appId) {
 		return allUserApps.getUserApp(appId);
 	}
-	
+
 	@Override
 	public List<UserApp> getUserApps() {
 		return allUserApps.getUserApps();
 	}
-	
+
 	@Override
 	public UserApp saveUserApp(UserApp userApp) {
 		UserApp toReturn = allUserApps.saveUserApp(userApp);
@@ -446,11 +452,11 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		new AppFrameworkActivator().contextRefreshed();
 		return toReturn;
 	}
-	
+
 	@Override
 	public void purgeUserApp(UserApp userApp) {
 		allUserApps.deleteUserApp(userApp);
 		new AppFrameworkActivator().contextRefreshed();
 	}
-	
+
 }
