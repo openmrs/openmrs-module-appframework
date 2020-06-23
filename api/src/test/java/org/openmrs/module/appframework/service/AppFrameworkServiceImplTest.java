@@ -1,21 +1,5 @@
 package org.openmrs.module.appframework.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.validation.Validator;
-
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
@@ -33,6 +17,21 @@ import org.openmrs.module.appframework.feature.TestFeatureTogglePropertiesFactor
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllComponentsState;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
+
+import javax.validation.Validator;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AppFrameworkServiceImplTest  {
 
@@ -232,25 +231,6 @@ public class AppFrameworkServiceImplTest  {
         contextModel.put("test", test);
 
         assertTrue(service.checkRequireExpression(extensionRequiring("some(test, function(it) { return it.encounter.encounterType === 1})"), contextModel));
-    }
-
-
-    @Test
-    public void testGetLoginLocationsShouldReturnAllLoginLocations() throws Exception {
-        // setup
-        List<Location> loginLocations = allLoginLocations.getLoginLocations();
-
-        // replay
-        List<Location> actualLoginLocations = service.getLoginLocations();
-
-        // verify
-        assertEquals(loginLocations.size(), actualLoginLocations.size());
-        assertEquals(loginLocations.get(0).getId(), actualLoginLocations.get(0).getId());
-        assertEquals(loginLocations.get(0).getName(), actualLoginLocations.get(0).getName());
-        assertEquals(loginLocations.get(0).getUuid(), actualLoginLocations.get(0).getUuid());
-        assertEquals(loginLocations.get(1).getId(), actualLoginLocations.get(1).getId());
-        assertEquals(loginLocations.get(1).getName(), actualLoginLocations.get(1).getName());
-        assertEquals(loginLocations.get(1).getUuid(), actualLoginLocations.get(1).getUuid());
     }
 
     private Extension extensionRequiring(String requires) {
