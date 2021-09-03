@@ -3,6 +3,8 @@ package org.openmrs.module.appframework.service;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
+import org.joda.time.LocalDate;
+import org.joda.time.Months;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 
 import javax.validation.Validator;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -215,7 +218,6 @@ public class AppFrameworkServiceImplTest  {
         assertFalse(service.checkRequireExpression(extensionRequiring("hasMemberWithProperty(sessionLocation.tags, 'display', 'Not this tag')"), contextModel));
     }
 
-
     @Test
     public void testSomeUtilityFunctionForRequireExpression() throws Exception {
 
@@ -231,6 +233,28 @@ public class AppFrameworkServiceImplTest  {
         contextModel.put("test", test);
 
         assertTrue(service.checkRequireExpression(extensionRequiring("some(test, function(it) { return it.encounter.encounterType === 1})"), contextModel));
+    }
+
+    @Test
+    public void testFullMonthsBetweenDatesUtilityFunctionForRequireExpressions() throws Exception {
+        AppContextModel contextModel = new AppContextModel();
+        Map<String, Object> obj = new HashMap<String, Object>();
+        contextModel.put("sessionLocation", obj);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        LocalDate d1 = new LocalDate(2021, 4, 12);
+        LocalDate d2 = new LocalDate(2021, 4, 12);
+
+        String d1Str = d1.toString("yyyy-MM-dd");
+
+        for (int i=0; i<1000; i++) {
+            String d2Str = d2.toString("yyyy-MM-dd");
+            int monthsExpected = Months.monthsBetween(d1, d2).getMonths();
+            String expr = "fullMonthsBetweenDates('" + d1Str + "', '" + d2Str + "') == " + monthsExpected;
+            System.out.println("Checking expression is true: " + expr);
+            assertTrue(service.checkRequireExpression(extensionRequiring(expr), contextModel));
+            d2 = d2.plusDays(1);
+        }
     }
 
     private Extension extensionRequiring(String requires) {

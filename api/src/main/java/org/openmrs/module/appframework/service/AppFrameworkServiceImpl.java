@@ -110,8 +110,18 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.javascriptEngine.eval("function some(list, func) { " + "if (!list) { return false; } "
                 + "var i, len=list.length; " + "for (i=0; i<len; ++i) { "
                 + "  if (func(list[i]) === true) { return true; } " + "} " + "return false; " + "}");
-        Object hasMemberThatEvaluatesTrue = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("some");
-        javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("some", hasMemberThatEvaluatesTrue);
+        Object some = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("some");
+        javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("some", some);
+
+		this.javascriptEngine.eval("function fullMonthsBetweenDates(earlierDate, laterDate) { "
+				+ "var d1 = new Date(earlierDate); "
+				+ "var d2 = new Date(laterDate); "
+				+ "var monthsBetween = ((d2.getFullYear() - d1.getFullYear()) * 12) + (d2.getMonth() - d1.getMonth()); "
+				+ "if (d2.getDate() < d1.getDate()) { monthsBetween = monthsBetween - 1; } "
+				+ "return monthsBetween; "
+				+ "}");
+		Object fullMonthsBetweenDates = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("fullMonthsBetweenDates");
+		javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("fullMonthsBetweenDates", fullMonthsBetweenDates);
 	}
 
 	@Override
