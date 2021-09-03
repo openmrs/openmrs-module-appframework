@@ -251,7 +251,6 @@ public class AppFrameworkServiceImplTest  {
             String d2Str = d2.toString("yyyy-MM-dd");
             int monthsExpected = Months.monthsBetween(d1, d2).getMonths();
             String expr = "fullMonthsBetweenDates('" + d1Str + "', '" + d2Str + "') == " + monthsExpected;
-            System.out.println("Checking expression is true: " + expr);
             assertTrue(service.checkRequireExpression(extensionRequiring(expr), contextModel));
             d2 = d2.plusDays(1);
         }
