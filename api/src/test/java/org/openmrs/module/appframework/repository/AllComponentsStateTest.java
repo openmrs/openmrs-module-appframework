@@ -1,34 +1,30 @@
 package org.openmrs.module.appframework.repository;
 
 import org.hibernate.Criteria;
-import org.openmrs.api.db.hibernate.DbSessionFactory;  
-import org.openmrs.api.db.hibernate.DbSession;  
-import org.hibernate.criterion.Criterion;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 public class AllComponentsStateTest {
 
-    @Mock
     private DbSessionFactory sessionFactory;
-
     private AllComponentsState allComponentsState;
 
     @Before
-    public void setUp() throws Exception {
-        initMocks(this);
+    public void setUp() {
+        sessionFactory = Mockito.mock(DbSessionFactory.class);
         allComponentsState = new AllComponentsState();
         allComponentsState.setSessionFactory(sessionFactory);
     }
@@ -48,10 +44,10 @@ public class AllComponentsStateTest {
         ArgumentCaptor<ComponentState> componentStateArgumentCaptor = ArgumentCaptor.forClass(ComponentState.class);
         verify(mockSession).saveOrUpdate(componentStateArgumentCaptor.capture());
         ComponentState componentState = componentStateArgumentCaptor.getValue();
-        assertEquals(null, componentState.getId());
+        assertNull(componentState.getId());
         assertEquals(componentId, componentState.getComponentId());
         assertEquals(componentType, componentState.getComponentType());
-        assertEquals(true, (boolean) componentState.getEnabled());
+        assertTrue(componentState.getEnabled());
     }
 
     @Test

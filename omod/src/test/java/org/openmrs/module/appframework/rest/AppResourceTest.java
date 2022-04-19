@@ -1,26 +1,26 @@
 package org.openmrs.module.appframework.rest;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.ExtensionPoint;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.openmrs.module.appframework.test.Matchers.hasEntry;
 
 public class AppResourceTest extends BaseModuleWebContextSensitiveTest {
 
     private AppDescriptor app;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() {
         ExtensionPoint extensionPoint1 = new ExtensionPoint("extPtId", "extDescr");
         ExtensionPoint extensionPoint2 = new ExtensionPoint("two", "2d");
         app = new AppDescriptor("id", "description", "label", "http://url", "icon-something", "icon-tiny", 5,
@@ -28,7 +28,7 @@ public class AppResourceTest extends BaseModuleWebContextSensitiveTest {
     }
 
     @Test
-    public void testDefaultRepresentation() throws Exception {
+    public void testDefaultRepresentation() {
         SimpleObject actual = new AppResource().asRepresentation(app, Representation.DEFAULT);
         assertThat(actual, hasEntry("uuid", is("id")));
         assertThat(actual, hasEntry("description", is("description")));

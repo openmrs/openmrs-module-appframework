@@ -1,24 +1,24 @@
 package org.openmrs.module.appframework.rest;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.openmrs.module.appframework.test.Matchers.hasEntry;
 
 public class ExtensionResourceTest extends BaseModuleWebContextSensitiveTest {
 
     private Extension extension;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("foo", "bar");

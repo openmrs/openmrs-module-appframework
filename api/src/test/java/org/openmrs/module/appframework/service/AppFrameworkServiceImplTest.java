@@ -1,13 +1,13 @@
 package org.openmrs.module.appframework.service;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
 import org.joda.time.LocalDate;
 import org.joda.time.Months;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.appframework.config.AppFrameworkConfig;
 import org.openmrs.module.appframework.context.AppContextModel;
@@ -66,7 +66,7 @@ public class AppFrameworkServiceImplTest  {
 
     private AppFrameworkServiceImpl service;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         featureToggles.setPropertiesFile(new File(this.getClass().getResource("/" + FeatureToggleProperties.FEATURE_TOGGLE_PROPERTIES_FILE_NAME).getFile()));
@@ -111,7 +111,7 @@ public class AppFrameworkServiceImplTest  {
     	service = new AppFrameworkServiceImpl(null, allAppDescriptors, allFreeStandingExtensions, allComponentsState, null, featureToggles, appFrameworkConfig, null);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         allAppDescriptors.clear();
         allFreeStandingExtensions.clear();

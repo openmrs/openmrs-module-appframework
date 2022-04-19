@@ -1,29 +1,18 @@
 package org.openmrs.module.appframework.web;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.appframework.service.AppFrameworkService;
+import org.mockito.Mockito;
 import org.openmrs.module.appframework.domain.AppDescriptor;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.openmrs.module.appframework.service.AppFrameworkService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
-@PrepareForTest(Context.class)
-@RunWith(PowerMockRunner.class)
 public class AppFrameworkControllerTest {
-
-    @Mock
-    AppFrameworkService mockAppFrameworkService;
 
     private List<AppDescriptor> getTestAppList() {
         List<AppDescriptor> appDescriptorList = new ArrayList<AppDescriptor>();
@@ -35,12 +24,11 @@ public class AppFrameworkControllerTest {
 
     @Test
     public void testGetAllApps() throws Exception {
-        mockStatic(Context.class);
-        when(Context.getService(AppFrameworkService.class)).thenReturn(mockAppFrameworkService);
+        AppFrameworkService mockAppFrameworkService = Mockito.mock(AppFrameworkService.class);
         when(mockAppFrameworkService.getAllApps()).thenReturn(getTestAppList());
-
-        List<AppDescriptor> appList = new AppFrameworkController().getApps();
-
+        AppFrameworkController appFrameworkController = new AppFrameworkController();
+        appFrameworkController.setAppFrameworkService(mockAppFrameworkService);
+        List<AppDescriptor> appList = appFrameworkController.getApps();
         assertNotNull(appList);
         assertEquals(3, appList.size());
         assertEquals("app1", appList.get(0).getId());

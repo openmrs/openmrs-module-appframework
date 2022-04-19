@@ -1,13 +1,12 @@
 package org.openmrs.module.appframework.factory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.repository.AllAppDescriptors;
 import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +25,6 @@ public class AppConfigurationLoaderFactoryTest extends BaseModuleContextSensitiv
     AllFreeStandingExtensions allFreeStandingExtensions;
 
     @Test
-    @DirtiesContext
     public void testConfigurationLoad() throws IOException {
 
         List<AppDescriptor> appDescriptors = appConfigurationLoaderFactory.getAppDescriptors();

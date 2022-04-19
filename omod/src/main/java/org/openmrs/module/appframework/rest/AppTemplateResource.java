@@ -13,7 +13,7 @@ import org.openmrs.module.webservices.rest.web.resource.impl.BaseDelegatingReada
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 
-@Resource(name = RestConstants.VERSION_1 + "/apptemplate", supportedClass = AppTemplate.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*", "2.4.*"})
+@Resource(name = RestConstants.VERSION_1 + "/apptemplate", supportedClass = AppTemplate.class, supportedOpenmrsVersions = {"1.9.* - 9.9.*"})
 public class AppTemplateResource extends BaseDelegatingReadableResource<AppTemplate> {
 
     private AppFrameworkService getService() {

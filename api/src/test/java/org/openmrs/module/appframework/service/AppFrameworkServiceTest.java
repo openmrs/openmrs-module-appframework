@@ -13,24 +13,8 @@
  */
 package org.openmrs.module.appframework.service;
 
-import static junit.framework.Assert.assertNotNull;
-import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.script.Bindings;
-
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.Person;
@@ -50,13 +34,24 @@ import org.openmrs.module.appframework.domain.AppDescriptor;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.domain.Extension;
 import org.openmrs.module.appframework.domain.UserApp;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.test.Verifies;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 
-@DirtiesContext
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
 	public static final String LOCATION_UUID1 = "6f42abbc-caac-40ae-a94e-9277ea15c125";
@@ -72,8 +67,9 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	@Autowired
 	private AppFrameworkConfig appFrameworkConfig;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
+		authenticate();
 		//trigger loading of the apps
 		new AppFrameworkActivator().contextRefreshed();
 	}
@@ -130,7 +126,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAllEnabledExtensions(String)}
 	 */
 	@Test
-	@Verifies(value = "should get all extensions for the specified extensionPointId", method = "getAllEnabledExtensions(String)")
 	public void getAllEnabledExtensions_shouldGetAllExtensionsForTheSpecifiedExtensionPointId() throws Exception {
 		List<Extension> visitExts = appFrameworkService.getAllEnabledExtensions("activeVisitActions");
 		assertEquals(1, visitExts.size());
@@ -145,7 +140,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAppsForCurrentUser()}
 	 */
 	@Test
-	@Verifies(value = "should get all enabled apps for the currently logged in user", method = "getAppsForCurrentUser()")
 	public void getAppsForCurrentUser_shouldGetAllEnabledAppsForTheCurrentlyLoggedInUser() throws Exception {
 		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
 		Context.authenticate(user.getUsername(), "Openmr5xy");
@@ -165,7 +159,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getExtensionsForCurrentUser()}
 	 */
 	@Test
-	@Verifies(value = "should get all enabled extensions for the currently logged in user", method = "getExtensionsForCurrentUser()")
 	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheCurrentlyLoggedInUser() throws Exception {
 		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
 		Context.authenticate(user.getUsername(), "Openmr5xy");
@@ -196,7 +189,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getAppsForCurrentUser()}
 	 */
 	@Test
-	@Verifies(value = "should return apps with no required privilege if there is no authenticated user", method = "getAppsForCurrentUser()")
 	public void getAppsForCurrentUser_shouldReturnNoAppIfThereIsNoAuthenticatedUser() throws Exception {
 		setupPrivilegesRolesAndUser("Some Random Privilege");
 		if (Context.getAuthenticatedUser() != null)
@@ -211,9 +203,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @see {@link AppFrameworkService#getExtensionsForCurrentUser()}
 	 */
 	@Test
-	@Verifies(value = "should return extensions with no required privilege if there is no authenticated user", method = "getExtensionsForCurrentUser()")
-	public void getExtensionsForCurrentUser_shouldReturnExtensionsWithNoRequiredPrivilegeIfThereIsNoAuthenticatedUser()
-	    throws Exception {
+	public void getExtensionsForCurrentUser_shouldReturnExtensionsWithNoRequiredPrivilegeIfThereIsNoAuthenticatedUser() {
 		setupPrivilegesRolesAndUser("Some Random Privilege");
 		if (Context.getAuthenticatedUser() != null)
 			Context.logout();
@@ -227,7 +217,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @verifies get all enabled extensions for the logged in user and extensionPointId
 	 */
 	@Test
-	@Verifies(value = "should return no extension if there is no authenticated user", method = "getExtensionsForCurrentUser(String)")
 	public void getExtensionsForCurrentUser_shouldReturnNoExtensionForNoLoggedInUser() throws Exception {
 		Context.logout();
 		List<Extension> userExts = appFrameworkService.getExtensionsForCurrentUser("activeVisitActions");
@@ -239,9 +228,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @verifies get all enabled extensions for the logged in user and extensionPointId
 	 */
 	@Test
-	@Verifies(value = "should get all enabled extensions for the logged in user and extension point id", method = "getExtensionsForCurrentUser(String)")
-	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheLoggedInUserAndExtensionPointId()
-	    throws Exception {
+	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheLoggedInUserAndExtensionPointId() {
 		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
 		Context.authenticate(user.getUsername(), "Openmr5xy");
 		assertEquals(user, Context.getAuthenticatedUser());
@@ -256,7 +243,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @verifies get all enabled extensions for the logged in user and extensionPointId
 	 */
 	@Test
-	@Verifies(value = "should return no extension for is user does not have privilege", method = "getExtensionsForCurrentUser(String)")
 	public void getExtensionsForCurrentUser_shouldReturnNoExtensionForUserWithoutPrivilege() throws Exception {
 		User user = setupPrivilegesRolesAndUser("Another Random Ext Privilege");
 		Context.authenticate(user.getUsername(), "Openmr5xy");
@@ -271,9 +257,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	 * @verifies get all enabled extensions for the logged in user and extensionPointId
 	 */
 	@Test
-	@Verifies(value = "should return just extensions of the id for super user", method = "getExtensionsForCurrentUser(String)")
-	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheSuperUserAndExtensionPointId()
-	    throws Exception {
+	public void getExtensionsForCurrentUser_shouldGetAllEnabledExtensionsForTheSuperUserAndExtensionPointId() {
 		
 		User user = new User();
 		user.setPerson(new Person());
@@ -292,12 +276,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertEquals(1, userExts.size());
 		assertEquals("orderXrayExtension", userExts.get(0).getId());
 	}
-	
-	/**
-	 * @see AppFrameworkService#getExtensionsForCurrentUser(String, Bindings)
-	 * @verifies get enabled extensions for the current user whose require property matches the
-	 *           contextModel
-	 */
+
 	@Test
 	public void getExtensionsForCurrentUser_shouldGetEnabledExtensionsForTheCurrentUserByRequireProperty() throws Exception {
 		User user = setupPrivilegesRolesAndUser("Some Random Privilege");
@@ -351,7 +330,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	}
 	
 	@Test
-	@Verifies(value = "should get all enabled apps", method = "getAllEnabledApps()")
 	public void getAllEnabledApps_shouldGetAllEnabledApps() throws Exception {
 		List<AppDescriptor> apps = appFrameworkService.getAllEnabledApps();
 		assertEquals(4, apps.size());//should include the app with that requires no privilege
@@ -438,7 +416,7 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertEquals(--originalAppDescriptorCount, appFrameworkService.getAllApps().size());
 	}
 	
-	@DirtiesContext
+	
 	@Test
 	public void getLoginLocations_shouldReturnLoginLocationsConfiguredForTheUser() {
 		LocationTag tag = new LocationTag();

@@ -5,22 +5,22 @@ import org.codehaus.jackson.node.TextNode;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.appframework.AppFrameworkActivator;
 import org.openmrs.module.appframework.domain.AppTemplate;
 import org.openmrs.module.appframework.service.AppFrameworkService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.util.OpenmrsUtil;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.openmrs.module.appframework.test.Matchers.hasEntry;
 
 public class AppTemplateResourceTest extends BaseModuleWebContextSensitiveTest {
@@ -28,8 +28,8 @@ public class AppTemplateResourceTest extends BaseModuleWebContextSensitiveTest {
     @Autowired
     private AppFrameworkService service;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() {
         new AppFrameworkActivator().contextRefreshed();
     }
 
