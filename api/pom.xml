@@ -70,6 +70,14 @@
             <artifactId>handlebars</artifactId>
         </dependency>
 
+		<!-- For Testing -->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.10.10</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
