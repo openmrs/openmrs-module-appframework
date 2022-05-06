@@ -15,7 +15,6 @@ import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.PropertyGetter;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
 import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
-import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
 import org.openmrs.module.webservices.rest.web.resource.api.Searchable;
@@ -25,7 +24,7 @@ import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/extension", supportedClass = Extension.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*", "2.4.*" })
+@Resource(name = RestConstants.VERSION_1 + "/extension", supportedClass = Extension.class, supportedOpenmrsVersions = {"1.9.* - 9.*" })
 public class ExtensionResource extends BaseDelegatingReadableResource<Extension> implements Searchable {
 
     private AppFrameworkService getService() {
