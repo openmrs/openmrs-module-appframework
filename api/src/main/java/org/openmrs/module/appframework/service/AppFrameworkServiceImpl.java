@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.api.LocationService;
@@ -96,7 +97,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.allUserApps = allUserApps;
 
 		if (javascriptEngine == null) {
-			javascriptEngine = new jdk.nashorn.api.scripting.NashornScriptEngineFactory().getScriptEngine();
+			javascriptEngine = new NashornScriptEngineFactory().getScriptEngine();
 			javascriptEngine.setBindings(javascriptEngine.createBindings(), ScriptContext.GLOBAL_SCOPE);
 		}
 

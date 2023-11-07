@@ -70,6 +70,12 @@
             <artifactId>handlebars</artifactId>
         </dependency>
 
+		<dependency>
+			<groupId>org.openjdk.nashorn</groupId>
+			<artifactId>nashorn-core</artifactId>
+		</dependency>
+
+
 		<!-- For Testing -->
 		<dependency>
 			<groupId>joda-time</groupId>
