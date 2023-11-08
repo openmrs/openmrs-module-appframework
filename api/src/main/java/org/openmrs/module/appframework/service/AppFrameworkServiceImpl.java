@@ -96,7 +96,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.allUserApps = allUserApps;
 
 		if (javascriptEngine == null) {
-			javascriptEngine = new jdk.nashorn.api.scripting.NashornScriptEngineFactory().getScriptEngine();
+			javascriptEngine = new ScriptEngineManager().getEngineByName("graal.js");
 			javascriptEngine.setBindings(javascriptEngine.createBindings(), ScriptContext.GLOBAL_SCOPE);
 		}
 
