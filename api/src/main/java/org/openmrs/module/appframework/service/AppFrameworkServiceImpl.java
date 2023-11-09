@@ -92,13 +92,10 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.locationService = locationService;
 		this.featureToggles = featureToggles;
 		this.appFrameworkConfig = appFrameworkConfig;
+		System.setProperty("polyglot.js.nashorn-compat", "true");
 		this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
 		this.allUserApps = allUserApps;
 
-		if (javascriptEngine == null) {
-			javascriptEngine = new ScriptEngineManager().getEngineByName("graal.js");
-			javascriptEngine.setBindings(javascriptEngine.createBindings(), ScriptContext.GLOBAL_SCOPE);
-		}
 
 		// there is surely a cleaner way to define this utility function in the global scope
 		this.javascriptEngine.eval("function hasMemberWithProperty(list, propName, val) { " + "if (!list) { return false; } "
@@ -346,9 +343,13 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 					} else {
 						bindings.put(e.getKey(), e.getValue());
 					}
-				}
+			}
 
-				javascriptEngine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+			for (Map.Entry<String, Object> e : contextModel.entrySet()) {
+				String jsonValue = new ObjectMapper().writeValueAsString(e.getValue());
+				javascriptEngine.eval(e.getKey() + " = " + jsonValue);
+			}
+
 				ObjectMapper jackson = new ObjectMapper();
 				for (Map.Entry<String, Object> e : mapProperties.entrySet()) {
 					try {
