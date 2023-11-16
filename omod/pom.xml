@@ -86,7 +86,7 @@
 	        <version>3.18.2-GA</version>
 	        <scope>test</scope>
 	    </dependency>
-		
+
 	</dependencies>
 
 	<build>
