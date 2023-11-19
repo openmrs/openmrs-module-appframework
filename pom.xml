@@ -280,7 +280,10 @@
 						<version>2.22.1</version>
 						<configuration>
 							<argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-							<argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+							<argLine>--add-opens java.base/java.lang=ALL-UNNAMED
+								--add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+								--add-opens java.base/java.security=ALL-UNNAMED
+							</argLine>
 						</configuration>
 					</plugin>
 				</plugins>
