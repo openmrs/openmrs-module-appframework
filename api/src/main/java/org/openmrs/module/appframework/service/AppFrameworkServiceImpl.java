@@ -13,7 +13,6 @@
  */
 package org.openmrs.module.appframework.service;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,12 +43,10 @@ import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.module.appframework.repository.AllUserApps;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -335,25 +332,20 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 				// with dot notation, but ScriptEngine and Bindings don't naturally handle this. Instead we will convert
 				// all Map-type properties to JSON and use this to define objects directly within the ScriptEngine.
 				// (Properties that are not Maps don't need this special treatment.)
-				Bindings bindings = new SimpleBindings();
-				Map<String, Object> mapProperties = new HashMap<String, Object>();
+				ObjectMapper objectMapper = new ObjectMapper();
+				Map<String, Object> mapProperties = new HashMap<>();
 				for (Map.Entry<String, Object> e : contextModel.entrySet()) {
 					if (e.getValue() instanceof Map) {
 						mapProperties.put(e.getKey(), e.getValue());
-					} else {
-						bindings.put(e.getKey(), e.getValue());
 					}
-			}
+					else if(!"util".equals(e.getKey())) {
+						javascriptEngine.eval("var " + e.getKey() + " = " + objectMapper.writeValueAsString(e.getValue()) + ";");
+					}
+				}
 
-			for (Map.Entry<String, Object> e : contextModel.entrySet()) {
-				String jsonValue = new ObjectMapper().writeValueAsString(e.getValue());
-				javascriptEngine.eval(e.getKey() + " = " + jsonValue);
-			}
-
-				ObjectMapper jackson = new ObjectMapper();
 				for (Map.Entry<String, Object> e : mapProperties.entrySet()) {
 					try {
-						javascriptEngine.eval("var " + e.getKey() + " = " + jackson.writeValueAsString(e.getValue()) + ";");
+						javascriptEngine.eval("var " + e.getKey() + " = " + objectMapper.writeValueAsString(e.getValue()) + ";");
 					}
 					catch (Exception ex) {
 						StringBuilder extraInfo = new StringBuilder();

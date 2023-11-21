@@ -2,7 +2,7 @@ package org.openmrs.module.appframework.service;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.joda.time.LocalDate;
 import org.joda.time.Months;
 import org.junit.After;

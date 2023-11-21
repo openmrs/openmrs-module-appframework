@@ -35,7 +35,7 @@
     </modules>
 	
 	<properties>
-		<openMRSVersion>1.9.9</openMRSVersion>
+		<openMRSVersion>2.0.0</openMRSVersion>
 		<webservicesRestVersion>2.21.0</webservicesRestVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <handlebarsVersion>1.1.2</handlebarsVersion>
@@ -142,7 +142,6 @@
 				<groupId>org.graalvm.js</groupId>
 				<artifactId>js</artifactId>
 				<version>${graalvm.version}</version>
-				<scope>runtime</scope>
 			</dependency>
 
 			<dependency>
@@ -154,21 +153,17 @@
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
 				<artifactId>xstream</artifactId>
-				<scope>test</scope>
 				<version>1.4.17</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.xml.bind</groupId>
 				<artifactId>jakarta.xml.bind-api</artifactId>
+				<scope>test</scope>
 				<version>2.3.2</version>
 			</dependency>
 
-			<dependency>
-				<groupId>org.glassfish.jaxb</groupId>
-				<artifactId>jaxb-runtime</artifactId>
-				<version>4.0.0</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -226,10 +221,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.22.1</version>
-					<configuration>
-						<argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -278,9 +269,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.22.1</version>
 						<configuration>
-							<argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
 							<argLine>--add-opens java.base/java.lang=ALL-UNNAMED
 								--add-opens java.base/jdk.internal.loader=ALL-UNNAMED
 								--add-opens java.base/java.security=ALL-UNNAMED
