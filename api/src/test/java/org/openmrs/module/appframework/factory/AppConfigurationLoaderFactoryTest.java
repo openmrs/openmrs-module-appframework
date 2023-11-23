@@ -26,7 +26,6 @@ public class AppConfigurationLoaderFactoryTest extends BaseModuleContextSensitiv
     AllFreeStandingExtensions allFreeStandingExtensions;
 
     @Test
-    @DirtiesContext
     public void testConfigurationLoad() throws IOException {
 
         List<AppDescriptor> appDescriptors = appConfigurationLoaderFactory.getAppDescriptors();

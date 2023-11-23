@@ -35,10 +35,11 @@
     </modules>
 	
 	<properties>
-		<openMRSVersion>1.9.9</openMRSVersion>
+		<openMRSVersion>2.0.0</openMRSVersion>
 		<webservicesRestVersion>2.21.0</webservicesRestVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <handlebarsVersion>1.1.2</handlebarsVersion>
+		<graalvm.version>19.0.0</graalvm.version>
 	</properties>
 
 	<dependencyManagement>
@@ -137,6 +138,32 @@
                 </exclusions>
             </dependency>
 
+			<dependency>
+				<groupId>org.graalvm.js</groupId>
+				<artifactId>js</artifactId>
+				<version>${graalvm.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.graalvm.js</groupId>
+				<artifactId>js-scriptengine</artifactId>
+				<version>${graalvm.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.thoughtworks.xstream</groupId>
+				<artifactId>xstream</artifactId>
+				<version>1.4.17</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>jakarta.xml.bind</groupId>
+				<artifactId>jakarta.xml.bind-api</artifactId>
+				<scope>test</scope>
+				<version>2.3.2</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -147,8 +174,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<target>1.6</target>
-						<source>1.6</source>
+						<target>1.7</target>
+						<source>1.7</source>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -194,10 +221,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.22.1</version>
-					<configuration>
-						<argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -234,6 +257,29 @@
             <url>https://mavenrepo.openmrs.org/snapshots</url>
         </snapshotRepository>
 	</distributionManagement>
+
+	<profiles>
+		<profile>
+			<id>Java 17</id>
+			<activation>
+				<jdk>17</jdk>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<argLine>--add-opens java.base/java.lang=ALL-UNNAMED
+								--add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+								--add-opens java.base/java.security=ALL-UNNAMED
+							</argLine>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	
 
 </project>

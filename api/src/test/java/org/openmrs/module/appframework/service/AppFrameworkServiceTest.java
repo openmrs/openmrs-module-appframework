@@ -56,7 +56,6 @@ import org.openmrs.util.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
-@DirtiesContext
 public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 	
 	public static final String LOCATION_UUID1 = "6f42abbc-caac-40ae-a94e-9277ea15c125";
@@ -438,7 +437,6 @@ public class AppFrameworkServiceTest extends BaseModuleContextSensitiveTest {
 		assertEquals(--originalAppDescriptorCount, appFrameworkService.getAllApps().size());
 	}
 	
-	@DirtiesContext
 	@Test
 	public void getLoginLocations_shouldReturnLoginLocationsConfiguredForTheUser() {
 		LocationTag tag = new LocationTag();
