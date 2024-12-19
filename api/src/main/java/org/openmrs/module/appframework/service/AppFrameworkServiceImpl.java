@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.appframework.service;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,15 +44,16 @@ import org.openmrs.module.appframework.repository.AllFreeStandingExtensions;
 import org.openmrs.module.appframework.repository.AllUserApps;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * It is a default implementation of {@link AppFrameworkService}.
@@ -60,28 +62,30 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
 	private final Log log = LogFactory.getLog(getClass());
 
-	private AllAppTemplates allAppTemplates;
+	private final AllAppTemplates allAppTemplates;
 
-	private AllAppDescriptors allAppDescriptors;
+	private final AllAppDescriptors allAppDescriptors;
 
-	private AllFreeStandingExtensions allFreeStandingExtensions;
+	private final AllFreeStandingExtensions allFreeStandingExtensions;
 
-	private AllComponentsState allComponentsState;
+	private final AllComponentsState allComponentsState;
 
-	private LocationService locationService;
+	private final LocationService locationService;
 
-	private FeatureToggleProperties featureToggles;
+	private final FeatureToggleProperties featureToggles;
 
-	private AppFrameworkConfig appFrameworkConfig;
+	private final AppFrameworkConfig appFrameworkConfig;
 
-	private ScriptEngine javascriptEngine;
+	private final ScriptEngine javascriptEngine;
 
-	private AllUserApps allUserApps;
+	private final AllUserApps allUserApps;
+
+	private final Map<String, String> requireExpressionScripts = new LinkedHashMap<>();
 
 	public AppFrameworkServiceImpl(AllAppTemplates allAppTemplates, AllAppDescriptors allAppDescriptors,
 	    AllFreeStandingExtensions allFreeStandingExtensions, AllComponentsState allComponentsState,
 	    LocationService locationService, FeatureToggleProperties featureToggles, AppFrameworkConfig appFrameworkConfig,
-	    AllUserApps allUserApps) throws ScriptException {
+	    AllUserApps allUserApps) {
 		this.allAppTemplates = allAppTemplates;
 		this.allAppDescriptors = allAppDescriptors;
 		this.allFreeStandingExtensions = allFreeStandingExtensions;
@@ -93,29 +97,17 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
 		this.allUserApps = allUserApps;
 
-
-		// there is surely a cleaner way to define this utility function in the global scope
-		this.javascriptEngine.eval("function hasMemberWithProperty(list, propName, val) { " + "if (!list) { return false; } "
-		        + "var i, len=list.length; " + "for (i=0; i<len; ++i) { "
-		        + "  if (list[i][propName] == val) { return true; } " + "} " + "return false; " + "}");
-		Object hasMemberWithProperty = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("hasMemberWithProperty");
-		javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("hasMemberWithProperty", hasMemberWithProperty);
-
-		this.javascriptEngine.eval("function some(list, func) { " + "if (!list) { return false; } "
-                + "var i, len=list.length; " + "for (i=0; i<len; ++i) { "
-                + "  if (func(list[i]) === true) { return true; } " + "} " + "return false; " + "}");
-        Object some = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("some");
-        javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("some", some);
-
-		this.javascriptEngine.eval("function fullMonthsBetweenDates(earlierDate, laterDate) { "
-				+ "var d1 = new Date(earlierDate); "
-				+ "var d2 = new Date(laterDate); "
-				+ "var monthsBetween = ((d2.getFullYear() - d1.getFullYear()) * 12) + (d2.getMonth() - d1.getMonth()); "
-				+ "if (d2.getDate() < d1.getDate()) { monthsBetween = monthsBetween - 1; } "
-				+ "return monthsBetween; "
-				+ "}");
-		Object fullMonthsBetweenDates = javascriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).get("fullMonthsBetweenDates");
-		javascriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE).put("fullMonthsBetweenDates", fullMonthsBetweenDates);
+		String[] scripts = {"hasMemberWithProperty", "some", "fullMonthsBetweenDates"};
+		for (String key : scripts) {
+			String resource = "scripts/" + key + ".js";
+			try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resource)) {
+				String value = IOUtils.toString(Objects.requireNonNull(inputStream), "UTF-8");
+				requireExpressionScripts.put(key, value);
+			}
+			catch (Exception e) {
+				throw new IllegalStateException("Unable to load script from classpath: " + resource, e);
+			}
+		}
 	}
 
 	@Override
@@ -322,57 +314,81 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 	}
 
 	@Override
+	public void addRequireExpressionScript(String key, String value) {
+		requireExpressionScripts.put(key, value);
+	}
+
+	@Override
+	public String getRequireExpressionContext(AppContextModel contextModel) throws Exception {
+		StringBuilder script = new StringBuilder();
+		for (String key : requireExpressionScripts.keySet()) {
+			script.append(System.lineSeparator());
+			script.append(requireExpressionScripts.get(key));
+			script.append(System.lineSeparator());
+		}
+		script.append(System.lineSeparator());
+
+		// If any properties in contextModel are Maps, we want to allow scripts to access their subproperties
+		// with dot notation, but ScriptEngine and Bindings don't naturally handle this. Instead we will convert
+		// all Map-type properties to JSON and use this to define objects directly within the ScriptEngine.
+		// (Properties that are not Maps don't need this special treatment.)
+		ObjectMapper objectMapper = new ObjectMapper();
+		Map<String, Object> mapProperties = new HashMap<>();
+		for (Map.Entry<String, Object> e : contextModel.entrySet()) {
+			if (e.getValue() instanceof Map) {
+				mapProperties.put(e.getKey(), e.getValue());
+			}
+			else if(!"util".equals(e.getKey())) {
+				script.append("var ").append(e.getKey()).append(" = ");
+				script.append(objectMapper.writeValueAsString(e.getValue())).append(";");
+				script.append(System.lineSeparator());
+			}
+		}
+
+		for (Map.Entry<String, Object> e : mapProperties.entrySet()) {
+			try {
+				script.append("var ").append(e.getKey()).append(" = ");
+				script.append(objectMapper.writeValueAsString(e.getValue())).append(";");
+				script.append(System.lineSeparator());
+			}
+			catch (Exception ex) {
+				StringBuilder extraInfo = new StringBuilder();
+				extraInfo.append("type:").append(e.getValue().getClass().getName());
+				if (e.getValue() instanceof Map) {
+					Map<?, ?> map = (Map<?, ?>) e.getValue();
+					extraInfo.append(" properties:");
+					for (Map.Entry<?, ?> entry : map.entrySet()) {
+						extraInfo.append(" ").append(entry.getKey().toString()).append(":");
+						extraInfo.append(entry.getValue() == null ? "null" : entry.getValue().getClass().toString());
+					}
+				}
+				throw new IllegalStateException("Failed to set '" + e.getKey() + "' variable (" + extraInfo + ")", ex);
+			}
+		}
+		script.append(System.lineSeparator());
+		return script.toString();
+	}
+
+	@Override
 	public boolean checkRequireExpression(Requireable candidate, AppContextModel contextModel) {
 		try {
-			String requireExpression = candidate.getRequire();
-			if (StringUtils.isBlank(requireExpression)) {
-				return true;
-			} else {
-				// If any properties in contextModel are Maps, we want to allow scripts to access their subproperties
-				// with dot notation, but ScriptEngine and Bindings don't naturally handle this. Instead we will convert
-				// all Map-type properties to JSON and use this to define objects directly within the ScriptEngine.
-				// (Properties that are not Maps don't need this special treatment.)
-				ObjectMapper objectMapper = new ObjectMapper();
-				Map<String, Object> mapProperties = new HashMap<>();
-				for (Map.Entry<String, Object> e : contextModel.entrySet()) {
-					if (e.getValue() instanceof Map) {
-						mapProperties.put(e.getKey(), e.getValue());
-					}
-					else if(!"util".equals(e.getKey())) {
-						javascriptEngine.eval("var " + e.getKey() + " = " + objectMapper.writeValueAsString(e.getValue()) + ";");
-					}
-				}
-
-				for (Map.Entry<String, Object> e : mapProperties.entrySet()) {
-					try {
-						javascriptEngine.eval("var " + e.getKey() + " = " + objectMapper.writeValueAsString(e.getValue()) + ";");
-					}
-					catch (Exception ex) {
-						StringBuilder extraInfo = new StringBuilder();
-						extraInfo.append("type:").append(e.getValue().getClass().getName());
-						if (e.getValue() instanceof Map) {
-							Map<?, ?> map = (Map<?, ?>) e.getValue();
-							extraInfo.append(" properties:");
-							for (Map.Entry entry : map.entrySet()) {
-								extraInfo.append(" ").append(entry.getKey().toString()).append(":")
-										.append(entry.getValue() == null ? "null" : entry.getValue().getClass().toString());
-							}
-						}
-						log.error("Failed to set '" + e.getKey() + "' scope variable (" + extraInfo
-										+ ") while evaluating require check for " + candidate.getClass().getSimpleName()
-										.toLowerCase() + " " + candidate.getId(),
-								ex);
-						return false;
-					}
-				}
-
-				return javascriptEngine.eval("(" + requireExpression + ") == true").equals(Boolean.TRUE);
-			}
-
+			return checkRequireExpressionStrict(candidate, contextModel);
 		}
 		catch (Exception e) {
-			log.error("Failed to evaluate 'require' check for extension " + candidate.getId(), e);
+			log.error("Failed to evaluate 'require' check for extension " + candidate.getId());
 			return false;
+		}
+	}
+
+	@Override
+	public boolean checkRequireExpressionStrict(Requireable candidate, AppContextModel contextModel) throws Exception {
+		String requireExpression = candidate.getRequire();
+		if (StringUtils.isBlank(requireExpression)) {
+			return true;
+		}
+		else {
+			String script = getRequireExpressionContext(contextModel) + System.lineSeparator() + requireExpression;
+			return javascriptEngine.eval(script).equals(Boolean.TRUE);
 		}
 	}
 
