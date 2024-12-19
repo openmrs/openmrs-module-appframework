@@ -169,7 +169,20 @@ public interface AppFrameworkService extends OpenmrsService {
     void purgeUserApp(UserApp userApp);
 
 	/**
+	 * Enables dependent modules to add additional helper function scripts to the javascript expression content
+	 * @since 2.18.0
+	 */
+	void addRequireExpressionScript(String key, String value);
+
+	/**
+	 * @since 2.18.0
+	 * @return the script containing variables and functions that are available when evaluating a "require" expression
+	 */
+	String getRequireExpressionContext(AppContextModel contextModel) throws Exception;
+
+	/**
 	 * Checks whether a Requireable object should be included in the current context
+	 * Will return false if the evaluation results in an exception
 	 *
 	 * @since 2.15.0
 	 * @param candidate the requireable object to check
@@ -177,4 +190,15 @@ public interface AppFrameworkService extends OpenmrsService {
 	 * @return true if the requireable should be included in this context; false otherwise
 	 */
 	boolean checkRequireExpression(Requireable candidate, AppContextModel contextModel);
+
+	/**
+	 * Checks whether a Requireable object should be included in the current context
+	 * Will throw an exception if the evaluation results in an exception
+	 *
+	 * @since 2.18.0
+	 * @param candidate the requireable object to check
+	 * @param contextModel the current context to check against
+	 * @return true if the requireable should be included in this context; false otherwise
+	 */
+	boolean checkRequireExpressionStrict(Requireable candidate, AppContextModel contextModel) throws Exception;
 }
