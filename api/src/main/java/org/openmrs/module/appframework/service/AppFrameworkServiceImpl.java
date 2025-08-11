@@ -58,6 +58,7 @@ import java.util.Objects;
 /**
  * It is a default implementation of {@link AppFrameworkService}.
  */
+@Transactional
 public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFrameworkService {
 
 	private final Log log = LogFactory.getLog(getClass());
