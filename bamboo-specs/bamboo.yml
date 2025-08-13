@@ -11,6 +11,8 @@ stages:
     final: false
     jobs:
     - Build and Test JDK 8
+    - Build and Test JDK 11
+    - Build and Test JDK 17
 - Deploy:
     manual: false
     final: false
@@ -36,6 +38,40 @@ Build and Test JDK 8:
         set -x
 
         docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" maven:3.9.9-amazoncorretto-8 bash -c 'mvn clean package -B'
+      description: Build and test
+  artifact-subscriptions: []
+Build and Test JDK 11:
+  key: BTJ11
+  tasks:
+  - checkout:
+      force-clean-build: false
+      description: Checkout default repository
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        #!/bin/bash -eu
+
+        set -x
+
+        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" maven:3.9.9-amazoncorretto-11 bash -c 'mvn clean package'
+      description: Build and test
+  artifact-subscriptions: []
+Build and Test JDK 17:
+  key: BTJ17
+  tasks:
+  - checkout:
+      force-clean-build: false
+      description: Checkout default repository
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        #!/bin/bash -eu
+
+        set -x
+
+        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" maven:3.9.9-amazoncorretto-17 bash -c 'mvn clean package'
       description: Build and test
   artifact-subscriptions: []
 Deploy to Maven:
