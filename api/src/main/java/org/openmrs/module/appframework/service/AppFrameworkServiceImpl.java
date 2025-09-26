@@ -15,6 +15,7 @@ package org.openmrs.module.appframework.service;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -388,6 +389,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			return true;
 		}
 		else {
+			requireExpression = StringEscapeUtils.unescapeHtml4(requireExpression);
 			String script = getRequireExpressionContext(contextModel) + System.lineSeparator() + requireExpression;
 			return javascriptEngine.eval(script).equals(Boolean.TRUE);
 		}

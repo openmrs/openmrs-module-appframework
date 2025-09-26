@@ -190,7 +190,16 @@ public class AppFrameworkServiceImplTest  {
         assertTrue(service.checkRequireExpression(extensionRequiring("visit.active"), contextModel));
         assertTrue(service.checkRequireExpression(extensionRequiring("visit.active || visit.admitted"), contextModel));
         assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted"), contextModel));
-        assertFalse(service.checkRequireExpression(extensionRequiring("visit.admitted && visit.admitted"), contextModel));
+        assertFalse(service.checkRequireExpression(extensionRequiring("visit.active && visit.admitted"), contextModel));
+    }
+
+    @Test
+    public void testCheckRequireExpressionWithHtmlEscapedCharacters() throws Exception {
+        VisitStatus visit = new VisitStatus(true, true);
+        AppContextModel contextModel = new AppContextModel();
+        contextModel.put("visit", visit);
+        assertTrue(service.checkRequireExpression(extensionRequiring("visit.active && visit.admitted"), contextModel));
+        assertTrue(service.checkRequireExpression(extensionRequiring("visit.active &amp;&amp; visit.admitted"), contextModel));
     }
 
     @Test
