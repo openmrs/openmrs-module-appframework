@@ -378,6 +378,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		}
 		catch (Exception e) {
 			log.error("Failed to evaluate 'require' check for extension " + candidate.getId());
+			log.debug(e);
 			return false;
 		}
 	}
