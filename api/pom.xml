@@ -13,70 +13,12 @@
 	<description>API project for AppFramework</description>
 
 	<dependencies>
-
-		<!-- Begin OpenMRS core -->
-
-		<dependency>
-			<groupId>org.openmrs.api</groupId>
-			<artifactId>openmrs-api</artifactId>
-			<type>jar</type>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.web</groupId>
-			<artifactId>openmrs-web</artifactId>
-			<type>jar</type>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.api</groupId>
-			<artifactId>openmrs-api</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.web</groupId>
-			<artifactId>openmrs-web</artifactId>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.test</groupId>
-			<artifactId>openmrs-test</artifactId>
-			<type>pom</type>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- End OpenMRS core -->
-
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>appframework-appsfortesting</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.github.jknack</groupId>
-            <artifactId>handlebars</artifactId>
-        </dependency>
-
-		<dependency>
-			<groupId>org.graalvm.js</groupId>
-			<artifactId>js</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.graalvm.js</groupId>
-			<artifactId>js-scriptengine</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-		</dependency>
 
 		<!-- For Testing -->
 		<dependency>
@@ -85,7 +27,6 @@
 			<version>2.10.10</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -103,30 +44,6 @@
 			</testResource>
 		</testResources>
 
-        <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.liquibase</groupId>-->
-                <!--<artifactId>liquibase-maven-plugin</artifactId>-->
-                <!--<version>2.0.1</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>run-postgres-change-sets</id>-->
-                        <!--<phase>initialize</phase>-->
-                        <!--<configuration>-->
-                            <!--<changeLogFile>src/main/resources/liquibase.xml</changeLogFile>-->
-                            <!--<driver>org.postgresql.Driver</driver>-->
-                            <!--<url>jdbc:postgresql://${postgres.server}/${postgres.db}</url>-->
-                            <!--<username>${postgres.user}</username>-->
-                            <!--<password>${postgres.password}</password>-->
-                            <!--<defaultSchemaName>${postgres.schema}</defaultSchemaName>-->
-                        <!--</configuration>-->
-                        <!--<goals>-->
-                            <!--<goal>update</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
-        </plugins>
 	</build>
 
 </project>
