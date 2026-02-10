@@ -255,7 +255,7 @@
 		<profile>
 			<id>Java 17</id>
 			<activation>
-				<jdk>17</jdk>
+				<jdk>[11,)</jdk>
 			</activation>
 			<build>
 				<plugins>
@@ -263,7 +263,8 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
-							<argLine>--add-opens java.base/java.lang=ALL-UNNAMED
+							<argLine>
+								--add-opens java.base/java.lang=ALL-UNNAMED
 								--add-opens java.base/jdk.internal.loader=ALL-UNNAMED
 								--add-opens java.base/java.security=ALL-UNNAMED
 							</argLine>
