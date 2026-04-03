@@ -78,7 +78,10 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 
 	private final AppFrameworkConfig appFrameworkConfig;
 
-	private final ScriptEngine javascriptEngine;
+    private final ThreadLocal<ScriptEngine> javascriptEngine = ThreadLocal.withInitial(() -> {
+        System.setProperty("polyglot.js.nashorn-compat", "true");
+        return new ScriptEngineManager().getEngineByName("JavaScript");
+    });
 
 	private final AllUserApps allUserApps;
 
@@ -95,8 +98,6 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		this.locationService = locationService;
 		this.featureToggles = featureToggles;
 		this.appFrameworkConfig = appFrameworkConfig;
-		System.setProperty("polyglot.js.nashorn-compat", "true");
-		this.javascriptEngine = new ScriptEngineManager().getEngineByName("JavaScript");
 		this.allUserApps = allUserApps;
 
 		String[] scripts = {"hasMemberWithProperty", "some", "fullMonthsBetweenDates"};
@@ -393,7 +394,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		else {
 			requireExpression = StringEscapeUtils.unescapeHtml4(requireExpression);
 			String script = getRequireExpressionContext(contextModel) + System.lineSeparator() + requireExpression;
-			return javascriptEngine.eval(script).equals(Boolean.TRUE);
+			return javascriptEngine.get().eval(script).equals(Boolean.TRUE);
 		}
 	}
 
