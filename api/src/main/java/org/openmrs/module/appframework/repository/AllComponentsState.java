@@ -3,12 +3,16 @@ package org.openmrs.module.appframework.repository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
-import org.openmrs.api.db.hibernate.DbSessionFactory;  
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.module.appframework.domain.ComponentState;
 import org.openmrs.module.appframework.domain.ComponentType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class AllComponentsState {
@@ -52,5 +56,16 @@ public class AllComponentsState {
         criteria.add(Restrictions.eq("componentId", componentId));
         criteria.add(Restrictions.eq("componentType", type));
         return (ComponentState) criteria.uniqueResult();
+    }
+
+    public Map<String, ComponentState> getComponentStatesFromDB(ComponentType type) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ComponentState.class);
+        criteria.add(Restrictions.eq("componentType", type));
+        List<ComponentState> rows = criteria.list();
+        Map<String, ComponentState> map = new HashMap<>(rows.size());
+        for (ComponentState cs : rows) {
+            map.put(cs.getComponentId(), cs);
+        }
+        return map;
     }
 }

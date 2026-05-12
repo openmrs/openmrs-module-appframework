@@ -34,6 +34,8 @@ public class FeatureToggleProperties {
 
     private Log log = LogFactory.getLog(getClass());
     private File propertiesFile;
+    private Properties cachedToggles;
+    private long cachedTogglesLastModified = -1;
 
     FeatureToggleProperties() {
         String propertiesFileName = System.getenv(FEATURE_TOGGLE_PROPERTIES_ENV);
@@ -47,6 +49,8 @@ public class FeatureToggleProperties {
     // TODO: find a better way to this--this public setter is just used to override the file in test scripts
     public void setPropertiesFile(File propertiesFile) {
         this.propertiesFile = propertiesFile;
+        this.cachedToggles = null;
+        this.cachedTogglesLastModified = -1;
     }
 
     public boolean isFeatureEnabled(String key) {
@@ -59,19 +63,20 @@ public class FeatureToggleProperties {
         return Collections.unmodifiableMap(toggles);
     }
 
-    private Properties loadToggles() {
-        Properties toggles = new Properties();
-
-        if(propertiesFile.exists()){
-            try {
-                FileInputStream inputStream = new FileInputStream(propertiesFile);
-                toggles.load(inputStream);
-                inputStream.close();
-            } catch (IOException e) {
-                log.error("Problem loading feature_toggles.properties file. Error: ", e);
+    private synchronized Properties loadToggles() {
+        long lastModified = propertiesFile.exists() ? propertiesFile.lastModified() : -1;
+        if (cachedToggles == null || lastModified != cachedTogglesLastModified) {
+            Properties toggles = new Properties();
+            if (propertiesFile.exists()) {
+                try (FileInputStream inputStream = new FileInputStream(propertiesFile)) {
+                    toggles.load(inputStream);
+                } catch (IOException e) {
+                    log.error("Problem loading feature_toggles.properties file. Error: ", e);
+                }
             }
+            cachedToggles = toggles;
+            cachedTogglesLastModified = lastModified;
         }
-
-        return toggles;
+        return cachedToggles;
     }
 }

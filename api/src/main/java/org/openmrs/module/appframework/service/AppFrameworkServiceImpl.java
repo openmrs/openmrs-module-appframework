@@ -146,10 +146,13 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		// first just get all apps
 		List<AppDescriptor> appDescriptors = getAllApps();
 
+		// bulk-load all component states once before the loop
+		Map<String, ComponentState> componentStatesById = allComponentsState.getComponentStatesFromDB(ComponentType.APP);
+
 		// find out which ones are disabled
 		List<AppDescriptor> disabledAppDescriptors = new ArrayList<AppDescriptor>();
 		for (AppDescriptor appDescriptor : appDescriptors) {
-			if (disabledByComponentState(appDescriptor) || disabledByFeatureToggle(appDescriptor)
+			if (disabledByComponentState(appDescriptor, componentStatesById) || disabledByFeatureToggle(appDescriptor)
 			        || disabledByAppFrameworkConfig(appDescriptor)) {
 				disabledAppDescriptors.add(appDescriptor);
 			}
@@ -160,8 +163,8 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		return appDescriptors;
 	}
 
-	private boolean disabledByComponentState(AppDescriptor appDescriptor) {
-		ComponentState componentState = allComponentsState.getComponentState(appDescriptor.getId(), ComponentType.APP);
+	private boolean disabledByComponentState(AppDescriptor appDescriptor, Map<String, ComponentState> componentStatesById) {
+		ComponentState componentState = componentStatesById.get(appDescriptor.getId());
 		return componentState != null && !componentState.getEnabled();
 	}
 
@@ -303,17 +306,44 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 		List<Extension> extensions = new ArrayList<Extension>();
 		UserContext userContext = Context.getUserContext();
 
+		// pre-compute the JS context string once for all extensions in this call
+		String requireContext = null;
+		if (contextModel != null) {
+			try {
+				requireContext = getRequireExpressionContext(contextModel);
+			} catch (Exception e) {
+				log.error("Failed to pre-compute require expression context", e);
+			}
+		}
+
 		for (Extension candidate : getAllEnabledExtensions(extensionPointId)) {
 			if ((candidate.getBelongsTo() == null
 			        || hasPrivilege(userContext, candidate.getBelongsTo().getRequiredPrivilege()))
 			        && hasPrivilege(userContext, candidate.getRequiredPrivilege())) {
-				if (contextModel == null || checkRequireExpression(candidate, contextModel)) {
+				if (contextModel == null || (requireContext != null && checkRequireExpressionWithContext(candidate, requireContext))) {
 					extensions.add(candidate);
 				}
 			}
 		}
 
 		return extensions;
+	}
+
+	private boolean checkRequireExpressionWithContext(Requireable candidate, String precomputedContext) {
+		String requireExpression = candidate.getRequire();
+		if (StringUtils.isBlank(requireExpression)) {
+			return true;
+		}
+		try {
+			requireExpression = StringEscapeUtils.unescapeHtml4(requireExpression);
+			String script = precomputedContext + System.lineSeparator() + requireExpression;
+			return javascriptEngine.get().eval(script).equals(Boolean.TRUE);
+		} catch (Exception e) {
+			log.error("Failed to evaluate 'require' check for extension " + candidate.getId());
+			log.error("Expression: " + candidate.getRequire());
+			log.error(e);
+			return false;
+		}
 	}
 
 	@Override
