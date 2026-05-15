@@ -71,7 +71,8 @@ public class FeatureToggleProperties {
                 try (FileInputStream inputStream = new FileInputStream(propertiesFile)) {
                     toggles.load(inputStream);
                 } catch (IOException e) {
-                    log.error("Problem loading feature_toggles.properties file. Error: ", e);
+                    throw new IllegalStateException("Problem loading feature_toggles.properties file.", e);
+                    
                 }
             }
             cachedToggles = toggles;

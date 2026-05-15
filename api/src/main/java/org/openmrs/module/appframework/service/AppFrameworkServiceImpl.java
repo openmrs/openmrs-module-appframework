@@ -312,7 +312,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			try {
 				requireContext = getRequireExpressionContext(contextModel);
 			} catch (Exception e) {
-				log.error("Failed to pre-compute require expression context", e);
+				throw new IllegalStateException("Failed to pre-compute require expression context", e);
 			}
 		}
 
@@ -320,7 +320,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			if ((candidate.getBelongsTo() == null
 			        || hasPrivilege(userContext, candidate.getBelongsTo().getRequiredPrivilege()))
 			        && hasPrivilege(userContext, candidate.getRequiredPrivilege())) {
-				if (contextModel == null || (requireContext != null && checkRequireExpressionWithContext(candidate, requireContext))) {
+				if (contextModel == null || checkRequireExpressionWithContext(candidate, requireContext)) {
 					extensions.add(candidate);
 				}
 			}
@@ -339,10 +339,7 @@ public class AppFrameworkServiceImpl extends BaseOpenmrsService implements AppFr
 			String script = precomputedContext + System.lineSeparator() + requireExpression;
 			return javascriptEngine.get().eval(script).equals(Boolean.TRUE);
 		} catch (Exception e) {
-			log.error("Failed to evaluate 'require' check for extension " + candidate.getId());
-			log.error("Expression: " + candidate.getRequire());
-			log.error(e);
-			return false;
+			throw new IllegalStateException("Failed to evaluate 'require' check for extension " + candidate.getId() + ", Expression: " + candidate.getRequire(), e);
 		}
 	}
 
